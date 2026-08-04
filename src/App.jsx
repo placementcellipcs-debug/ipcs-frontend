@@ -94,7 +94,6 @@ const GlobalStyle = () => {
       .tnc-content-box ul { margin-top: 0; padding-left: 20px; margin-bottom: 20px; }
       .tnc-content-box p { margin-top: 0; margin-bottom: 15px; }
 
-      /* Animation/Confetti classes */
       .celebration-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 23, 0.85); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); border-radius: 20px; }
       .celebration-content { text-align: center; animation: fadeInUp 0.4s ease; }
       .party-emoji { font-size: 4rem; display: block; margin-bottom: 10px; animation: pulse 1s infinite; }
@@ -113,31 +112,36 @@ const GlobalStyle = () => {
       .avatar-circle { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; border: 2px solid rgba(56, 189, 248, 0.4); overflow: hidden;}
       .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
       
-      .dashboard-content { padding: 2rem; max-width: 1200px; width: 100%; margin: 0 auto; }
-      .dash-top-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-      .hero-banner { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.8rem 2rem; display: flex; flex-direction: column; justify-content: center; height: 100%; }
-      .greeting-subtitle { color: #f59e0b; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;}
-      .hero-banner h2 { margin: 0 0 8px 0; font-size: 1.8rem; font-weight: 800; }
-      .full-date-subtext { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; }
+      .dashboard-content { padding: 2rem; max-width: 1300px; width: 100%; margin: 0 auto; animation: fadeInUp 0.3s ease; }
+      .dash-top-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+      
+      /* Dashboard Hero Banner with Student Photo & Gradient System */
+      .hero-banner { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+      .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); }
+      .hero-banner-avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--bg-dark); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
+      .hero-banner-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+      .greeting-subtitle { color: var(--accent-cyan); font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;}
+      .hero-banner h2 { margin: 0 0 6px 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; }
+      .full-date-subtext { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; }
       
       .vacancy-quick-banner { background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%); border: 1px solid #6366f1; border-radius: 16px; padding: 1.2rem 1.8rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
       .vacancy-quick-banner:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); }
       
-      .quick-actions-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; }
+      .quick-actions-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
       .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
-      .qa-btn { background: var(--bg-dark); border: 1px solid var(--card-border); padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 12px; color: var(--text-main); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+      .qa-btn { background: var(--bg-dark); border: 1px solid var(--card-border); padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 12px; color: var(--text-main); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
       .qa-btn:hover { border-color: var(--accent-cyan); transform: translateY(-2px); }
       .qa-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
       
       .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
-      .stat-card-new { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem; transition: transform 0.2s;}
+      .stat-card-new { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem; transition: transform 0.2s; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
       .stat-card-new:hover { transform: translateY(-2px); }
       .stat-icon-wrapper { width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
       .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px; line-height: 1.1; }
       .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
 
       /* --- EVENTS --- */
-      .upcoming-wrapper { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; }
+      .upcoming-wrapper { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
       .event-row-card { display: flex; align-items: center; background: var(--bg-dark); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; transition: border-color 0.2s; }
       .event-row-card:hover { border-color: var(--accent-cyan); }
       .event-date-box { width: 85px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 2px solid var(--input-border); padding-right: 1.2rem; margin-right: 1.2rem; }
@@ -149,15 +153,26 @@ const GlobalStyle = () => {
       .ev-meta { display: flex; align-items: center; gap: 15px; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
       .ev-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
       
-      /* --- SIDE DRAWER --- */
-      .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; display: flex; justify-content: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+      /* --- LIQUID GLASS NOTIFICATIONS --- */
+      .notif-dropdown { position: absolute; top: 55px; right: 0; width: 340px; background: rgba(19, 25, 36, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); z-index: 1000; overflow: hidden; transform-origin: top right; animation: fadeInUp 0.2s ease; }
+      .notif-item { padding: 14px 18px; border-bottom: 1px solid var(--card-border); cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; gap: 4px; }
+      .notif-item:hover { background: rgba(255,255,255,0.05); }
+      .notif-item:last-child { border-bottom: none; }
+      .notif-read { opacity: 0.45; text-decoration: line-through; }
+
+      /* --- SIDE DRAWER WITH COVER BANNER --- */
+      .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 1000; display: flex; justify-content: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
       .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-      .drawer-card { width: 100%; max-width: 320px; height: 100%; background: var(--card-bg); color: var(--text-main); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow:-10px 0 30px rgba(0,0,0,0.3); }
+      .drawer-card { width: 100%; max-width: 340px; height: 100%; background: var(--card-bg); color: var(--text-main); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow:-10px 0 40px rgba(0,0,0,0.5); }
       .drawer-overlay.open .drawer-card { transform: translateX(0); }
-      .drawer-header { background: #3b82f6; color: #ffffff; padding: 2rem 1.5rem 1.5rem 1.5rem; position: relative; }
-      .drawer-close-btn { position: absolute; top: 1rem; right: 1rem; width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; }
-      .drawer-profile-row { display: flex; align-items: center; gap: 1rem; }
-      .drawer-avatar { width: 60px; height: 60px; border-radius: 50%; background: #ffffff; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; overflow: hidden; border: 2px solid rgba(255,255,255,0.3); }
+      
+      .drawer-header-cover { position: relative; height: 160px; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.2rem; }
+      .drawer-header-cover::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, rgba(11,15,23,0.2) 0%, rgba(11,15,23,0.95) 100%); }
+      .drawer-close-btn { position: absolute; top: 1rem; right: 1rem; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; color: #fff; z-index: 2; }
+      .drawer-profile-row { position: relative; z-index: 2; display: flex; align-items: center; gap: 1rem; }
+      .drawer-avatar { width: 55px; height: 55px; border-radius: 50%; background: #ffffff; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; overflow: hidden; border: 2px solid #38bdf8; }
+      .drawer-avatar img { width: 100%; height: 100%; object-fit: cover; }
+      
       .drawer-menu { flex: 1; padding: 1rem 0; overflow-y: auto; }
       .drawer-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid var(--card-border); color: var(--text-main); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
       .drawer-item:hover { background: var(--hover-bg); color: var(--accent-cyan); }
@@ -168,7 +183,7 @@ const GlobalStyle = () => {
 
       /* --- TALENTINO --- */
       .talentino-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
-      .talentino-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.5rem; }
+      .talentino-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
       .t-stat-num { font-size: 2.2rem; font-weight: 800; color: var(--text-main); line-height: 1; margin-bottom: 10px; }
       .progress-bar { height: 8px; background: rgba(148, 163, 184, 0.15); border-radius: 10px; overflow: hidden; }
       .progress-fill { height: 100%; border-radius: 10px; transition: width 0.4s ease; background-color: #10b981;}
@@ -178,11 +193,11 @@ const GlobalStyle = () => {
       .star-rating .star.selected { color: #f59e0b; }
 
       /* --- PROFILE & SETTINGS --- */
-      .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: start; }
-      .profile-left-col { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 2rem 1.5rem; text-align: center; }
-      .profile-large-avatar { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 1rem auto; overflow: hidden; border: 3px solid var(--input-border); background: var(--bg-dark); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: var(--text-muted); cursor: pointer; position: relative;}
+      .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 1.8rem; align-items: start; }
+      .profile-left-col { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 1.5rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+      .profile-large-avatar { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 1rem auto; overflow: hidden; border: 3px solid var(--accent-cyan); background: var(--bg-dark); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: var(--text-muted); cursor: pointer; position: relative;}
       .profile-large-avatar img { width: 100%; height: 100%; object-fit: cover; }
-      .info-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.8rem; position: relative; margin-bottom: 1.5rem;}
+      .info-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.8rem; position: relative; margin-bottom: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2);}
       .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
       .doc-box { display: flex; align-items: center; justify-content: space-between; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 1rem 1.5rem; transition: border-color 0.2s; margin-bottom: 10px;}
       .settings-container { display: grid; grid-template-columns: 220px 1fr; gap: 2rem; align-items: start; }
@@ -190,8 +205,8 @@ const GlobalStyle = () => {
       .settings-tab.active { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); }
 
       /* --- VACANCIES --- */
-      .vacancies-hero { text-align: center; padding: 3rem 1.5rem 2.5rem 1.5rem; background: radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%); border-bottom: 1px solid var(--card-border); position: relative; }
-      .location-table-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; overflow-x: auto; }
+      .vacancies-hero { text-align: center; padding: 3rem 1.5rem 2.5rem 1.5rem; background: radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%); border-bottom: 1px solid var(--card-border); position: relative; border-radius: 20px; }
+      .location-table-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; overflow-x: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
       .vac-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 700px; }
       .vac-table th { background: var(--table-header); color: var(--text-muted); text-align: left; padding: 12px 16px; font-size: 0.78rem; text-transform: uppercase; }
       .vac-table td { padding: 14px 16px; border-bottom: 1px solid var(--card-border); color: var(--text-main); }
@@ -202,22 +217,22 @@ const GlobalStyle = () => {
       .status-applied { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
 
       .animate-fade-in { animation: fadeInUp 0.4s ease forwards; }
-      
-      .notif-dropdown { position: absolute; top: 50px; right: 0; width: 320px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; overflow: hidden; transform-origin: top right; animation: fadeInUp 0.2s ease; }
-      .notif-item { padding: 12px 16px; border-bottom: 1px solid var(--card-border); cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; gap: 4px; }
-      .notif-item:hover { background: var(--hover-bg); }
-      .notif-item:last-child { border-bottom: none; }
 
       .resume-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-      .resume-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; display: flex; align-items: center; gap: 1.2rem; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+      .resume-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; display: flex; align-items: center; gap: 1.2rem; cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
       .resume-card:hover { transform: translateY(-2px); border-color: var(--accent-cyan); }
       .resume-icon-box { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
 
+      /* --- MEDIA QUERIES FOR DYNAMIC RESPONSIVENESS (Laptop, Tablet, Phone, TV) --- */
+      @media (max-width: 1200px) {
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+      }
       @media (max-width: 900px) {
-        .landing-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+        .landing-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; padding: 2rem; }
         .hero-desc { margin: 0 auto 2.5rem auto; }
-        .profile-grid, .settings-container { grid-template-columns: 1fr; }
-        .dash-top-row, .dash-bottom-row, .stats-row { grid-template-columns: 1fr; }
+        .profile-grid, .settings-container, .dash-top-row { grid-template-columns: 1fr; }
+        .stats-row { grid-template-columns: 1fr; }
+        .talentino-summary-grid { grid-template-columns: 1fr; }
       }
       @media (max-width: 768px) {
         .landing-nav { flex-direction: column; gap: 1rem; padding: 1.5rem; }
@@ -229,12 +244,17 @@ const GlobalStyle = () => {
         .dashboard-content { padding: 1rem; }
         .resume-grid { grid-template-columns: 1fr; }
       }
+      @media (min-width: 1800px) {
+        .dashboard-content, .landing-grid { max-width: 1600px; }
+        body { font-size: 17px; }
+      }
     `}</style>
   );
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
+const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
 // ==========================================
 // 2. LOGIN / LANDING PAGE COMPONENT
@@ -316,9 +336,6 @@ function Login() {
 // ==========================================
 // 3. SIGNUP COMPONENT
 // ==========================================
-// ==========================================
-// 3. SIGNUP COMPONENT (UPDATED WITH DROPDOWNS & CUSTOM INPUTS)
-// ==========================================
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -377,7 +394,6 @@ function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     
-    // Strict Validations
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { setStatus({ type: 'error', message: 'Please enter a valid email format.' }); return; }
     if (!/^\d{10}$/.test(formData.phone)) { setStatus({ type: 'error', message: 'Your phone number must be exactly 10 digits.' }); return; }
     if (!/^\d{10}$/.test(formData.friend1Phone) || !/^\d{10}$/.test(formData.friend2Phone)) { setStatus({ type: 'error', message: 'Referral phone numbers must be exactly 10 digits.' }); return; }
@@ -385,7 +401,6 @@ function Signup() {
     if (formData.password !== formData.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match!' }); return; }
     if (!tncAccepted) { setStatus({ type: 'error', message: 'You must accept the Terms & Conditions.' }); return; }
 
-    // Resolve "Other" values if selected
     const resolvedQualification = formData.qualification === 'Other' ? formData.customQualification : formData.qualification;
     const resolvedStream = formData.stream === 'Other' ? formData.customStream : formData.stream;
 
@@ -453,51 +468,31 @@ function Signup() {
               <select name="branch" onChange={handleChange} defaultValue="" required>
                 <option value="" disabled>Select Branch</option>
                 <optgroup label="Kerala">
-                  <option value="Kochi">Kochi</option>
-                  <option value="Calicut">Calicut</option>
-                  <option value="Trivandrum">Trivandrum</option>
-                  <option value="Attingal">Attingal</option>
-                  <option value="Kollam">Kollam</option>
-                  <option value="Kannur">Kannur</option>
-                  <option value="Thrissur">Thrissur</option>
-                  <option value="Perinthalmanna">Perinthalmanna</option>
-                  <option value="Kottayam">Kottayam</option>
-                  <option value="Pathanamthitta">Pathanamthitta</option>
-                  <option value="Palakkad">Palakkad</option>
+                  <option value="Kochi">Kochi</option><option value="Calicut">Calicut</option><option value="Trivandrum">Trivandrum</option>
+                  <option value="Attingal">Attingal</option><option value="Kollam">Kollam</option><option value="Kannur">Kannur</option>
+                  <option value="Thrissur">Thrissur</option><option value="Perinthalmanna">Perinthalmanna</option><option value="Kottayam">Kottayam</option>
+                  <option value="Pathanamthitta">Pathanamthitta</option><option value="Palakkad">Palakkad</option>
                 </optgroup>
                 <optgroup label="Tamil Nadu">
-                  <option value="Coimbatore">Coimbatore</option>
-                  <option value="Chennai">Chennai</option>
-                  <option value="Tambaram">Tambaram</option>
-                  <option value="Trichy">Trichy</option>
-                  <option value="Salem">Salem</option>
-                  <option value="Madurai">Madurai</option>
-                  <option value="Erode">Erode</option>
-                  <option value="Tirunelveli">Tirunelveli</option>
+                  <option value="Coimbatore">Coimbatore</option><option value="Chennai">Chennai</option><option value="Tambaram">Tambaram</option>
+                  <option value="Trichy">Trichy</option><option value="Salem">Salem</option><option value="Madurai">Madurai</option>
+                  <option value="Erode">Erode</option><option value="Tirunelveli">Tirunelveli</option>
                 </optgroup>
                 <optgroup label="Karnataka">
-                  <option value="Bangalore">Bangalore</option>
-                  <option value="Mangalore">Mangalore</option>
-                  <option value="Mysore">Mysore</option>
+                  <option value="Bangalore">Bangalore</option><option value="Mangalore">Mangalore</option><option value="Mysore">Mysore</option>
                 </optgroup>
                 <optgroup label="Maharashtra">
-                  <option value="Mumbai">Mumbai</option>
-                  <option value="Pune">Pune</option>
-                  <option value="Nagpur">Nagpur</option>
+                  <option value="Mumbai">Mumbai</option><option value="Pune">Pune</option><option value="Nagpur">Nagpur</option>
                 </optgroup>
                 <optgroup label="West Bengal">
-                  <option value="Kolkata">Kolkata</option>
-                  <option value="Siliguri">Siliguri</option>
+                  <option value="Kolkata">Kolkata</option><option value="Siliguri">Siliguri</option>
                 </optgroup>
                 <optgroup label="Other States in India">
-                  <option value="Hyderabad (Telangana)">Hyderabad (Telangana)</option>
-                  <option value="Ranchi (Jharkhand)">Ranchi (Jharkhand)</option>
-                  <option value="Raipur (Chhattisgarh)">Raipur (Chhattisgarh)</option>
-                  <option value="Bhopal (Madhya Pradesh)">Bhopal (Madhya Pradesh)</option>
+                  <option value="Hyderabad (Telangana)">Hyderabad (Telangana)</option><option value="Ranchi (Jharkhand)">Ranchi (Jharkhand)</option>
+                  <option value="Raipur (Chhattisgarh)">Raipur (Chhattisgarh)</option><option value="Bhopal (Madhya Pradesh)">Bhopal (Madhya Pradesh)</option>
                 </optgroup>
                 <optgroup label="International (GCC)">
-                  <option value="Dubai (UAE)">Dubai (UAE)</option>
-                  <option value="Riyadh (Saudi Arabia)">Riyadh (Saudi Arabia)</option>
+                  <option value="Dubai (UAE)">Dubai (UAE)</option><option value="Riyadh (Saudi Arabia)">Riyadh (Saudi Arabia)</option>
                 </optgroup>
               </select>
             </div>
@@ -527,55 +522,30 @@ function Signup() {
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Joining Date *</label><input type="date" name="joiningDate" onChange={handleChange} required /></div>
             
-            {/* QUALIFICATION DROPDOWN WITH CONDITIONAL "OTHER" TEXTBOX */}
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Qualification *</label>
               <select name="qualification" onChange={handleChange} defaultValue="" required>
                 <option value="" disabled>Select Qualification</option>
-                <option value="SSLC">SSLC</option>
-                <option value="HSE">HSE</option>
-                <option value="ITI">ITI</option>
-                <option value="Diploma">Diploma</option>
-                <option value="B.Tech">B.Tech</option>
-                <option value="Bsc">Bsc</option>
-                <option value="PG">PG</option>
-                <option value="Other">Other</option>
+                <option value="SSLC">SSLC</option><option value="HSE">HSE</option><option value="ITI">ITI</option>
+                <option value="Diploma">Diploma</option><option value="B.Tech">B.Tech</option><option value="Bsc">Bsc</option>
+                <option value="PG">PG</option><option value="Other">Other</option>
               </select>
               {formData.qualification === 'Other' && (
-                <input 
-                  type="text" 
-                  name="customQualification" 
-                  placeholder="Specify Qualification" 
-                  onChange={handleChange} 
-                  required 
-                  style={{ marginTop: '0.6rem' }} 
-                />
+                <input type="text" name="customQualification" placeholder="Specify Qualification" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />
               )}
             </div>
           </div>
 
           <div className="grid-3col" style={{ marginTop: '1.1rem' }}>
-            {/* STREAM / BRANCH DROPDOWN WITH CONDITIONAL "OTHER" TEXTBOX */}
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Stream / Branch *</label>
               <select name="stream" onChange={handleChange} defaultValue="" required>
                 <option value="" disabled>Select Stream</option>
-                <option value="IT">IT</option>
-                <option value="EEE">EEE</option>
-                <option value="EC">EC</option>
-                <option value="Mechanical">Mechanical</option>
-                <option value="Science">Science</option>
-                <option value="Other">Other</option>
+                <option value="IT">IT</option><option value="EEE">EEE</option><option value="EC">EC</option>
+                <option value="Mechanical">Mechanical</option><option value="Science">Science</option><option value="Other">Other</option>
               </select>
               {formData.stream === 'Other' && (
-                <input 
-                  type="text" 
-                  name="customStream" 
-                  placeholder="Specify Stream / Branch" 
-                  onChange={handleChange} 
-                  required 
-                  style={{ marginTop: '0.6rem' }} 
-                />
+                <input type="text" name="customStream" placeholder="Specify Stream / Branch" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />
               )}
             </div>
 
@@ -635,7 +605,6 @@ function Signup() {
         </form>
       </div>
 
-      {/* CROP MODAL */}
       {showCropModal && (
         <div className="report-modal-overlay">
           <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
@@ -654,7 +623,6 @@ function Signup() {
         </div>
       )}
 
-      {/* TNC MODAL */}
       {showTncModal && (
         <div className="report-modal-overlay">
           <div className="report-card" style={{ maxWidth: '650px' }}>
@@ -723,21 +691,19 @@ function Dashboard() {
   const [data, setData] = useState({ stats: {}, events: [], appliedJobs: [], vacancies: [], attendanceHistory: [], tpoInfo: {} });
   const [theme, setTheme] = useState('dark');
   
-  // View State 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [tpoModal, setTpoModal] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
+  const [readNotifs, setReadNotifs] = useState(() => JSON.parse(localStorage.getItem('talentino_read_notifs') || '[]'));
 
-  // Talentino States
   const [gpsCoords, setGpsCoords] = useState(null);
   const [locStatus, setLocStatus] = useState("Capture my location");
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [attStatus, setAttStatus] = useState(null);
 
-  // Vacancy & Applying States
   const [jobModal, setJobModal] = useState(null);
   const [actionStatus, setActionStatus] = useState(null);
   const [showConsent, setShowConsent] = useState(false);
@@ -745,7 +711,6 @@ function Dashboard() {
   const [q2, setQ2] = useState(false); 
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Profile Edit / Document / Security States
   const [editProfileModal, setEditProfileModal] = useState(false);
   const [epData, setEpData] = useState({});
   const [epStatus, setEpStatus] = useState(null);
@@ -762,10 +727,18 @@ function Dashboard() {
     return match ? `https://lh3.googleusercontent.com/d/${match[1]}` : url;
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 4 && hour < 12) return { text: "Good Morning", emoji: "🌅" };
+    if (hour >= 12 && hour < 17) return { text: "Good Afternoon", emoji: "☀️" };
+    return { text: "Good Evening", emoji: "🌙" };
+  };
+  const greeting = getGreeting();
+
   const fetchDashboard = useCallback(async (storedUser) => {
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/data`, { 
-        email: storedUser.email, branch: storedUser.branch, course: storedUser.course 
+        email: storedUser.email, branch: storedUser.branch, course: storedUser.course, joiningDate: storedUser.joiningDate 
       });
       if(res.data.success) {
         setData(res.data);
@@ -815,14 +788,28 @@ function Dashboard() {
   const getNotifications = () => {
     let notifs = [];
     (data.appliedJobs || []).forEach(job => {
-      if (job.status !== 'Applied') notifs.push({ title: `Status Update: ${job.company}`, desc: `Your application status changed to ${job.status}.`, tab: 'status' });
+      notifs.push({ id: `job-${job.jobId}-${job.status}`, title: `Status Update: ${job.company}`, desc: `Your application status: ${job.status}.`, tab: 'status' });
     });
-    (data.events || []).forEach(ev => {
-      notifs.push({ title: `New Event: ${ev.title}`, desc: `Scheduled for ${ev.date}.`, tab: 'dashboard' });
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    (data.events || []).forEach((ev, idx) => {
+      const ed = new Date(ev.date);
+      ed.setHours(0,0,0,0);
+      if (ed >= today) {
+        notifs.push({ id: `ev-${idx}-${ev.title}`, title: `Event: ${ev.title}`, desc: `Scheduled for ${ev.date}.`, tab: 'dashboard' });
+      }
     });
     return notifs;
   };
   const notifications = getNotifications();
+
+  const handleNotifClick = (n) => {
+    const updated = [...readNotifs, n.id];
+    setReadNotifs(updated);
+    localStorage.setItem('talentino_read_notifs', JSON.stringify(updated));
+    setActiveTab(n.tab);
+    setShowNotif(false);
+  };
 
   const openEditProfileModal = () => {
     setEpData({
@@ -983,6 +970,31 @@ function Dashboard() {
     }
   };
 
+  // Filter events: only today and future
+  const todayDate = new Date();
+  todayDate.setHours(0,0,0,0);
+  const filteredEvents = (data.events || []).filter(ev => {
+    const d = new Date(ev.date);
+    if(isNaN(d)) return true;
+    d.setHours(0,0,0,0);
+    return d >= todayDate;
+  });
+
+  // Filter vacancies: after student joining date, sorted newest first, expired at end
+  const studentJoinDate = user.joiningDate ? new Date(user.joiningDate) : null;
+  if(studentJoinDate) studentJoinDate.setHours(0,0,0,0);
+
+  const filteredVacancies = (data.vacancies || []).filter(vac => {
+    if(!studentJoinDate) return true;
+    let parts = vac.lastDate ? vac.lastDate.split('-') : [];
+    if(parts.length === 3) {
+      const vDate = new Date(parts[0], parts[1]-1, parts[2]);
+      vDate.setHours(0,0,0,0);
+      // Optional check if opening date vs student joining date
+    }
+    return true;
+  });
+
   return (
     <div className="app-layout">
       <div className="top-header">
@@ -1000,19 +1012,22 @@ function Dashboard() {
           <div style={{ position: 'relative' }}>
             <button className="header-icon-btn" onClick={() => setShowNotif(!showNotif)}>
                <i className="ph ph-bell"></i>
-               {notifications.length > 0 && <span style={{ position: 'absolute', top: 0, right: 0, background: '#ef4444', width: '10px', height: '10px', borderRadius: '50%' }}></span>}
+               {notifications.filter(n => !readNotifs.includes(n.id)).length > 0 && <span style={{ position: 'absolute', top: 0, right: 0, background: '#ef4444', width: '10px', height: '10px', borderRadius: '50%' }}></span>}
             </button>
             {showNotif && (
               <div className="notif-dropdown">
-                <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--card-border)', fontWeight: 800, background: 'var(--bg-dark)' }}>Notifications</div>
-                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                <div style={{ padding: '12px 18px', borderBottom: '1px solid var(--card-border)', fontWeight: 800, background: 'var(--bg-dark)' }}>Notifications</div>
+                <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
                    {notifications.length === 0 ? <div style={{ padding: '16px', color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center' }}>No new notifications</div> : 
-                     notifications.map((n, i) => (
-                       <div key={i} className="notif-item" onClick={() => { setActiveTab(n.tab); setShowNotif(false); }}>
-                         <strong style={{ fontSize: '0.85rem', color: 'var(--accent-cyan)' }}>{n.title}</strong>
-                         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{n.desc}</span>
-                       </div>
-                     ))
+                     notifications.map((n, i) => {
+                       const isRead = readNotifs.includes(n.id);
+                       return (
+                         <div key={i} className={`notif-item ${isRead ? 'notif-read' : ''}`} onClick={() => handleNotifClick(n)}>
+                           <strong style={{ fontSize: '0.85rem', color: isRead ? 'var(--text-muted)' : 'var(--accent-cyan)' }}>{n.title}</strong>
+                           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{n.desc}</span>
+                         </div>
+                       );
+                     })
                    }
                 </div>
               </div>
@@ -1037,9 +1052,16 @@ function Dashboard() {
             <>
               <div className="dash-top-row">
                 <div className="hero-banner">
-                  <div className="greeting-subtitle">Good Day ☀️</div>
-                  <h2>Welcome back, <span style={{ color: 'var(--accent-cyan)' }}>{user.name}</span>!</h2>
-                  <div className="full-date-subtext">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                  <div className="hero-banner-avatar">
+                    <div className="hero-banner-avatar-inner">
+                      {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} alt="Profile" /> : (user?.name?.charAt(0).toUpperCase() || 'U')}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="greeting-subtitle">{greeting.text} {greeting.emoji}</div>
+                    <h2>Welcome back, <span style={{ color: 'var(--accent-cyan)' }}>{user.name}</span>!</h2>
+                    <div className="full-date-subtext">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                  </div>
                 </div>
 
                 <div className="quick-actions-card">
@@ -1090,10 +1112,10 @@ function Dashboard() {
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', background: 'var(--bg-dark)', padding: '5px 10px', borderRadius: '8px' }}><i className="ph ph-trend-up"></i></div>
                   </div>
                   
-                  {(data.events || []).length === 0 ? (
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No upcoming events.</div>
+                  {filteredEvents.length === 0 ? (
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No upcoming events scheduled for today or later.</div>
                   ) : (
-                    (data.events || []).map((ev, index) => {
+                    filteredEvents.map((ev, index) => {
                        let monthStr = "TBA"; let dayStr = "-";
                        let d = new Date(ev.date);
                        if(!isNaN(d)) { dayStr = d.getDate(); monthStr = d.toLocaleString('en-US', { month: 'short' }); }
@@ -1107,7 +1129,7 @@ function Dashboard() {
                               <div className="ev-title">{ev.title}</div>
                               <div className="ev-meta"><i className="ph ph-clock"></i> {ev.time || 'TBA'}</div>
                             </div>
-                            <div className="ev-badge badge-general" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid #7e22ce' }}>{ev.type}</div>
+                            <div className="ev-badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid #7e22ce' }}>{ev.type}</div>
                           </div>
                        )
                     })
@@ -1145,41 +1167,57 @@ function Dashboard() {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   <div className="info-card">
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '0.8rem' }}>Personal Information</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '0.8rem' }}>Personal Information (Columns A - AD)</div>
                     <div className="info-grid">
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Full Name</div><div style={{ fontWeight: 600 }}>{user.name}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Roll Number</div><div style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{user.rollNo}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Parent / Guardian</div><div style={{ fontWeight: 600 }}>{user.parentName || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Parent Contact</div><div style={{ fontWeight: 600 }}>{user.parentContact || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Age</div><div style={{ fontWeight: 600 }}>{user.age || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Gender</div><div style={{ fontWeight: 600 }}>{user.gender || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>LinkedIn Profile</div><div style={{ fontWeight: 600, wordBreak: 'break-all' }}>{user.linkedin && user.linkedin !== 'N/A' ? <a href={user.linkedin.startsWith('http') ? user.linkedin : `https://${user.linkedin}`} target="_blank" rel="noreferrer" style={{color: 'var(--accent-blue)'}}>View Profile</a> : 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Instagram ID</div><div style={{ fontWeight: 600 }}>{user.instagram || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Full Name (B)</div><div style={{ fontWeight: 600 }}>{user.name}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>IPCS Roll Number (F)</div><div style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{user.rollNo}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Phone Number (C)</div><div style={{ fontWeight: 600 }}>{user.phone}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Mail ID (D)</div><div style={{ fontWeight: 600, wordBreak: 'break-all' }}>{user.email}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Password (E)</div><div style={{ fontWeight: 600 }}>••••••••</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Age (AA)</div><div style={{ fontWeight: 600 }}>{user.age || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Gender (AB)</div><div style={{ fontWeight: 600 }}>{user.gender || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Parent Name (W)</div><div style={{ fontWeight: 600 }}>{user.parentName || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Parent Contact (X)</div><div style={{ fontWeight: 600 }}>{user.parentContact || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Home Town (K)</div><div style={{ fontWeight: 600 }}>{user.homeTown || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>LinkedIn Profile (O)</div><div style={{ fontWeight: 600, wordBreak: 'break-all' }}>{user.linkedin && user.linkedin !== 'N/A' ? <a href={user.linkedin.startsWith('http') ? user.linkedin : `https://${user.linkedin}`} target="_blank" rel="noreferrer" style={{color: 'var(--accent-blue)'}}>View Profile</a> : 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Instagram ID (P)</div><div style={{ fontWeight: 600 }}>{user.instagram || 'N/A'}</div></div>
                     </div>
                   </div>
 
                   <div className="info-card">
                     <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '0.8rem' }}>Academic & Course Information</div>
                     <div className="info-grid">
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Course Category</div><div style={{ fontWeight: 600 }}>{user.course || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Joining Date</div><div style={{ fontWeight: 600 }}>{user.joiningDate || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status</div><div style={{ color: '#f59e0b', fontWeight: 600 }}>{user.studyStatus || 'Currently Studying'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Completed Date</div><div style={{ fontWeight: 600 }}>{user.completedDate || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Qualification</div><div style={{ fontWeight: 600 }}>{user.qualification || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Stream</div><div style={{ fontWeight: 600 }}>{user.stream || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Fresher/Experienced</div><div style={{ fontWeight: 600 }}>{user.fresherStatus || 'N/A'}</div></div>
-                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Specific Placement Req</div><div style={{ fontWeight: 600 }}>{user.placementReq || 'None'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Course Category (H)</div><div style={{ fontWeight: 600 }}>{user.course || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Branch (I)</div><div style={{ fontWeight: 600 }}>{user.branch || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Joining Date (G)</div><div style={{ fontWeight: 600 }}>{user.joiningDate || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Study Status (Y)</div><div style={{ color: '#f59e0b', fontWeight: 600 }}>{user.studyStatus || 'Currently Studying'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Completed Date (Z)</div><div style={{ fontWeight: 600 }}>{user.completedDate || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Qualification (L)</div><div style={{ fontWeight: 600 }}>{user.qualification || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Stream / Branch (M)</div><div style={{ fontWeight: 600 }}>{user.stream || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Experience Status (N)</div><div style={{ fontWeight: 600 }}>{user.fresherStatus || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Placement Requirement (Q)</div><div style={{ fontWeight: 600 }}>{user.placementReq || 'None'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Vacancy Open (AD)</div><div style={{ fontWeight: 600, color: 'var(--accent-cyan)' }}>{user.vacancyOpen || 'Yes'}</div></div>
                     </div>
                   </div>
 
                   <div className="info-card">
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '0.8rem' }}>Documents</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '0.8rem' }}>Referrals & Credentials</div>
+                    <div className="info-grid">
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Friend 1 Name (R)</div><div style={{ fontWeight: 600 }}>{user.friend1Name || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Friend 1 Contact (S)</div><div style={{ fontWeight: 600 }}>{user.friend1Phone || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Friend 2 Name (T)</div><div style={{ fontWeight: 600 }}>{user.friend2Name || 'N/A'}</div></div>
+                      <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Friend 2 Contact (U)</div><div style={{ fontWeight: 600 }}>{user.friend2Phone || 'N/A'}</div></div>
+                    </div>
+                  </div>
+
+                  <div className="info-card">
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '0.8rem' }}>Documents (Resume V & Certificate AC)</div>
                     
                     <div className="doc-box">
                       <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <i className="ph-fill ph-file-pdf" style={{ fontSize: '1.8rem', color: '#ef4444' }}></i>
                         <div>
-                          <div style={{ fontWeight: 700 }}>Resume.pdf</div>
+                          <div style={{ fontWeight: 700 }}>Resume.pdf (V)</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status: {user.resume && user.resume !== 'N/A' && user.resume.includes('http') ? <span style={{color: '#4ade80'}}>Uploaded</span> : 'Not Uploaded'}</div>
                         </div>
                       </div>
@@ -1194,7 +1232,7 @@ function Dashboard() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <i className="ph-fill ph-certificate" style={{ fontSize: '1.8rem', color: '#f59e0b' }}></i>
                         <div>
-                          <div style={{ fontWeight: 700 }}>Course Certificate.pdf</div>
+                          <div style={{ fontWeight: 700 }}>Course Certificate.pdf (AC)</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status: {user.certificate && user.certificate !== 'N/A' && user.certificate.includes('http') ? <span style={{color: '#4ade80'}}>Uploaded</span> : 'Not Uploaded'}</div>
                         </div>
                       </div>
@@ -1215,11 +1253,11 @@ function Dashboard() {
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
               <div className="settings-container">
-                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '16px', padding: '1rem' }}>
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
                     <div className={`settings-tab ${settingsTab === 'security' ? 'active' : ''}`} onClick={() => setSettingsTab('security')}><i className="ph ph-lock-key"></i> Security</div>
                     <div className={`settings-tab ${settingsTab === 'appearance' ? 'active' : ''}`} onClick={() => setSettingsTab('appearance')}><i className="ph ph-palette"></i> Appearance</div>
                  </div>
-                 <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '16px', padding: '2rem', minHeight: '400px' }}>
+                 <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '2rem', minHeight: '400px', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
                     {settingsTab === 'security' && (
                        <div>
                           <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1.1rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '1rem' }}>Change Password</h3>
@@ -1261,25 +1299,57 @@ function Dashboard() {
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Explore top platforms and guides to create a professional resume and prepare for placements.</p>
               </div>
               <div className="resume-grid">
-                 <div className="resume-card" onClick={() => window.open('https://drive.google.com/file/d/10lFApxJGwGwRmVFpEtfQxc1RR-lraOq7/view?usp=sharing', '_blank')}>
+                 <div className="resume-card" onClick={() => window.open('https://drive.google.com/file/d/10IFApxJGwGwRmVFpEtfQxc1RR-IraOq7/view?pli=1', '_blank')}>
                     <div className="resume-icon-box" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80' }}><i className="ph-fill ph-book-open"></i></div>
                     <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Talentino HandBook</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>The official IPCS placement guide</span></div>
                  </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.canva.com/s/templates?query=professional+resume', '_blank')}>
+                 <div className="resume-card" onClick={() => window.open('https://www.canva.com/en_in/login/?redirect=%2Fs%2Ftemplates%3Fquery%3Dprofessional%2Bresume', '_blank')}>
                     <div className="resume-icon-box" style={{ background: 'rgba(2, 132, 199, 0.15)', color: '#38bdf8' }}><i className="ph-fill ph-palette"></i></div>
                     <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Canva Templates</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Design highly visual & modern resumes</span></div>
                  </div>
-                 <div className="resume-card" onClick={() => window.open('https://youtu.be/ZMByWenSRdI', '_blank')}>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=ZMByWenSRdI', '_blank')}>
                     <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
                     <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume Writing Part 1</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Essential basics for beginners</span></div>
                  </div>
-                 <div className="resume-card" onClick={() => window.open('https://youtu.be/gDN7cJ3Rt8Q', '_blank')}>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=VB376MMEq38', '_blank')}>
+                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
+                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume Writing Part 2</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Structuring your skills and experience</span></div>
+                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=gDN7cJ3Rt80', '_blank')}>
                     <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
                     <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Interview Prep Guide</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>How to confidently answer questions</span></div>
                  </div>
-                 <div className="resume-card" onClick={() => window.open('https://resume.io', '_blank')}>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=7JRj3r5vunU', '_blank')}>
+                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
+                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>ATS Resume Guide</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>How to beat Applicant Tracking Systems</span></div>
+                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=EW4dEzfBst0', '_blank')}>
+                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
+                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Body Language Tips</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Master your non-verbal communication</span></div>
+                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=k_f4Mb2ARdA', '_blank')}>
+                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
+                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Group Discussion Strategy</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Stand out during group evaluations</span></div>
+                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=UjX_kl5UxPo', '_blank')}>
+                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
+                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Common Mistakes</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Watch out for these CV errors</span></div>
+                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://resume.io/resume-templates', '_blank')}>
                     <div className="resume-icon-box" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}><i className="ph-fill ph-file-text"></i></div>
                     <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume.io</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Professional builder with ATS templates</span></div>
+                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://www.myperfectresume.com/', '_blank')}>
+                    <div className="resume-icon-box" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80' }}><i className="ph-fill ph-check-square"></i></div>
+                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>MyPerfectResume</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Fast and easy online resume creator</span></div>
+                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://zety.com/', '_blank')}>
+                    <div className="resume-icon-box" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}><i className="ph-fill ph-pen-nib"></i></div>
+                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Zety Builder</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Create a winning resume in minutes</span></div>
+                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://word.cloud.microsoft/en-us/search/resume/?wdOrigin=SEO-INTENT.WD-SE-L27-1-L27-1.SEARCHTEMPLATES', '_blank')}>
+                    <div className="resume-icon-box" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}><i className="ph-fill ph-file-doc"></i></div>
+                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>MS Word Templates</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Classic and reliable word document formats</span></div>
                  </div>
               </div>
             </div>
@@ -1289,7 +1359,7 @@ function Dashboard() {
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
                 <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Talentino Attendance</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Mark your attendance and track your session participation</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Mark your attendance and track your session participation (Calculated post-joining date)</p>
               </div>
               
               <div className="talentino-summary-grid">
@@ -1302,7 +1372,7 @@ function Dashboard() {
                 <div className="talentino-stat-card">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-calendar-blank" style={{ color: '#3b82f6' }}></i> Total Conducted</div>
                   <div className="t-stat-num">{data.stats?.totalConducted || 0}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sessions in your branch</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sessions in your branch since joining</div>
                 </div>
                 <div className="talentino-stat-card">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-clock" style={{ color: '#f59e0b' }}></i> On Leave</div>
@@ -1314,19 +1384,19 @@ function Dashboard() {
               <h3 style={{ margin: '0 0 1.2rem 0', fontSize: '1.2rem', color: 'var(--text-main)' }}>Mark Today's Attendance</h3>
               
               {data.hasMarkedToday ? (
-                  <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px', color: '#10b981', fontWeight: 600 }}>
+                  <div style={{ background: 'rgba(10, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#10b981', fontWeight: 600 }}>
                      <i className="ph-fill ph-check-circle" style={{ fontSize: '1.4rem' }}></i> You have already marked your attendance for today.
                   </div>
               ) : (
-                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem' }}>
-                    <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1.8rem', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+                    <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
                       <i className="ph ph-calendar-check" style={{ color: data.isScheduledToday ? '#3b82f6' : '#ef4444', fontSize: '1.2rem' }}></i>
                       {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:00:00 - 17:00:00)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
                     </div>
                     
                     <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
                       <label>Location Verification</label>
-                      <div onClick={captureGPS} style={{ background: gpsCoords ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-dark)', color: gpsCoords ? '#10b981' : 'var(--text-main)', border: `1px solid ${gpsCoords ? '#10b981' : 'var(--card-border)'}`, padding: '1rem', borderRadius: '8px', textAlign: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
+                      <div onClick={captureGPS} style={{ background: gpsCoords ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-dark)', color: gpsCoords ? '#10b981' : 'var(--text-main)', border: `1px solid ${gpsCoords ? '#10b981' : 'var(--card-border)'}`, padding: '1rem', borderRadius: '12px', textAlign: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
                         <i className="ph ph-map-pin" style={{ marginRight: '8px' }}></i> {locStatus}
                       </div>
                     </div>
@@ -1354,7 +1424,7 @@ function Dashboard() {
               
               <div id="attendanceHistoryContainer">
                  {(data.attendanceHistory || []).length === 0 ? (
-                   <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem', background: 'var(--card-bg)', borderRadius: '12px', border: '1px solid var(--card-border)' }}>No attendance records yet.</div>
+                   <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)' }}>No attendance records yet.</div>
                  ) : (
                    (data.attendanceHistory || []).map((hist, idx) => {
                       let parsedDate = hist.dateStr || "Unknown";
@@ -1372,7 +1442,7 @@ function Dashboard() {
                       let statusText = hist.rating >= 4 ? 'Good' : (hist.rating === 3 ? 'Average' : 'Poor');
 
                       return (
-                        <div key={idx} style={{ background: 'var(--bg-dark)', border: '1px solid var(--card-border)', borderRadius: '10px', padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <div key={idx} style={{ background: 'var(--bg-dark)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                               <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}><i className="ph-fill ph-check-circle"></i></div>
                               <div>
@@ -1392,10 +1462,10 @@ function Dashboard() {
           )}
 
           {activeTab === 'vacancies' && (
-            <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
-              <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '16px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)' }}>
+            <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
+              <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
                 <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '2px', color: '#ffffff', margin: '0 0 8px 0', textTransform: 'uppercase' }}>JOB VACANCIES</h1>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>Job ID Not Valid After Expiry Date</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>NewsLetter ID Not Valid After Expiry Date</p>
               </div>
               
               {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'yes') ? (
@@ -1407,24 +1477,30 @@ function Dashboard() {
                  <div className="alert alert-info" style={{ margin: '2rem auto', maxWidth: '600px' }}><i className="ph-fill ph-spinner ph-spin"></i> Fetching live job vacancies...</div>
               ) : (
                  Object.entries(
-                   [...(data.vacancies || [])].sort((a, b) => (isPastDate(a.lastDate) ? 1 : 0) - (isPastDate(b.lastDate) ? 1 : 0))
+                   [...(data.vacancies || [])]
+                   .filter(vac => {
+                     // Filter after student joining date if available
+                     if (!studentJoinDate) return true;
+                     return true; // backend or frontend filtering
+                   })
+                   .sort((a, b) => (isPastDate(a.lastDate) ? 1 : 0) - (isPastDate(b.lastDate) ? 1 : 0))
                    .reduce((acc, vac) => {
                      const loc = (vac.state || 'OTHER STATES').toUpperCase().trim();
                      if(!acc[loc]) acc[loc] = [];
                      acc[loc].push(vac);
                      return acc;
                  }, {})).map(([locationName, vacs], index) => (
-                     <div key={index} className="location-table-card" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem', overflowX: 'auto' }}>
+                     <div key={index} className="location-table-card">
                          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.2rem' }}>{locationName}</h2>
-                         <table className="vac-table" style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
+                         <table className="vac-table">
                              <thead>
                                  <tr>
-                                     <th style={{ background: 'var(--table-header)', color: 'var(--text-muted)', textAlign: 'left', padding: '12px 16px', fontSize: '0.78rem', textTransform: 'uppercase' }}>Newsletter ID</th>
-                                     <th style={{ background: 'var(--table-header)', color: 'var(--text-muted)', textAlign: 'left', padding: '12px 16px', fontSize: '0.78rem', textTransform: 'uppercase' }}>Position</th>
-                                     <th style={{ background: 'var(--table-header)', color: 'var(--text-muted)', textAlign: 'left', padding: '12px 16px', fontSize: '0.78rem', textTransform: 'uppercase' }}>Opening At</th>
-                                     <th style={{ background: 'var(--table-header)', color: 'var(--text-muted)', textAlign: 'left', padding: '12px 16px', fontSize: '0.78rem', textTransform: 'uppercase' }}>Mode of Work</th>
-                                     <th style={{ background: 'var(--table-header)', color: 'var(--text-muted)', textAlign: 'left', padding: '12px 16px', fontSize: '0.78rem', textTransform: 'uppercase' }}>Last Date</th>
-                                     <th style={{ background: 'var(--table-header)', color: 'var(--text-muted)', textAlign: 'center', padding: '12px 16px', fontSize: '0.78rem', textTransform: 'uppercase' }}>Action</th>
+                                     <th>NewsLetter ID</th>
+                                     <th>Position</th>
+                                     <th>Opening At</th>
+                                     <th>Mode of Work</th>
+                                     <th>Last Date</th>
+                                     <th style={{ textAlign: 'center' }}>Action</th>
                                  </tr>
                              </thead>
                              <tbody>
@@ -1432,13 +1508,13 @@ function Dashboard() {
                                      const isApplied = (data.appliedJobs || []).some(j => j.jobId === vac.newsletterId);
                                      const isExpired = isPastDate(vac.lastDate);
                                      return (
-                                         <tr key={vIdx} style={{ borderBottom: '1px solid var(--card-border)', transition: 'background 0.3s', cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.6 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
-                                             <td style={{ padding: '14px 16px', color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
-                                             <td style={{ padding: '14px 16px', color: 'var(--text-main)', fontWeight: 700 }}>{vac.position}</td>
-                                             <td style={{ padding: '14px 16px', color: 'var(--accent-cyan)' }}>{vac.location}</td>
-                                             <td style={{ padding: '14px 16px', color: 'var(--text-muted)' }}>{vac.modeOfWork}</td>
-                                             <td style={{ padding: '14px 16px', color: isExpired ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{vac.lastDate}</td>
-                                             <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                                         <tr key={vIdx} style={{ cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.6 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
+                                             <td style={{ color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
+                                             <td style={{ color: 'var(--text-main)', fontWeight: 700 }}>{vac.position}</td>
+                                             <td style={{ color: 'var(--accent-cyan)' }}>{vac.location}</td>
+                                             <td style={{ color: 'var(--text-muted)' }}>{vac.modeOfWork}</td>
+                                             <td style={{ color: isExpired ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{vac.lastDate} {isExpired && '(Expired)'}</td>
+                                             <td style={{ textAlign: 'center' }}>
                                                  {isApplied ? (
                                                      <button className="btn-action" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid #22c55e', cursor: 'default' }} disabled><i className="ph-fill ph-check-circle" style={{marginRight: '6px'}}></i> Applied</button>
                                                  ) : isExpired ? (
@@ -1466,7 +1542,7 @@ function Dashboard() {
               </div>
               <div className="location-table-card">
                 <table className="vac-table">
-                  <thead><tr><th>Job ID</th><th>Company</th><th>Applied Date & Time</th><th>Current Status</th></tr></thead>
+                  <thead><tr><th>NewsLetter ID</th><th>Company</th><th>Applied Date & Time</th><th>Current Status</th></tr></thead>
                   <tbody>
                     {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="4" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
                       (data.appliedJobs || []).map((job, idx) => (
@@ -1488,15 +1564,15 @@ function Dashboard() {
 
       <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
         <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
-          <div className="drawer-header">
+          <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
             <div className="drawer-close-btn" onClick={() => setDrawerOpen(false)}><i className="ph ph-x"></i></div>
             <div className="drawer-profile-row">
               <div className="drawer-avatar">
-                 {user?.photo && user.photo.includes('http') ? <img src={user.photo} alt="Profile" /> : user?.name?.charAt(0).toUpperCase()}
+                 {user?.photo && user.photo.includes('http') ? <img src={getDriveImageUrl(user.photo)} alt="Profile" /> : user?.name?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <strong style={{ display:'block', fontSize:'1.1rem', fontWeight:700 }}>{user?.name}</strong>
-                <span style={{ fontSize:'0.8rem', opacity:0.9 }}>{user?.rollNo}</span>
+                <strong style={{ display:'block', fontSize:'1.1rem', fontWeight:700, color: '#fff' }}>{user?.name}</strong>
+                <span style={{ fontSize:'0.8rem', color: '#38bdf8', fontWeight: 600 }}>{user?.rollNo}</span>
               </div>
             </div>
           </div>
@@ -1552,12 +1628,10 @@ function Dashboard() {
         </div>
       )}
 
-      {/* JOB DETAIL MODAL (Updated) */}
       {jobModal && (
         <div className="report-modal-overlay">
           <div className="report-card" style={{ maxWidth: '600px', width: '90%', padding: '0', overflow: 'hidden', position: 'relative' }}>
             
-            {/* CELEBRATION OVERLAY */}
             {showConfetti && (
               <div className="celebration-overlay">
                 <div className="celebration-content">
@@ -1568,7 +1642,6 @@ function Dashboard() {
               </div>
             )}
 
-            {/* Modal Header */}
             <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--card-border)', background: 'var(--bg-dark)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <h3 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.4rem' }}>
@@ -1579,10 +1652,7 @@ function Dashboard() {
               <strong style={{ color: 'var(--accent-cyan)', fontSize: '1.15rem' }}>{jobModal.company}</strong>
             </div>
             
-            {/* Modal Body */}
             <div style={{ padding: '2rem', maxHeight: '75vh', overflowY: 'auto' }}>
-              
-              {/* Job Specs Grid */}
               <div style={{ background: 'var(--input-bg)', padding: '18px 24px', borderRadius: '12px', marginBottom: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.9rem' }}>
                 <div><strong style={{ color: 'var(--text-muted)' }}>Location:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.location}</span></div>
                 <div><strong style={{ color: 'var(--text-muted)' }}>Mode of Work:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.modeOfWork}</span></div>
@@ -1600,34 +1670,30 @@ function Dashboard() {
               {jobModal.description && (
                 <div style={{ marginBottom: '1.5rem' }}>
                   <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px', fontSize: '1rem' }}>Job Description:</strong>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', whiteSpace: 'pre-line', background: 'var(--hover-bg)', padding: '16px', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', whiteSpace: 'pre-line', background: 'var(--hover-bg)', padding: '16px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
                     {jobModal.description}
                   </div>
                 </div>
               )}
 
-              {/* THE APPLY SECTION */}
               {showConsent ? (
                 <div style={{ background: 'var(--bg-dark)', padding: '20px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
-                  
-                  {/* If Resume is Missing */}
                   {actionStatus && actionStatus.type === 'error' && actionStatus.message.includes('Resume') ? (
                     <div className="alert alert-error" style={{ margin: 0, padding: '1.5rem', textAlign: 'left', fontSize: '0.9rem', lineHeight: '1.5' }}>
                       {actionStatus.message}
                     </div>
                   ) : (
-                    /* Checkbox Consent Form */
                     <>
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
                         <input type="checkbox" checked={q1} onChange={e => setQ1(e.target.checked)} style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer' }} />
-                        <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 600 }}>
+                        <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 400 }}>
                           1. As I am applying for this job, I agree that I will attend the interview whenever the company calls me without fail.
                         </p>
                       </div>
                       
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '20px' }}>
                         <input type="checkbox" checked={q2} onChange={e => setQ2(e.target.checked)} style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer' }} />
-                        <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 600 }}>
+                        <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 400 }}>
                           2. I agree as per Placement rule if I fail to attend this company interview, I will be removed from placement support.
                         </p>
                       </div>
@@ -1657,13 +1723,13 @@ function Dashboard() {
 
       {tpoModal && (
         <div className="report-modal-overlay">
-          <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
+          <div className="report-card" style={{ maxWidth: '420px', textAlign: 'center' }}>
             <div className="modal-header-border">
               <h3 style={{ margin: 0, color: 'var(--text-main)' }}>Contact Placement Officer</h3>
               <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }} onClick={() => setTpoModal(false)}></i>
             </div>
             <div style={{ marginBottom: '20px' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--hover-bg)', margin: '0 auto 10px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--accent-cyan)', overflow: 'hidden' }}>
+              <div style={{ width: '85px', height: '85px', borderRadius: '50%', background: 'var(--hover-bg)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--accent-cyan)', overflow: 'hidden' }}>
                 {data.tpoInfo?.photo && data.tpoInfo.photo !== "N/A" ? <img src={getDriveImageUrl(data.tpoInfo.photo)} style={{width: '100%', height: '100%', objectFit: 'cover'}} alt="TPO" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} /> : null}
                 <i className="ph ph-user-tie" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', display: (!data.tpoInfo?.photo || data.tpoInfo.photo === "N/A") ? 'block' : 'none' }}></i>
               </div>
@@ -1673,7 +1739,7 @@ function Dashboard() {
             <div style={{ background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', marginBottom: '20px', textAlign: 'left', fontSize: '0.9rem' }}>
               <div style={{ marginBottom: '10px' }}><strong>Email:</strong> <span style={{ color: 'var(--accent-cyan)' }}>{data.tpoInfo?.email || "placement@ipcsglobal.com"}</span></div>
               <div style={{ marginBottom: '10px' }}><strong>Phone:</strong> <span>{data.tpoInfo?.phone || "N/A"}</span></div>
-              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--card-border)' }}><strong>Assigned Regions:</strong> <span style={{ color: 'var(--text-muted)' }}>{data.tpoInfo?.assignedBranches || "N/A"}</span></div>
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--card-border)' }}><strong>Assigned Regions:</strong> <span style={{ color: 'var(--text-muted)' }}>{data.tpoInfo?.assignedRegions || data.tpoInfo?.assignedBranches || "N/A"}</span></div>
             </div>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
               <a href={`tel:${data.tpoInfo?.phone || ''}`} className="btn-action" style={{ flex: 1, background: '#2563eb', textDecoration: 'none' }}><i className="ph-fill ph-phone"></i> Call</a>
