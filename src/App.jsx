@@ -585,6 +585,11 @@ function Dashboard() {
   const [theme, setTheme] = useState('dark');
   
   // View State 
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [tpoModal, setTpoModal] = useState(false);
+  const [helpModal, setHelpModal] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
   const location = useLocation();
 const activeTab = location.pathname.split('/')[2] || 'dashboard';
 
