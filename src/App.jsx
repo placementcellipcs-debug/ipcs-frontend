@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Cropper from 'react-easy-crop';
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const GlobalStyle = () => {
   useEffect(() => {
@@ -42,11 +41,24 @@ const GlobalStyle = () => {
       input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; font-size: 0.88rem; color: var(--text-main); outline: none; transition: background 0.3s, border-color 0.3s; resize: vertical; }
       input:focus, select:focus, textarea:focus { border-color: var(--accent-cyan); }
       ::placeholder { color: var(--text-muted); opacity: 0.6; }
+      optgroup { background: var(--bg-dark); color: var(--accent-cyan); font-weight: 700; font-style: normal; }
+      optgroup option { color: var(--text-main); font-weight: 500; }
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
+      /* --- LANDING PAGE (LOGIN) STYLES --- */
+      .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%); display: flex; flex-direction: column; }
+      .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      .nav-links { display: flex; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
+      .nav-links span { cursor: pointer; transition: color 0.2s; }
+      .nav-links span:hover { color: var(--text-main); }
+      .landing-grid { display: grid; grid-template-columns: 1fr 440px; gap: 4rem; padding: 4rem; flex: 1; align-items: center; max-width: 1400px; margin: 0 auto; width: 100%; }
+      .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: var(--accent-cyan); padding: 6px 16px; border-radius: 30px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1.5rem; }
+      .hero-title { font-size: 4rem; font-weight: 800; line-height: 1.1; margin: 0 0 1.5rem 0; color: #ffffff; letter-spacing: -1px; }
+      .hero-desc { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; max-width: 500px; margin-bottom: 2.5rem; }
+      
       .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100vw; padding: 20px; }
-      .auth-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.2rem 1.8rem; width: 100%; max-width: 440px; }
+      .auth-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.2rem 1.8rem; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
       .brand-logo-container { display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; }
       .auth-logo-img { max-width: 220px; height: auto; object-fit: contain; }
       .switch-mode { text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted); }
@@ -58,6 +70,7 @@ const GlobalStyle = () => {
       .alert-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
       .alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
 
+      /* --- PROFILE REGISTRATION --- */
       .profile-reg-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 2.2rem; width: 100%; max-width: 880px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); max-height: 92vh; overflow-y: auto; }
       .reg-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--card-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
       .section-title { font-size: 0.78rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 1.8rem 0 1.1rem 0; padding-bottom: 6px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; gap: 8px; color: var(--text-main); }
@@ -73,11 +86,13 @@ const GlobalStyle = () => {
       @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
       .report-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(6px); z-index: 1100; display: flex; justify-content: center; align-items: center; padding: 20px; transition: opacity 0.3s; }
-      .report-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; position: relative; animation: fadeInReveal 0.3s ease;}
+      .report-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; animation: fadeInReveal 0.3s ease;}
       .modal-header-border { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.8rem; }
       .tnc-content-box { height: 350px; overflow-y: auto; font-size: 0.85rem; color: var(--text-main); background: var(--input-bg); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--input-border); line-height: 1.7; position: relative; }
-      .tnc-content-box h4 { color: var(--text-main); font-size: 0.9rem; margin-top: 0; margin-bottom: 10px; text-transform: uppercase; }
+      .tnc-content-box h4 { color: var(--text-main); font-size: 0.9rem; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; }
+      .tnc-content-box h4:first-child { margin-top: 0; }
       .tnc-content-box ul { margin-top: 0; padding-left: 20px; margin-bottom: 20px; }
+      .tnc-content-box p { margin-top: 0; margin-bottom: 15px; }
 
       /* Animation/Confetti classes */
       .celebration-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 23, 0.85); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); border-radius: 20px; }
@@ -90,7 +105,7 @@ const GlobalStyle = () => {
       .main-body { flex: 1; display: flex; flex-direction: column; width: 100%; }
       .top-header { height: 65px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; transition: background 0.3s; }
       .header-left { display: flex; align-items: center; gap: 12px; }
-      .header-logo-img { height: 40px; width: auto; object-fit: contain; }
+      .header-logo-img { height: 35px; width: auto; object-fit: contain; }
       .header-right { display: flex; align-items: center; gap: 18px; }
       .header-icon-btn { position: relative; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; background: none; border: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; }
       .header-icon-btn:hover { color: var(--accent-cyan); background: var(--hover-bg); }
@@ -199,10 +214,14 @@ const GlobalStyle = () => {
       .resume-icon-box { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
 
       @media (max-width: 900px) {
+        .landing-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+        .hero-desc { margin: 0 auto 2.5rem auto; }
         .profile-grid, .settings-container { grid-template-columns: 1fr; }
         .dash-top-row, .dash-bottom-row, .stats-row { grid-template-columns: 1fr; }
       }
       @media (max-width: 768px) {
+        .landing-nav { flex-direction: column; gap: 1rem; padding: 1.5rem; }
+        .hero-title { font-size: 2.8rem; }
         .grid-2col, .grid-3col, .info-grid { grid-template-columns: 1fr; }
         .primary-layout-row { grid-template-columns: 1fr; gap: 1rem; }
         .vacancy-quick-banner { flex-direction: column; gap: 15px; text-align: center; }
@@ -214,30 +233,27 @@ const GlobalStyle = () => {
   );
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
+
+// ==========================================
+// 2. LOGIN / LANDING PAGE COMPONENT
+// ==========================================
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [tncAccepted, setTncAccepted] = useState(false);
   const [status, setStatus] = useState(null);
-  const [showTncModal, setShowTncModal] = useState(false);
-  const [tncScrolled, setTncScrolled] = useState(false);
-
-  const handleTncScroll = (e) => {
-    const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 25;
-    if (bottom) setTncScrolled(true);
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) { setStatus({ type: 'error', message: 'Please enter both email and password.' }); return; }
-    if (!tncAccepted) { setStatus({ type: 'error', message: 'You must accept the Terms & Conditions.' }); return; }
 
     setStatus({ type: 'info', message: 'Verifying credentials...' });
 
     try {
-      const response = await axios.post(API_BASE_URL + '/api/auth/login', { email, password });
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
       if (response.data.success) {
         localStorage.setItem('talentino_student_token', response.data.token);
         localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
@@ -249,76 +265,57 @@ function Login() {
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
-        <div className="brand-logo-container">
-          <img src="https://lh3.googleusercontent.com/d/1y36ddjxHfSsu4cINBvUbeTe0OyobG2TP" alt="IPCS Global Logo" className="auth-logo-img" />
+    <div className="landing-wrapper">
+      <div className="landing-nav">
+        <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
+        <div className="nav-links">
+          <span>Home</span>
+          <span>Recruiters</span>
+          <span>Placements</span>
+          <span>Testimonials</span>
         </div>
-        <h2 style={{ textAlign: 'center', margin: '0 0 6px 0' }}>Welcome back</h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
-
-        <form onSubmit={handleLogin}>
-          <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-          <div className="form-group"><label>Password</label>
-            <div className="pwd-wrapper">
-              <input type={showPassword ? "text" : "password"} placeholder="Enter password" style={{ paddingRight: '40px' }} value={password} onChange={(e) => setPassword(e.target.value)} />
-              <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}>
-                <i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i>
-              </span>
-            </div>
-          </div>
-          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '15px' }}>
-            <input type="checkbox" style={{ width: 'auto', cursor: tncAccepted ? 'pointer' : 'not-allowed' }} checked={tncAccepted} disabled={!tncAccepted} onChange={(e) => setTncAccepted(e.target.checked)} />
-            <label style={{ margin: 0, fontSize: '0.8rem', textTransform: 'none' }}>I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span></label>
-          </div>
-          <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem' }}>Sign in &rarr;</button>
-        </form>
-
-        {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
-
-        <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
       </div>
-
-      {showTncModal && (
-        <div className="report-modal-overlay">
-          <div className="report-card" style={{ maxWidth: '650px' }}>
-            <div className="modal-header-border">
-              <h3 style={{ margin: 0, color: 'var(--text-main)' }}>IPCS Placement Rule Set</h3>
-              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }} onClick={() => setShowTncModal(false)}></i>
-            </div>
-            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: 0, marginBottom: '1.5rem' }}>Below mentioned are the Rules to be followed by students for getting Placement Support from IPCS. Please scroll to the bottom to accept.</p>
-            <div className="tnc-content-box" onScroll={handleTncScroll}>
-              <h4>ELIGIBILITY CRITERIA FOR ATTENDING THE INTERVIEWS</h4>
-              <ul>
-                <li>Students who have completed at least 90% of the course.</li>
-                <li>Students who have paid the full fees.</li>
-                <li>Students who have passion for working & take their career seriously.</li>
-                <li>Candidates should be ready for any location (exemption only for female students).</li>
-              </ul>
-              <h4>DOS & DON’TS FOR THE CANDIDATES</h4>
-              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Job applications & Interview:</strong>
-              <ul>
-                <li>Check all criteria mentioned in the employment news, if everything suits to you then only APPLY to the mentioned company.</li>
-                <li>Students should attend the interview on the date and time as allotted by the recruiter.</li>
-                <li>It is mandatory for Students to update the placement coordinator of their attendance in the interviews.</li>
-                <li>Students attending the interview and not getting selected is not a problem. Losing in an interview is not a criteria for further interviews.</li>
-                <li>Students who are not attending the 3 interviews even after their acceptance to attend the interviews will be barred to attend any further interviews.</li>
-              </ul>
-            </div>
-            {!tncScrolled ? (
-              <div style={{ textAlign: 'center', color: '#f59e0b', fontSize: '0.88rem', fontWeight: 700, marginTop: '15px' }}>↓ Please scroll to the end of the rules to Accept ↓</div>
-            ) : (
-              <div style={{ display: 'flex', marginTop: '20px' }}>
-                <button type="button" className="btn-action" style={{ width: '100%', background: '#22c55e' }} onClick={() => { setTncAccepted(true); setShowTncModal(false); }}>Accept</button>
-              </div>
-            )}
-          </div>
+      
+      <div className="landing-grid">
+        <div className="hero-section">
+          <div className="hero-badge"><i className="ph-fill ph-seal-check"></i> Talenzo (Connecting Talent with Opportunity)</div>
+          <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: 'var(--accent-cyan)' }}>Careers with IPCS</span></h1>
+          <p className="hero-desc">IPCS Global connects future-ready talent in Industrial Automation, Embedded Systems, IoT, and Digital Tech with leading blue-chip global firms. Experience zero-barrier career transitions.</p>
         </div>
-      )}
+
+        <div className="auth-card" style={{ margin: '0 auto' }}>
+          <div className="brand-logo-container">
+            <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" />
+          </div>
+          <h2 style={{ textAlign: 'center', margin: '0 0 6px 0' }}>Welcome back</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
+
+          <form onSubmit={handleLogin}>
+            <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+            <div className="form-group"><label>Password</label>
+              <div className="pwd-wrapper">
+                <input type={showPassword ? "text" : "password"} placeholder="Enter password" style={{ paddingRight: '40px' }} value={password} onChange={(e) => setPassword(e.target.value)} />
+                <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}>
+                  <i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i>
+                </span>
+              </div>
+            </div>
+            
+            <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem' }}>Sign in &rarr;</button>
+          </form>
+
+          {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
+
+          <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
+        </div>
+      </div>
     </div>
   );
 }
 
+// ==========================================
+// 3. SIGNUP COMPONENT
+// ==========================================
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -335,16 +332,12 @@ function Signup() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [finalPhotoBase64, setFinalPhotoBase64] = useState('');
 
-  const [qualSelect, setQualSelect] = useState('');
-  const [streamSelect, setStreamSelect] = useState('');
-  const [qualOther, setQualOther] = useState('');
-  const [streamOther, setStreamOther] = useState('');
-
   const [formData, setFormData] = useState({
     rollNo: '', name: '', phone: '', email: '', age: '', gender: '', branch: '', 
     course: '', joiningDate: '', fresherStatus: '', homeTown: '',
     linkedin: '', instagram: '', placementReq: '', parentName: '', parentContact: '', 
-    friend1Name: '', friend1Phone: '', friend2Name: '', friend2Phone: '', password: '', confirmPassword: ''
+    friend1Name: '', friend1Phone: '', friend2Name: '', friend2Phone: '', password: '', confirmPassword: '',
+    qualification: '', stream: ''
   });
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -380,17 +373,20 @@ function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    
+    // Strict Validations
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { setStatus({ type: 'error', message: 'Please enter a valid email format.' }); return; }
+    if (!/^\d{10}$/.test(formData.phone)) { setStatus({ type: 'error', message: 'Your phone number must be exactly 10 digits.' }); return; }
+    if (!/^\d{10}$/.test(formData.friend1Phone) || !/^\d{10}$/.test(formData.friend2Phone)) { setStatus({ type: 'error', message: 'Referral phone numbers must be exactly 10 digits.' }); return; }
+    if (formData.friend1Phone === formData.friend2Phone) { setStatus({ type: 'error', message: 'Friend 1 and Friend 2 referral phone numbers cannot be the same.' }); return; }
     if (formData.password !== formData.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match!' }); return; }
     if (!tncAccepted) { setStatus({ type: 'error', message: 'You must accept the Terms & Conditions.' }); return; }
 
     setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
-    const finalQual = qualSelect === 'Other' ? qualOther : qualSelect;
-    const finalStream = streamSelect === 'Other' ? streamOther : streamSelect;
-
-    const payload = { ...formData, photoBase64: finalPhotoBase64, qualification: finalQual, stream: finalStream };
+    const payload = { ...formData, photoBase64: finalPhotoBase64 };
 
     try {
-      const response = await axios.post(API_BASE_URL + '/api/auth/register', payload);
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
       if (response.data.success) {
         setStatus({ type: 'success', message: 'Account created! Redirecting to login...' });
         setTimeout(() => navigate('/'), 2500); 
@@ -401,12 +397,12 @@ function Signup() {
   };
 
   return (
-    <div className="auth-wrapper">
+    <div className="auth-wrapper" style={{ background: '#0b0f17' }}>
       <div className="profile-reg-card">
         <div className="reg-header">
           <div><h2 style={{ margin: '0 0 4px 0' }}>Create Student Profile</h2><p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>Register records, course details, and placement preferences</p></div>
           <div className="brand-logo-container" style={{ marginBottom: 0 }}>
-            <img src="https://lh3.googleusercontent.com/d/1y36ddjxHfSsu4cINBvUbeTe0OyobG2TP" alt="IPCS Global Logo" style={{ height: '38px' }} />
+            <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" style={{ height: '38px' }} />
           </div>
         </div>
 
@@ -425,7 +421,7 @@ function Signup() {
                 <div className="form-group" style={{ marginBottom: 0 }}><label>Full Name *</label><input type="text" name="name" placeholder="e.g. Vishnu Kumar" onChange={handleChange} required /></div>
               </div>
               <div className="grid-2col">
-                <div className="form-group" style={{ marginBottom: 0 }}><label>Phone Number *</label><input type="tel" name="phone" placeholder="+91 9876543210" onChange={handleChange} required /></div>
+                <div className="form-group" style={{ marginBottom: 0 }}><label>Phone Number *</label><input type="tel" name="phone" placeholder="10 Digit Number" onChange={handleChange} required /></div>
                 <div className="form-group" style={{ marginBottom: 0 }}><label>Email ID *</label><input type="email" name="email" placeholder="student@ipcsglobal.com" onChange={handleChange} required /></div>
               </div>
             </div>
@@ -441,39 +437,85 @@ function Signup() {
             <div className="form-group" style={{ marginBottom: 0 }}><label>Branch Campus *</label>
               <select name="branch" onChange={handleChange} defaultValue="" required>
                 <option value="" disabled>Select Branch</option>
-                <option value="Bangalore">Bangalore</option><option value="Kochi">Kochi</option><option value="Trivandrum">Trivandrum</option>
+                <optgroup label="Kerala">
+                  <option value="Kochi">Kochi</option>
+                  <option value="Calicut">Calicut</option>
+                  <option value="Trivandrum">Trivandrum</option>
+                  <option value="Attingal">Attingal</option>
+                  <option value="Kollam">Kollam</option>
+                  <option value="Kannur">Kannur</option>
+                  <option value="Thrissur">Thrissur</option>
+                  <option value="Perinthalmanna">Perinthalmanna</option>
+                  <option value="Kottayam">Kottayam</option>
+                  <option value="Pathanamthitta">Pathanamthitta</option>
+                  <option value="Palakkad">Palakkad</option>
+                </optgroup>
+                <optgroup label="Tamil Nadu">
+                  <option value="Coimbatore">Coimbatore</option>
+                  <option value="Chennai">Chennai</option>
+                  <option value="Tambaram">Tambaram</option>
+                  <option value="Trichy">Trichy</option>
+                  <option value="Salem">Salem</option>
+                  <option value="Madurai">Madurai</option>
+                  <option value="Erode">Erode</option>
+                  <option value="Tirunelveli">Tirunelveli</option>
+                </optgroup>
+                <optgroup label="Karnataka">
+                  <option value="Bangalore">Bangalore</option>
+                  <option value="Mangalore">Mangalore</option>
+                  <option value="Mysore">Mysore</option>
+                </optgroup>
+                <optgroup label="Maharashtra">
+                  <option value="Mumbai">Mumbai</option>
+                  <option value="Pune">Pune</option>
+                  <option value="Nagpur">Nagpur</option>
+                </optgroup>
+                <optgroup label="West Bengal">
+                  <option value="Kolkata">Kolkata</option>
+                  <option value="Siliguri">Siliguri</option>
+                </optgroup>
+                <optgroup label="Other States in India">
+                  <option value="Hyderabad (Telangana)">Hyderabad (Telangana)</option>
+                  <option value="Ranchi (Jharkhand)">Ranchi (Jharkhand)</option>
+                  <option value="Raipur (Chhattisgarh)">Raipur (Chhattisgarh)</option>
+                  <option value="Bhopal (Madhya Pradesh)">Bhopal (Madhya Pradesh)</option>
+                </optgroup>
+                <optgroup label="International (GCC)">
+                  <option value="Dubai (UAE)">Dubai (UAE)</option>
+                  <option value="Riyadh (Saudi Arabia)">Riyadh (Saudi Arabia)</option>
+                </optgroup>
               </select>
             </div>
           </div>
 
           <div className="grid-2col" style={{ marginTop: '1.1rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Parent/Guardian Name</label><input type="text" name="parentName" placeholder="Full Name" onChange={handleChange} /></div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Parent Contact No.</label><input type="tel" name="parentContact" placeholder="+91 XXXXXXXXXX" onChange={handleChange} /></div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Parent Contact No.</label><input type="tel" name="parentContact" placeholder="10 Digit Number" onChange={handleChange} /></div>
           </div>
 
           <div className="section-title" style={{ color: '#4ade80', marginTop: '2rem' }}><i className="ph ph-graduation-cap" style={{ fontSize: '1.2rem' }}></i> ACADEMIC & COURSE DETAILS</div>
           <div className="grid-3col">
             <div className="form-group" style={{ marginBottom: 0 }}><label>Course Category *</label>
               <select name="course" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Course Category</option><option value="Industrial Automation">Industrial Automation</option><option value="Python Full Stack">Python Full Stack</option><option value="MERN Stack">MERN Stack</option>
+                <option value="" disabled>Select Course Category</option>
+                <option value="Industrial Automation">Industrial Automation</option>
+                <option value="BMS & CCTV">BMS & CCTV</option>
+                <option value="Embedded and IOT">Embedded and IOT</option>
+                <option value="Python and Data Science">Python and Data Science</option>
+                <option value="Artificial Intelligence">Artificial Intelligence</option>
+                <option value="Python Full Stack">Python Full Stack</option>
+                <option value="Java Full Stack">Java Full Stack</option>
+                <option value="MERN Stack">MERN Stack</option>
+                <option value="Software Testing">Software Testing</option>
+                <option value="Digital Marketing">Digital Marketing</option>
               </select>
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Joining Date *</label><input type="date" name="joiningDate" onChange={handleChange} required /></div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Qualification *</label>
-              <select onChange={(e) => setQualSelect(e.target.value)} defaultValue="" required>
-                <option value="" disabled>Select Qualification</option><option value="SSLC">SSLC</option><option value="Diploma">Diploma</option><option value="B.Tech">B.Tech</option><option value="Other">Other</option>
-              </select>
-              {qualSelect === 'Other' && <input type="text" placeholder="Please specify qualification" style={{ marginTop: '8px' }} onChange={(e) => setQualOther(e.target.value)} required />}
-            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Qualification *</label><input type="text" name="qualification" placeholder="e.g. B.Tech" onChange={handleChange} required /></div>
           </div>
 
           <div className="grid-3col" style={{ marginTop: '1.1rem' }}>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Stream / Branch *</label>
-              <select onChange={(e) => setStreamSelect(e.target.value)} defaultValue="" required>
-                <option value="" disabled>Select Stream</option><option value="IT">IT</option><option value="EEE">EEE</option><option value="Other">Other</option>
-              </select>
-              {streamSelect === 'Other' && <input type="text" placeholder="Please specify stream" style={{ marginTop: '8px' }} onChange={(e) => setStreamOther(e.target.value)} required />}
-            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Stream / Branch *</label><input type="text" name="stream" placeholder="e.g. IT" onChange={handleChange} required /></div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Experience Status *</label>
               <select name="fresherStatus" onChange={handleChange} defaultValue="" required>
                 <option value="" disabled>Select Status</option><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option>
@@ -491,31 +533,31 @@ function Signup() {
           <div className="section-title" style={{ color: '#c084fc', marginTop: '2rem' }}><i className="ph ph-users" style={{ fontSize: '1.2rem' }}></i> REFERRALS & SECURITY CREDENTIALS</div>
           <div className="grid-2col">
             <div style={{ background: 'var(--input-bg)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--input-border)' }}>
-              <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, display: 'block', marginBottom: '0.6rem' }}>FRIEND 1 REFERRAL *</span>
+              <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase' }}>FRIEND 1 REFERRAL *</span>
               <input type="text" name="friend1Name" placeholder="Full Name" style={{ marginBottom: '0.6rem' }} onChange={handleChange} required />
-              <input type="tel" name="friend1Phone" placeholder="10-digit Contact Number" onChange={handleChange} required />
+              <input type="tel" name="friend1Phone" placeholder="10 Digit Contact Number" onChange={handleChange} required />
             </div>
             <div style={{ background: 'var(--input-bg)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--input-border)' }}>
-              <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, display: 'block', marginBottom: '0.6rem' }}>FRIEND 2 REFERRAL *</span>
+              <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase' }}>FRIEND 2 REFERRAL *</span>
               <input type="text" name="friend2Name" placeholder="Full Name" style={{ marginBottom: '0.6rem' }} onChange={handleChange} required />
-              <input type="tel" name="friend2Phone" placeholder="10-digit Contact Number" onChange={handleChange} required />
+              <input type="tel" name="friend2Phone" placeholder="10 Digit Contact Number" onChange={handleChange} required />
             </div>
           </div>
 
           <div className="grid-2col" style={{ marginTop: '1.1rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Password *</label>
               <div className="pwd-wrapper">
-                <input type={showPassword ? "text" : "password"} name="password" placeholder="Create account password" onChange={handleChange} required />
+                <input type={showPassword ? "text" : "password"} name="password" placeholder="Create account password" onChange={handleChange} required style={{ paddingRight: '40px' }} />
                 <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}><i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i></span>
               </div>
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Confirm Password *</label>
-              <div className="pwd-wrapper"><input type={showPassword ? "text" : "password"} name="confirmPassword" placeholder="Re-enter password" onChange={handleChange} required /></div>
+              <div className="pwd-wrapper"><input type={showPassword ? "text" : "password"} name="confirmPassword" placeholder="Re-enter password" onChange={handleChange} required style={{ paddingRight: '40px' }} /></div>
             </div>
           </div>
 
           <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
-            <input type="checkbox" style={{ width: 'auto', cursor: tncAccepted ? 'pointer' : 'not-allowed' }} checked={tncAccepted} disabled={!tncAccepted} onChange={(e) => setTncAccepted(e.target.checked)} />
+            <input type="checkbox" style={{ width: 'auto', cursor: 'pointer' }} checked={tncAccepted} onChange={(e) => setTncAccepted(e.target.checked)} />
             <label style={{ margin: 0, fontSize: '0.82rem', textTransform: 'none' }}>
               I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span>
             </label>
@@ -557,12 +599,43 @@ function Signup() {
               <h3 style={{ margin: 0, color: 'var(--text-main)' }}>IPCS Placement Rule Set</h3>
               <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setShowTncModal(false)}></i>
             </div>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: 0, marginBottom: '1.5rem' }}>Below mentioned are the Rules to be followed by students for getting Placement Support from IPCS. Please scroll to the bottom to accept.</p>
             <div className="tnc-content-box" onScroll={handleTncScroll}>
               <h4>ELIGIBILITY CRITERIA FOR ATTENDING THE INTERVIEWS</h4>
               <ul>
-                <li>Students who have completed at least 90% of the course.</li>
+                <li>Students who have completed at least 90% of the course (certain companies want candidates immediately in such case you should be in a position to join immediately).</li>
                 <li>Students who have paid the full fees.</li>
+                <li>Students who have passion for working & take their career seriously.</li>
+                <li>Candidates should be ready for any location (exemption only for female students).</li>
               </ul>
+              
+              <h4>DOS & DON’TS FOR THE CANDIDATES</h4>
+              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Job applications & Interview:</strong>
+              <ul>
+                <li>Check all criteria mentioned in the employment news, if everything suits to you then only APPLY to the mentioned company.</li>
+                <li>Students should attend the interview on the date and time as allotted by the recruiter.</li>
+                <li>It is mandatory for Students to update the placement coordinator of their attendance in the interviews. If they are not updating their attendance they will not be allowed for the next interview.</li>
+                <li>Students attending the interview and not getting selected is not a problem. Losing in an interview is not a criteria for further interviews.</li>
+                <li>Students who are not attending the 3 interviews even after their acceptance to attend the interviews will be barred to attend any further interviews and name will be removed from Placement Support.</li>
+                <li>Once enrolled for Placement Support, we expect to student to apply for all companies, if a student not applying to any company for more than 15 days with a valid reason will be removed from Placement Support.</li>
+              </ul>
+
+              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Joining:</strong>
+              <ul>
+                <li>Students can take time to accept or reject the company’s offer but keep the Placement Team and the recruiter updated of their intentions.</li>
+                <li>Students after being selected & given a date to join should adhere to that. No excuses will be accepted thereafter.</li>
+                <li>Students who are not joining after being selected by a recruiter will have to justify why he/she has not joined. Without an apt reason there won’t be more chances.</li>
+                <li>2 times after accepting the offer and not joining will be considered as Black Mark and such student will be barred and name will be removed from Placement Support.</li>
+                <li>1 year commitment to the company getting recruited is mandatory.</li>
+                <li>If anyone joining and getting absconded from work without informing employer will be removed from our Placement Support.</li>
+                <li>There will not be any commitment on Basic Salary /Work Location or other facilities - Candidate has to abide the HR policies set by the hiring company.</li>
+              </ul>
+
+              <h4>Promotional Use of Student Media</h4>
+              <p>Photos and videos of the student taken by IPCS after successful placement may be used by the organization for promotional purposes. By participating in the placement process, the student gives consent for IPCS to use such media across platforms including social media, websites, brochures, and other official materials.</p>
+              
+              <h4>DECLARATION</h4>
+              <p>I hereby declare that I have read & understood the terms & conditions of IPCS Placement Cell. I adhere to follow the rules & incase of any failure to do so; I understand that I won’t be eligible for Placement Support & it will be completely my sole responsibility.</p>
             </div>
             {!tncScrolled ? (
               <div style={{ textAlign: 'center', color: '#f59e0b', fontSize: '0.88rem', fontWeight: 700, marginTop: '15px' }}>↓ Please scroll to the end of the rules to Accept ↓</div>
@@ -578,6 +651,9 @@ function Signup() {
   );
 }
 
+// ==========================================
+// 4. MAIN DASHBOARD ECOSYSTEM
+// ==========================================
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
@@ -590,16 +666,15 @@ function Dashboard() {
   const [tpoModal, setTpoModal] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
-  
 
-  // Talentino States (FIXED - re-added from new code)
+  // Talentino States
   const [gpsCoords, setGpsCoords] = useState(null);
   const [locStatus, setLocStatus] = useState("Capture my location");
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [attStatus, setAttStatus] = useState(null);
 
-  // Vacancy & Applying States (FIXED - using updated boolean checkboxes & celebration animation)
+  // Vacancy & Applying States
   const [jobModal, setJobModal] = useState(null);
   const [actionStatus, setActionStatus] = useState(null);
   const [showConsent, setShowConsent] = useState(false);
@@ -618,7 +693,6 @@ function Dashboard() {
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
 
-  // Auto-Fix Google Drive Image URLs
   const getDriveImageUrl = (url) => {
     if (!url || url === "N/A") return null;
     const match = url.match(/(?:id=|\/d\/)([\w-]+)/);
@@ -627,7 +701,7 @@ function Dashboard() {
 
   const fetchDashboard = useCallback(async (storedUser) => {
     try {
-      const res = await axios.post(API_BASE_URL + '/api/dashboard/data', { 
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/data`, { 
         email: storedUser.email, branch: storedUser.branch, course: storedUser.course 
       });
       if(res.data.success) {
@@ -647,10 +721,7 @@ function Dashboard() {
     setUser(storedUser);
     fetchDashboard(storedUser);
 
-    // REAL-TIME SILENT SYNC (Refreshes data automatically every 15 seconds)
-    const interval = setInterval(() => {
-      fetchDashboard(storedUser);
-    }, 15000);
+    const interval = setInterval(() => { fetchDashboard(storedUser); }, 15000);
     return () => clearInterval(interval);
   }, [navigate, fetchDashboard]);
 
@@ -690,7 +761,6 @@ function Dashboard() {
   };
   const notifications = getNotifications();
 
-  // Profile Edit Functions
   const openEditProfileModal = () => {
     setEpData({
         age: user.age || '', gender: user.gender || 'Male',
@@ -707,7 +777,7 @@ function Dashboard() {
   const handleProfileUpdate = async () => {
     setEpStatus({ type: 'info', message: 'Saving changes...' });
     try {
-        const res = await axios.post(API_BASE_URL + '/api/dashboard/profile/update', { email: user.email, ...epData });
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/update`, { email: user.email, ...epData });
         if(res.data.success) {
             setEpStatus({ type: 'success', message: 'Profile updated!' });
             const updatedUser = { ...user, ...res.data.user };
@@ -728,7 +798,7 @@ function Dashboard() {
     reader.readAsDataURL(file);
     reader.onload = async () => {
         try {
-            const res = await axios.post(API_BASE_URL + '/api/dashboard/profile/document', {
+            const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/document`, {
                 email: user.email, rollNo: user.rollNo, base64: reader.result, docType
             });
             if (res.data.success) {
@@ -748,7 +818,7 @@ function Dashboard() {
     if(pwdData.newPwd.length < 8) { setPwdStatus({ type: 'error', message: 'Password must be at least 8 characters' }); return; }
     setPwdStatus({ type: 'info', message: 'Updating password...' });
     try {
-        const res = await axios.post(API_BASE_URL + '/api/dashboard/profile/password', {
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/password`, {
             email: user.email, currentPassword: pwdData.current, newPassword: pwdData.newPwd
         });
         if(res.data.success) {
@@ -763,7 +833,7 @@ function Dashboard() {
     if(!issueText.trim()) return;
     setIssueStatus({ type: 'info', message: 'Submitting...' });
     try {
-        const res = await axios.post(API_BASE_URL + '/api/dashboard/support/issue', {
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/support/issue`, {
             email: user.email, name: user.name, branch: user.branch, course: user.course, issueDetails: issueText
         });
         if(res.data.success) {
@@ -773,7 +843,6 @@ function Dashboard() {
     } catch(err) { setIssueStatus({ type: 'error', message: 'Submission failed' }); }
   };
 
-  // TALENTINO LOGIC
   const captureGPS = () => {
     if(!data.isScheduledToday || data.hasMarkedToday) return; 
     setLocStatus("Capturing...");
@@ -790,7 +859,7 @@ function Dashboard() {
   const submitAttendance = async () => {
     setAttStatus({ type: 'info', message: 'Verifying location and submitting...' });
     try {
-      const res = await axios.post(API_BASE_URL + '/api/dashboard/attendance', {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, {
         email: user.email, name: user.name, branch: user.branch, course: user.course,
         rating, location: locStatus, userLat: gpsCoords.lat, userLng: gpsCoords.lng, feedback
       });
@@ -803,7 +872,6 @@ function Dashboard() {
     }
   };
 
-  // VACANCY LOGIC
   const isPastDate = (dateStr) => {
     if (!dateStr || dateStr.toLowerCase() === 'open') return false;
     let parts = dateStr.split('-');
@@ -832,13 +900,13 @@ function Dashboard() {
     }
     setActionStatus({ type: 'info', message: 'Submitting application...' });
     try {
-      const res = await axios.post(API_BASE_URL + '/api/dashboard/apply', {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/apply`, {
          email: user.email, jobId: jobModal.newsletterId, companyName: jobModal.company, name: user.name, 
          phone: user.phone, rollNo: user.rollNo, course: user.course, branch: user.branch,
          qualification: user.qualification, resume: user.resume
       });
       if(res.data.success) {
-        setShowConfetti(true); // Trigger Celebration Animation
+        setShowConfetti(true);
         fetchDashboard(user); 
         setTimeout(() => { 
             setJobModal(null); setActionStatus(null); setShowConsent(false); 
@@ -861,7 +929,7 @@ function Dashboard() {
               <i className="ph ph-arrow-left"></i> Dashboard
             </button>
           ) : (
-            <img src="https://lh3.googleusercontent.com/d/1y36ddjxHfSsu4cINBvUbeTe0OyobG2TP" alt="IPCS Global" className="header-logo-img" />
+            <img src={GLOBAL_LOGO_URL} alt="IPCS Global" className="header-logo-img" />
           )}
           <span style={{ marginLeft: '10px', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>{getBreadcrumb()}</span>
         </div>
@@ -1600,7 +1668,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
