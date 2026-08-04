@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cropper from 'react-easy-crop';
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'API_BASE_URL + '';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const GlobalStyle = () => {
   useEffect(() => {
