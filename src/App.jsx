@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Cropper from 'react-easy-crop';
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -585,11 +585,13 @@ function Dashboard() {
   const [theme, setTheme] = useState('dark');
   
   // View State 
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [tpoModal, setTpoModal] = useState(false);
-  const [helpModal, setHelpModal] = useState(false);
-  const [showNotif, setShowNotif] = useState(false);
+  const location = useLocation();
+const activeTab = location.pathname.split('/')[2] || 'dashboard';
+
+const setActiveTab = (tabName) => {
+  if (tabName === 'dashboard') navigate('/dashboard');
+  else navigate(`/dashboard/${tabName}`);
+};
 
   // Talentino States (FIXED - re-added from new code)
   const [gpsCoords, setGpsCoords] = useState(null);
@@ -1599,7 +1601,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
