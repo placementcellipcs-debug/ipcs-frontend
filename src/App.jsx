@@ -590,13 +590,7 @@ function Dashboard() {
   const [tpoModal, setTpoModal] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
-  const location = useLocation();
-const activeTab = location.pathname.split('/')[2] || 'dashboard';
-
-const setActiveTab = (tabName) => {
-  if (tabName === 'dashboard') navigate('/dashboard');
-  else navigate(`/dashboard/${tabName}`);
-};
+  
 
   // Talentino States (FIXED - re-added from new code)
   const [gpsCoords, setGpsCoords] = useState(null);
