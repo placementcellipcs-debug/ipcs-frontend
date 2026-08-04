@@ -316,6 +316,9 @@ function Login() {
 // ==========================================
 // 3. SIGNUP COMPONENT
 // ==========================================
+// ==========================================
+// 3. SIGNUP COMPONENT (UPDATED WITH DROPDOWNS & CUSTOM INPUTS)
+// ==========================================
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -337,7 +340,7 @@ function Signup() {
     course: '', joiningDate: '', fresherStatus: '', homeTown: '',
     linkedin: '', instagram: '', placementReq: '', parentName: '', parentContact: '', 
     friend1Name: '', friend1Phone: '', friend2Name: '', friend2Phone: '', password: '', confirmPassword: '',
-    qualification: '', stream: ''
+    qualification: '', customQualification: '', stream: '', customStream: ''
   });
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -382,8 +385,20 @@ function Signup() {
     if (formData.password !== formData.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match!' }); return; }
     if (!tncAccepted) { setStatus({ type: 'error', message: 'You must accept the Terms & Conditions.' }); return; }
 
+    // Resolve "Other" values if selected
+    const resolvedQualification = formData.qualification === 'Other' ? formData.customQualification : formData.qualification;
+    const resolvedStream = formData.stream === 'Other' ? formData.customStream : formData.stream;
+
+    if (!resolvedQualification.trim()) { setStatus({ type: 'error', message: 'Please specify your qualification.' }); return; }
+    if (!resolvedStream.trim()) { setStatus({ type: 'error', message: 'Please specify your stream/branch.' }); return; }
+
     setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
-    const payload = { ...formData, photoBase64: finalPhotoBase64 };
+    const payload = { 
+      ...formData, 
+      qualification: resolvedQualification, 
+      stream: resolvedStream, 
+      photoBase64: finalPhotoBase64 
+    };
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
@@ -511,11 +526,59 @@ function Signup() {
               </select>
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Joining Date *</label><input type="date" name="joiningDate" onChange={handleChange} required /></div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Qualification *</label><input type="text" name="qualification" placeholder="e.g. B.Tech" onChange={handleChange} required /></div>
+            
+            {/* QUALIFICATION DROPDOWN WITH CONDITIONAL "OTHER" TEXTBOX */}
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Qualification *</label>
+              <select name="qualification" onChange={handleChange} defaultValue="" required>
+                <option value="" disabled>Select Qualification</option>
+                <option value="SSLC">SSLC</option>
+                <option value="HSE">HSE</option>
+                <option value="ITI">ITI</option>
+                <option value="Diploma">Diploma</option>
+                <option value="B.Tech">B.Tech</option>
+                <option value="Bsc">Bsc</option>
+                <option value="PG">PG</option>
+                <option value="Other">Other</option>
+              </select>
+              {formData.qualification === 'Other' && (
+                <input 
+                  type="text" 
+                  name="customQualification" 
+                  placeholder="Specify Qualification" 
+                  onChange={handleChange} 
+                  required 
+                  style={{ marginTop: '0.6rem' }} 
+                />
+              )}
+            </div>
           </div>
 
           <div className="grid-3col" style={{ marginTop: '1.1rem' }}>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Stream / Branch *</label><input type="text" name="stream" placeholder="e.g. IT" onChange={handleChange} required /></div>
+            {/* STREAM / BRANCH DROPDOWN WITH CONDITIONAL "OTHER" TEXTBOX */}
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Stream / Branch *</label>
+              <select name="stream" onChange={handleChange} defaultValue="" required>
+                <option value="" disabled>Select Stream</option>
+                <option value="IT">IT</option>
+                <option value="EEE">EEE</option>
+                <option value="EC">EC</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Science">Science</option>
+                <option value="Other">Other</option>
+              </select>
+              {formData.stream === 'Other' && (
+                <input 
+                  type="text" 
+                  name="customStream" 
+                  placeholder="Specify Stream / Branch" 
+                  onChange={handleChange} 
+                  required 
+                  style={{ marginTop: '0.6rem' }} 
+                />
+              )}
+            </div>
+
             <div className="form-group" style={{ marginBottom: 0 }}><label>Experience Status *</label>
               <select name="fresherStatus" onChange={handleChange} defaultValue="" required>
                 <option value="" disabled>Select Status</option><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option>
