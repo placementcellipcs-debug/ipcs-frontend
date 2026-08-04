@@ -237,7 +237,7 @@ function Login() {
     setStatus({ type: 'info', message: 'Verifying credentials...' });
 
     try {
-      const response = await axios.post('API_BASE_URL + '/api/auth/login', { email, password });
+      const response = await axios.post(API_BASE_URL + '/api/auth/login', { email, password });
       if (response.data.success) {
         localStorage.setItem('talentino_student_token', response.data.token);
         localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
@@ -390,7 +390,7 @@ function Signup() {
     const payload = { ...formData, photoBase64: finalPhotoBase64, qualification: finalQual, stream: finalStream };
 
     try {
-      const response = await axios.post('API_BASE_URL + '/api/auth/register', payload);
+      const response = await axios.post(API_BASE_URL + '/api/auth/register', payload);
       if (response.data.success) {
         setStatus({ type: 'success', message: 'Account created! Redirecting to login...' });
         setTimeout(() => navigate('/'), 2500); 
@@ -626,7 +626,7 @@ function Dashboard() {
 
   const fetchDashboard = useCallback(async (storedUser) => {
     try {
-      const res = await axios.post('API_BASE_URL + '/api/dashboard/data', { 
+      const res = await axios.post(API_BASE_URL + '/api/dashboard/data', { 
         email: storedUser.email, branch: storedUser.branch, course: storedUser.course 
       });
       if(res.data.success) {
@@ -706,7 +706,7 @@ function Dashboard() {
   const handleProfileUpdate = async () => {
     setEpStatus({ type: 'info', message: 'Saving changes...' });
     try {
-        const res = await axios.post('API_BASE_URL + '/api/dashboard/profile/update', { email: user.email, ...epData });
+        const res = await axios.post(API_BASE_URL + '/api/dashboard/profile/update', { email: user.email, ...epData });
         if(res.data.success) {
             setEpStatus({ type: 'success', message: 'Profile updated!' });
             const updatedUser = { ...user, ...res.data.user };
@@ -727,7 +727,7 @@ function Dashboard() {
     reader.readAsDataURL(file);
     reader.onload = async () => {
         try {
-            const res = await axios.post('API_BASE_URL + '/api/dashboard/profile/document', {
+            const res = await axios.post(API_BASE_URL + '/api/dashboard/profile/document', {
                 email: user.email, rollNo: user.rollNo, base64: reader.result, docType
             });
             if (res.data.success) {
@@ -747,7 +747,7 @@ function Dashboard() {
     if(pwdData.newPwd.length < 8) { setPwdStatus({ type: 'error', message: 'Password must be at least 8 characters' }); return; }
     setPwdStatus({ type: 'info', message: 'Updating password...' });
     try {
-        const res = await axios.post('API_BASE_URL + '/api/dashboard/profile/password', {
+        const res = await axios.post(API_BASE_URL + '/api/dashboard/profile/password', {
             email: user.email, currentPassword: pwdData.current, newPassword: pwdData.newPwd
         });
         if(res.data.success) {
@@ -762,7 +762,7 @@ function Dashboard() {
     if(!issueText.trim()) return;
     setIssueStatus({ type: 'info', message: 'Submitting...' });
     try {
-        const res = await axios.post('API_BASE_URL + '/api/dashboard/support/issue', {
+        const res = await axios.post(API_BASE_URL + '/api/dashboard/support/issue', {
             email: user.email, name: user.name, branch: user.branch, course: user.course, issueDetails: issueText
         });
         if(res.data.success) {
@@ -789,7 +789,7 @@ function Dashboard() {
   const submitAttendance = async () => {
     setAttStatus({ type: 'info', message: 'Verifying location and submitting...' });
     try {
-      const res = await axios.post('API_BASE_URL + '/api/dashboard/attendance', {
+      const res = await axios.post(API_BASE_URL + '/api/dashboard/attendance', {
         email: user.email, name: user.name, branch: user.branch, course: user.course,
         rating, location: locStatus, userLat: gpsCoords.lat, userLng: gpsCoords.lng, feedback
       });
@@ -831,7 +831,7 @@ function Dashboard() {
     }
     setActionStatus({ type: 'info', message: 'Submitting application...' });
     try {
-      const res = await axios.post('API_BASE_URL + '/api/dashboard/apply', {
+      const res = await axios.post(API_BASE_URL + '/api/dashboard/apply', {
          email: user.email, jobId: jobModal.newsletterId, companyName: jobModal.company, name: user.name, 
          phone: user.phone, rollNo: user.rollNo, course: user.course, branch: user.branch,
          qualification: user.qualification, resume: user.resume
