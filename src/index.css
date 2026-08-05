@@ -176,3 +176,56 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-cyan); }
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg-dark: #080c14;
+  --card-bg: #111827;
+  --card-border: rgba(255, 255, 255, 0.05);
+  --accent-cyan: #38bdf8;
+  --accent-blue: #3b82f6;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+/* Utilities & Animations */
+.glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid var(--card-border); }
+.btn-glow { background: linear-gradient(90deg, #0ea5e9, #38bdf8); color: white; padding: 0.9rem 2rem; border-radius: 30px; font-weight: 800; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4); transition: all 0.3s; }
+.btn-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(14, 165, 233, 0.6); }
+
+/* Live Ticker Animation */
+.ticker-slide-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes fadeSlideUp {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Infinite Marquees */
+.animate-marquee-left { animation: marqueeLeft 80s linear infinite; }
+.animate-marquee-right { animation: marqueeRight 80s linear infinite; }
+@keyframes marqueeLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes marqueeRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+.company-card { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; width: 280px; flex-shrink: 0; transition: all 0.3s; }
+.company-card:hover { border-color: rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.9); transform: translateY(-5px); }
+
+.form-group label { display: block; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; }
+.form-group input { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; background: #1e293b; border: 1px solid #334155; color: white; outline: none; }
+.form-group input:focus { border-color: var(--accent-cyan); }

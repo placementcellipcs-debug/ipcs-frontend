@@ -2099,3 +2099,19 @@ export default function App() {
     </>
   );
 }
+// Import Pages
+import Home from './pages/Home';
+import Dashboard from './pages/Dashboard'; // Move your Dashboard logic here
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/signup" element={<div>Signup Component Here</div>} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="*" element={<div className="flex h-screen items-center justify-center text-white bg-[#080c14]">404 Not Found</div>} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

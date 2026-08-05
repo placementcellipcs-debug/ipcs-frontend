@@ -140,7 +140,7 @@ if (!navigator.geolocation) { setLocStatus("GPS Not Supported"); return; }
 navigator.geolocation.getCurrentPosition(
 pos => {
 setGpsCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-setLocStatus(${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (GPS Verified));
+setLocStatus(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (GPS Verified)`);
 },
 err => { setLocStatus("GPS Permission Denied"); }
 );
@@ -1002,6 +1002,9 @@ return (
         </div>
       )}
 
+    </div>
+  </div>
+
   {/* SIDE DRAWER */}
   <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
     <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
@@ -1252,7 +1255,5 @@ return (
   )}
 
 </div>
-
-
 );
 }
