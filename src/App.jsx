@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Cropper from 'react-easy-crop';
+// Add this near your other imports at the top of the file
+import loadingVideo from './assets/loading.mp4';
 
 const GlobalStyle = () => {
   useEffect(() => {

@@ -10,6 +10,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [tncAccepted, setTncAccepted] = useState(false);
   const [status, setStatus] = useState(null);
+  const [showLoadingVideo, setShowLoadingVideo] = useState(false);
 
 
   const [showTncModal, setShowTncModal] = useState(false);
@@ -29,7 +30,14 @@ function Login() {
     if (!email || !password) { setStatus({ type: 'error', message: 'Please enter both email and password.' }); return; }
     if (!tncAccepted) { setStatus({ type: 'error', message: 'You must accept the Terms & Conditions.' }); return; }
 
-
+// Inside handleLogin try block:
+if (response.data.success) {
+  localStorage.setItem('talentino_student_token', response.data.token);
+  localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
+  
+  // Trigger the video instead of navigating immediately
+  setShowLoadingVideo(true);
+}
     setStatus({ type: 'info', message: 'Verifying credentials...' });
 
 
@@ -39,6 +47,23 @@ function Login() {
         localStorage.setItem('talentino_student_token', response.data.token);
         localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
         navigate('/dashboard');
+        // If login is successful, show the full-screen video
+if (showLoadingVideo) {
+  return (
+    <div className="video-loading-screen">
+      <video 
+        src={loadingVideo} 
+        autoPlay 
+        muted 
+        playsInline 
+        onEnded={() => navigate('/dashboard')} // Navigates exactly when the video finishes!
+        className="fullscreen-video"
+      />
+    </div>
+  );
+}
+
+// Your existing return ( <div className="landing-wrapper"> ... ) goes here
       }
     } catch (error) {
       setStatus({ type: 'error', message: error.response?.data?.message || 'Server Error. Is the backend running?' });
