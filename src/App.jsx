@@ -4,6 +4,7 @@ import axios from 'axios';
 import Cropper from 'react-easy-crop';
 import loadingVideo from './assets/video.mp4';
 
+/* STREAMING_CHUNK:Initializing global styles and variables... */
 const GlobalStyle = () => {
   useEffect(() => {
     if (!document.getElementById('phosphor-icons')) {
@@ -47,7 +48,7 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* --- LANDING PAGE (LOGIN) STYLES --- */
+      /* STREAMING_CHUNK:Configuring landing page and auth card styles... */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%); display: flex; flex-direction: column; }
       .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
       .nav-links { display: flex; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
@@ -71,7 +72,7 @@ const GlobalStyle = () => {
       .alert-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
       .alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
 
-      /* --- VIDEO LOADER STYLES --- */
+      /* STREAMING_CHUNK:Adding Video Loader CSS... */
       .video-loader-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-in-out; }
       .video-loader-overlay.fade-out { opacity: 0; pointer-events: none; }
       .video-loader-overlay video { width: 100%; height: 100%; object-fit: cover; }
@@ -88,6 +89,7 @@ const GlobalStyle = () => {
       .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.1rem; }
       .form-footer-bar { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid var(--card-border); }
 
+      /* STREAMING_CHUNK:Setting up animations and modal overlays... */
       @keyframes fadeInReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -95,6 +97,10 @@ const GlobalStyle = () => {
       .report-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; animation: fadeInReveal 0.3s ease;}
       .modal-header-border { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.8rem; }
       .tnc-content-box { height: 350px; overflow-y: auto; font-size: 0.85rem; color: var(--text-main); background: var(--input-bg); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--input-border); line-height: 1.7; position: relative; }
+      .tnc-content-box h4 { color: var(--text-main); font-size: 0.9rem; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; }
+      .tnc-content-box h4:first-child { margin-top: 0; }
+      .tnc-content-box ul { margin-top: 0; padding-left: 20px; margin-bottom: 20px; }
+      .tnc-content-box p { margin-top: 0; margin-bottom: 15px; }
 
       .celebration-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 23, 0.85); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); border-radius: 20px; }
       .celebration-content { text-align: center; animation: fadeInUp 0.4s ease; }
@@ -104,28 +110,28 @@ const GlobalStyle = () => {
       /* --- DASHBOARD STYLES --- */
       .app-layout { display: flex; flex-direction: column; width: 100vw; min-height: 100vh; }
       .main-body { flex: 1; display: flex; flex-direction: column; width: 100%; }
-      .top-header { height: 65px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; transition: background 0.3s; position: relative; z-index: 50; }
+      .top-header { height: 65px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; transition: background 0.3s; z-index: 50; position: relative;}
       .header-left { display: flex; align-items: center; gap: 12px; }
       .header-logo-img { height: 35px; width: auto; object-fit: contain; }
       .header-right { display: flex; align-items: center; gap: 18px; }
       .header-icon-btn { position: relative; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; background: none; border: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; }
       .header-icon-btn:hover { color: var(--accent-cyan); background: var(--hover-bg); }
-      .user-profile-badge { display: flex; align-items: center; cursor: pointer; z-index: 51; }
+      .user-profile-badge { display: flex; align-items: center; cursor: pointer; }
       .avatar-circle { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; border: 2px solid rgba(56, 189, 248, 0.4); overflow: hidden;}
       .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
       
       .dashboard-content { padding: 2rem; max-width: 1300px; width: 100%; margin: 0 auto; animation: fadeInUp 0.3s ease; }
       .dash-top-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
       
-      /* Dashboard Hero Banner with Student Photo & Gradient System */
-      .hero-banner { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
-      .hero-banner::after { content: ''; position: absolute; right: -5%; top: 0; height: 100%; width: 50%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat right center; background-size: contain; opacity: 0.1; mask-image: linear-gradient(to right, transparent, black); pointer-events: none; z-index: 0; }
-      .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); z-index: 2; position: relative; }
+      /* STREAMING_CHUNK:Styling Hero banner with Faded Background Logo... */
+      .hero-banner { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
+      .hero-banner::after { content: ''; position: absolute; right: -5%; top: 0; height: 100%; width: 50%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat right center; background-size: contain; opacity: 0.1; mask-image: linear-gradient(to right, transparent, black); -webkit-mask-image: linear-gradient(to right, transparent, black); pointer-events: none; z-index: 0; }
+      .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); position: relative; z-index: 2; }
       .hero-banner-avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--bg-dark); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
       .hero-banner-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
-      .greeting-subtitle { color: var(--accent-cyan); font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; z-index: 2; position: relative; }
-      .hero-banner h2 { margin: 0 0 6px 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; z-index: 2; position: relative; }
-      .full-date-subtext { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; z-index: 2; position: relative; }
+      .greeting-subtitle { color: var(--accent-cyan); font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; position: relative; z-index: 2; }
+      .hero-banner h2 { margin: 0 0 6px 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; position: relative; z-index: 2;}
+      .full-date-subtext { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; position: relative; z-index: 2;}
       
       .vacancy-quick-banner { background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%); border: 1px solid #6366f1; border-radius: 16px; padding: 1.2rem 1.8rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
       .vacancy-quick-banner:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); }
@@ -156,8 +162,8 @@ const GlobalStyle = () => {
       .ev-meta { display: flex; align-items: center; gap: 15px; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
       .ev-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
       
-      /* --- LIQUID GLASS NOTIFICATIONS --- */
-      .notif-dropdown { position: absolute; top: 55px; right: 0; width: 340px; background: rgba(19, 25, 36, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); z-index: 1000; overflow: hidden; transform-origin: top right; animation: fadeInUp 0.2s ease; }
+      /* STREAMING_CHUNK:Adding Smart Notifications CSS... */
+      .notif-dropdown { position: absolute; top: 55px; right: 0; width: 340px; background: rgba(19, 25, 36, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); z-index: 1000; overflow: hidden; transform-origin: top right; animation: fadeInUp 0.2s ease; }
       .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; gap: 4px; }
       .notif-item:hover { background: rgba(255,255,255,0.1); }
       .notif-item:last-child { border-bottom: none; }
@@ -196,15 +202,15 @@ const GlobalStyle = () => {
       .star-rating .star:hover { transform: scale(1.5); }
       .star-rating .star.selected { color: #f59e0b; }
 
+      /* STREAMING_CHUNK:Styling the Profile Layout and Document boxes... */
       /* --- PROFILE & SETTINGS --- */
       .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 1.8rem; align-items: start; }
-      .profile-left-col { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 1.5rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; overflow: hidden;}
+      .profile-left-col { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 1.5rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
       .profile-left-col::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat center center; background-size: 90%; opacity: 0.05; pointer-events: none; z-index: 0; }
       .profile-large-avatar { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 1rem auto; overflow: hidden; border: 3px solid var(--accent-cyan); background: var(--bg-dark); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: var(--text-muted); position: relative; z-index: 2;}
       .profile-large-avatar img { width: 100%; height: 100%; object-fit: cover; }
       .info-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.8rem; position: relative; margin-bottom: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2);}
       .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
-      
       .doc-box { display: flex; align-items: center; justify-content: space-between; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 1.2rem; margin-bottom: 12px; transition: border-color 0.2s;}
       
       .settings-container { display: grid; grid-template-columns: 220px 1fr; gap: 2rem; align-items: start; }
@@ -260,6 +266,7 @@ const GlobalStyle = () => {
   );
 };
 
+/* STREAMING_CHUNK:Initializing state variables and logic... */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
@@ -273,6 +280,8 @@ function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState(null);
+  
+  // Video Loader States
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [fadeVideo, setFadeVideo] = useState(false);
 
@@ -287,6 +296,7 @@ function Login() {
         localStorage.setItem('talentino_student_token', response.data.token);
         localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
         
+        // Trigger 6-second video loader before entering dashboard
         setIsLoggingIn(true);
         setTimeout(() => setFadeVideo(true), 5500); 
         setTimeout(() => navigate('/dashboard'), 6000);
@@ -296,6 +306,7 @@ function Login() {
     }
   };
 
+  // The Video Overlay screen
   if (isLoggingIn) {
     return (
       <div className={`video-loader-overlay ${fadeVideo ? 'fade-out' : ''}`}>
@@ -352,13 +363,16 @@ function Login() {
 // ==========================================
 // 3. SIGNUP COMPONENT
 // ==========================================
+/* STREAMING_CHUNK:Rendering Registration and Profile logic... */
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState(null);
+  
   const [showTncModal, setShowTncModal] = useState(false);
   const [tncScrolled, setTncScrolled] = useState(false);
   const [tncAccepted, setTncAccepted] = useState(false);
+
   const [showCropModal, setShowCropModal] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -598,8 +612,8 @@ function Signup() {
           </div>
 
           <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '20px' }}>
-            <input type="checkbox" style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '2px', cursor: 'pointer' }} checked={tncAccepted} onChange={(e) => setTncAccepted(e.target.checked)} />
-            <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: '1.4' }}>
+            <input type="checkbox" style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} checked={tncAccepted} onChange={(e) => setTncAccepted(e.target.checked)} />
+            <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: 1.4 }}>
               I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span>
             </label>
           </div>
@@ -613,6 +627,7 @@ function Signup() {
         </form>
       </div>
 
+      {/* STREAMING_CHUNK:Image crop and Terms modal layouts... */}
       {showCropModal && (
         <div className="report-modal-overlay">
           <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
@@ -682,6 +697,7 @@ function Signup() {
 // ==========================================
 // 4. MAIN DASHBOARD ECOSYSTEM
 // ==========================================
+/* STREAMING_CHUNK:Configuring robust dashboard logic and APIs... */
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
@@ -790,7 +806,7 @@ function Dashboard() {
     }
   };
 
-  // Notification Sorting Logic
+  /* STREAMING_CHUNK:Notification logic and filtering arrays... */
   const getNotifications = () => {
     let notifs = [];
     (data.appliedJobs || []).forEach(job => {
@@ -991,6 +1007,7 @@ function Dashboard() {
     return 0; // Both expired or both active
   });
 
+  /* STREAMING_CHUNK:Rendering Dashboard structure and Navbar... */
   return (
     <div className="app-layout">
       <div className="top-header">
@@ -1135,6 +1152,7 @@ function Dashboard() {
             </>
           )}
 
+          {/* STREAMING_CHUNK:Rendering polished Profile layout... */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -1244,6 +1262,7 @@ function Dashboard() {
             </div>
           )}
 
+          {/* STREAMING_CHUNK:Rendering Settings and Guide tab layouts... */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
@@ -1350,6 +1369,7 @@ function Dashboard() {
             </div>
           )}
 
+          {/* STREAMING_CHUNK:Rendering Talentino attendance module... */}
           {activeTab === 'talentino' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -1456,6 +1476,7 @@ function Dashboard() {
             </div>
           )}
 
+          {/* STREAMING_CHUNK:Rendering Vacancies grid and Job Details Modals... */}
           {activeTab === 'vacancies' && (
             <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
@@ -1550,6 +1571,73 @@ function Dashboard() {
         </div>
       </div>
 
+      <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
+        <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
+          <div className="drawer-header-cover">
+            <div className="drawer-close-btn" onClick={() => setDrawerOpen(false)}><i className="ph ph-x"></i></div>
+            <div className="drawer-profile-row">
+              <div className="drawer-avatar">
+                 {user?.photo && user.photo.includes('http') ? <img src={getDriveImageUrl(user.photo)} alt="Profile" /> : user?.name?.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <strong style={{ display:'block', fontSize:'1.1rem', fontWeight:700, color: '#fff' }}>{user?.name}</strong>
+                <span style={{ fontSize:'0.8rem', color: '#38bdf8', fontWeight: 600 }}>{user?.rollNo}</span>
+              </div>
+            </div>
+          </div>
+          <div className="drawer-menu">
+            <div className="drawer-item" onClick={() => { setActiveTab('dashboard'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-house"></i> Dashboard</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setActiveTab('talentino'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setActiveTab('profile'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setActiveTab('status'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setActiveTab('vacancies'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setActiveTab('guide'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-book-open"></i> Guide</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setTpoModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-address-book"></i> Contact TPO</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setHelpModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-info"></i> Request Help</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setActiveTab('settings'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-gear"></i> Settings</div><span>&rsaquo;</span></div>
+          </div>
+          <div className="drawer-footer">
+            <button className="btn-logout-drawer" onClick={handleLogout}>Log Out</button>
+            <div style={{ fontSize:'0.72rem', color:'var(--text-muted)' }}>Copyright &copy; 2026 Talentino IPCS Global</div>
+          </div>
+        </div>
+      </div>
+      
+      {/* STREAMING_CHUNK:Rendering closing Modals (Profile, Modals, Support)... */}
+      {editProfileModal && (
+        <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
+          <div className="report-card" style={{ maxWidth: '700px' }}>
+            <div className="modal-header-border">
+              <h3 style={{ margin: 0, color: 'var(--text-main)' }}><i className="ph ph-pencil-simple" style={{ color: 'var(--accent-cyan)' }}></i> Edit Profile Details</h3>
+              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setEditProfileModal(false)}></i>
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', background: 'var(--hover-bg)', padding: '10px', borderRadius: '8px' }}><strong>Note:</strong> Core ID details (Name, Roll No, Branch, Email, Course) are strictly uneditable by students. Contact admin for corrections.</div>
+            <div className="grid-2col">
+               <div className="form-group"><label>Age</label><input type="number" value={epData.age} onChange={(e) => setEpData({...epData, age: e.target.value})} /></div>
+               <div className="form-group"><label>Gender</label><select value={epData.gender} onChange={(e) => setEpData({...epData, gender: e.target.value})}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+               <div className="form-group"><label>Parent Name</label><input type="text" value={epData.parentName} onChange={(e) => setEpData({...epData, parentName: e.target.value})} /></div>
+               <div className="form-group"><label>Parent Contact</label><input type="tel" value={epData.parentContact} onChange={(e) => setEpData({...epData, parentContact: e.target.value})} /></div>
+               <div className="form-group"><label>Studying Status</label><select value={epData.studyStatus} onChange={(e) => setEpData({...epData, studyStatus: e.target.value})}><option value="Currently Studying">Currently Studying</option><option value="Completed Course">Completed Course</option></select></div>
+               <div className="form-group"><label>Course Completed Date</label><input type="date" value={epData.completedDate} onChange={(e) => setEpData({...epData, completedDate: e.target.value})} /></div>
+               <div className="form-group"><label>Stream</label><input type="text" value={epData.stream} onChange={(e) => setEpData({...epData, stream: e.target.value})} /></div>
+               <div className="form-group"><label>Home Town</label><input type="text" value={epData.homeTown} onChange={(e) => setEpData({...epData, homeTown: e.target.value})} /></div>
+               <div className="form-group"><label>Fresher Status</label><select value={epData.fresherStatus} onChange={(e) => setEpData({...epData, fresherStatus: e.target.value})}><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option></select></div>
+               <div className="form-group"><label>Qualification</label><input type="text" value={epData.qualification} onChange={(e) => setEpData({...epData, qualification: e.target.value})} /></div>
+            </div>
+            <div className="grid-2col" style={{ marginTop: '1rem' }}>
+               <div className="form-group"><label>LinkedIn</label><input type="text" value={epData.linkedin} onChange={(e) => setEpData({...epData, linkedin: e.target.value})} /></div>
+               <div className="form-group"><label>Instagram Handle</label><input type="text" value={epData.instagram} onChange={(e) => setEpData({...epData, instagram: e.target.value})} /></div>
+            </div>
+            <div className="form-group"><label>Placement Requirements</label><textarea rows="2" value={epData.placementReq} onChange={(e) => setEpData({...epData, placementReq: e.target.value})}></textarea></div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '15px' }}>
+               <button className="btn-cancel" onClick={() => setEditProfileModal(false)}>Cancel</button>
+               <button className="btn-action" onClick={handleProfileUpdate}>Save Changes</button>
+            </div>
+            {epStatus && <div className={`alert alert-${epStatus.type}`} style={{marginTop: '10px'}}>{epStatus.message}</div>}
+          </div>
+        </div>
+      )}
+
       {jobModal && (
         <div className="report-modal-overlay">
           <div className="report-card" style={{ maxWidth: '600px', width: '90%', padding: '0', overflow: 'hidden', position: 'relative' }}>
@@ -1607,14 +1695,14 @@ function Dashboard() {
                   ) : (
                     <>
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-                        <input type="checkbox" checked={q1} onChange={e => setQ1(e.target.checked)} style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '2px', cursor: 'pointer' }} />
+                        <input type="checkbox" checked={q1} onChange={e => setQ1(e.target.checked)} style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} />
                         <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 400, lineHeight: 1.4 }}>
                           1. As I am applying for this job, I agree that I will attend the interview whenever the company calls me without fail.
                         </p>
                       </div>
                       
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '20px' }}>
-                        <input type="checkbox" checked={q2} onChange={e => setQ2(e.target.checked)} style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '2px', cursor: 'pointer' }} />
+                        <input type="checkbox" checked={q2} onChange={e => setQ2(e.target.checked)} style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} />
                         <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 400, lineHeight: 1.4 }}>
                           2. I agree as per Placement rule if I fail to attend this company interview, I will be removed from placement support.
                         </p>
