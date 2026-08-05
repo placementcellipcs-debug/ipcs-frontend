@@ -4,7 +4,6 @@ import axios from 'axios';
 import Cropper from 'react-easy-crop';
 import loadingVideo from './assets/video.mp4';
 
-/* STREAMING_CHUNK:Initializing global styles and variables... */
 const GlobalStyle = () => {
   useEffect(() => {
     if (!document.getElementById('phosphor-icons')) {
@@ -48,7 +47,7 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* STREAMING_CHUNK:Configuring landing page and auth card styles... */
+      /* --- LANDING PAGE (LOGIN) STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%); display: flex; flex-direction: column; }
       .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
       .nav-links { display: flex; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
@@ -72,7 +71,7 @@ const GlobalStyle = () => {
       .alert-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
       .alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
 
-      /* STREAMING_CHUNK:Adding Video Loader CSS... */
+      /* --- VIDEO LOADER STYLES --- */
       .video-loader-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-in-out; }
       .video-loader-overlay.fade-out { opacity: 0; pointer-events: none; }
       .video-loader-overlay video { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s ease; }
@@ -90,7 +89,6 @@ const GlobalStyle = () => {
       .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.1rem; }
       .form-footer-bar { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid var(--card-border); }
 
-      /* STREAMING_CHUNK:Setting up animations and modal overlays... */
       @keyframes fadeInReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -98,6 +96,10 @@ const GlobalStyle = () => {
       .report-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; animation: fadeInReveal 0.3s ease;}
       .modal-header-border { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.8rem; }
       .tnc-content-box { height: 350px; overflow-y: auto; font-size: 0.85rem; color: var(--text-main); background: var(--input-bg); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--input-border); line-height: 1.7; position: relative; }
+      .tnc-content-box h4 { color: var(--text-main); font-size: 0.9rem; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; }
+      .tnc-content-box h4:first-child { margin-top: 0; }
+      .tnc-content-box ul { margin-top: 0; padding-left: 20px; margin-bottom: 20px; }
+      .tnc-content-box p { margin-top: 0; margin-bottom: 15px; }
 
       .celebration-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 23, 0.85); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); border-radius: 20px; }
       .celebration-content { text-align: center; animation: fadeInUp 0.4s ease; }
@@ -120,7 +122,6 @@ const GlobalStyle = () => {
       .dashboard-content { padding: 2rem; max-width: 1300px; width: 100%; margin: 0 auto; animation: fadeInUp 0.3s ease; }
       .dash-top-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
       
-      /* STREAMING_CHUNK:Styling Hero banner with Faded Background Logo... */
       .hero-banner { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
       .hero-banner::after { content: ''; position: absolute; right: -5%; top: 0; height: 100%; width: 50%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat right center; background-size: contain; opacity: 0.1; mask-image: linear-gradient(to right, transparent, black); -webkit-mask-image: linear-gradient(to right, transparent, black); pointer-events: none; z-index: 0; }
       .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); position: relative; z-index: 2; }
@@ -131,6 +132,7 @@ const GlobalStyle = () => {
       .full-date-subtext { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; position: relative; z-index: 2;}
       
       .vacancy-quick-banner { background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%); border: 1px solid #6366f1; border-radius: 16px; padding: 1.2rem 1.8rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
+      .vacancy-quick-banner:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); }
       
       .quick-actions-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
       .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
@@ -158,7 +160,6 @@ const GlobalStyle = () => {
       .ev-meta { display: flex; align-items: center; gap: 15px; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
       .ev-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
       
-      /* STREAMING_CHUNK:Adding Smart Notifications CSS... */
       .notif-dropdown { position: absolute; top: 55px; right: 0; width: 340px; background: rgba(19, 25, 36, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); z-index: 1000; overflow: hidden; transform-origin: top right; animation: fadeInUp 0.2s ease; }
       .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; gap: 4px; }
       .notif-item:hover { background: rgba(255,255,255,0.1); }
@@ -201,7 +202,6 @@ const GlobalStyle = () => {
       /* --- APP STATUS GRID --- */
       .app-stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
 
-      /* STREAMING_CHUNK:Styling the Profile Layout and Document boxes... */
       /* --- PROFILE & SETTINGS --- */
       .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 1.8rem; align-items: start; }
       .profile-left-col { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 1.5rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
@@ -266,7 +266,6 @@ const GlobalStyle = () => {
   );
 };
 
-/* STREAMING_CHUNK:Initializing state variables and logic... */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
@@ -369,7 +368,6 @@ function Login() {
 // ==========================================
 // 3. SIGNUP COMPONENT
 // ==========================================
-/* STREAMING_CHUNK:Rendering Registration and Profile logic... */
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -702,7 +700,6 @@ function Signup() {
 // ==========================================
 // 4. MAIN DASHBOARD ECOSYSTEM
 // ==========================================
-/* STREAMING_CHUNK:Configuring robust dashboard logic and APIs... */
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
@@ -811,7 +808,6 @@ function Dashboard() {
     }
   };
 
-  /* STREAMING_CHUNK:Notification logic and filtering arrays... */
   const getNotifications = () => {
     let notifs = [];
     (data.appliedJobs || []).forEach(job => {
@@ -946,7 +942,7 @@ function Dashboard() {
     if (!dateStr || dateStr.toLowerCase() === 'open') return false;
     let parts = dateStr.split(/[-/]/);
     if (parts.length === 3) {
-        // Assume DD/MM/YYYY or DD-MM-YYYY format
+        // Assume DD/MM/YYYY or DD-MM-YYYY format from the sheet
         let d = new Date(parts[2], parts[1] - 1, parts[0]);
         let now = new Date(); now.setHours(0,0,0,0);
         return d < now;
@@ -1022,7 +1018,7 @@ function Dashboard() {
   // --------------------------------------------------------
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
   (data.appliedJobs || []).forEach(job => {
-    const s = (job.status || '').toLowerCase();
+    const s = (job.status || job.Status || '').toLowerCase();
     if (s.includes('offer') || s.includes('placed') || s.includes('selected') || s.includes('joined')) { appStats.offers++; appStats.attended++; }
     else if (s.includes('not attended')) { appStats.notAttended++; }
     else if (s.includes('attended') || s.includes('completed')) { appStats.attended++; }
@@ -1043,7 +1039,15 @@ function Dashboard() {
     return { bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid #0284c7' };
   };
 
-  /* STREAMING_CHUNK:Rendering Dashboard structure and Navbar... */
+  // TPO Data Fallbacks (Fixes missing Assigned Branches & Photos)
+  const tpo = data.tpoInfo || {};
+  const tpoPhoto = tpo.profilePhoto || tpo.photo || tpo['Profile Photo'];
+  const tpoName = tpo.name || tpo['TPO Name'] || "Placement Officer";
+  const tpoSitting = tpo.sittingBranch || tpo['Sitting Branch'] || "N/A";
+  const tpoEmail = tpo.email || tpo.mailId || tpo['Mail ID'] || "placement@ipcsglobal.com";
+  const tpoPhone = tpo.phone || tpo.contactNumber || tpo['Contact Number'] || "N/A";
+  const tpoAssigned = tpo.assignedBranches || tpo.assignedRegions || tpo['Assigned Branches'] || "N/A";
+
   return (
     <div className="app-layout">
       <div className="top-header">
@@ -1188,7 +1192,6 @@ function Dashboard() {
             </>
           )}
 
-          {/* STREAMING_CHUNK:Rendering polished Profile layout... */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -1298,7 +1301,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Settings and Guide tab layouts... */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
@@ -1405,7 +1407,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Talentino attendance module... */}
           {activeTab === 'talentino' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -1512,7 +1513,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Vacancies grid and Job Details Modals... */}
           {activeTab === 'vacancies' && (
             <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
@@ -1579,7 +1579,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Application Status Analytics... */}
           {activeTab === 'status' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -1624,17 +1623,24 @@ function Dashboard() {
                   <tbody>
                     {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="5" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
                       (data.appliedJobs || []).map((job, idx) => {
-                        const style = getStatusStyle(job.status);
+                        const statusVal = job.status || job.Status || 'Applied';
+                        const style = getStatusStyle(statusVal);
+                        const jobIdVal = job.jobId || job['Job ID'] || job.id;
+                        const companyVal = job.company || job.companyName || job['Company Name'] || 'Company N/A';
+                        const positionVal = job.position || job.Position || 'Position N/A';
+                        const dateVal = job.date || job.TimeStamp || job.Timestamp || job.time || 'N/A';
+                        const remarksVal = job.remarks || job.Remarks || '-';
+
                         return(
                         <tr key={idx}>
-                          <td style={{color:'var(--accent-purple)', fontWeight:700}}>{job.jobId}</td>
+                          <td style={{color:'var(--accent-purple)', fontWeight:700}}>{jobIdVal}</td>
                           <td>
-                             <div style={{fontWeight:600}}>{job.company}</div>
-                             <div style={{fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px'}}>{job.position || 'Position N/A'}</div>
+                             <div style={{fontWeight:600}}>{companyVal}</div>
+                             <div style={{fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px'}}>{positionVal}</div>
                           </td>
-                          <td style={{color:'var(--text-muted)', fontSize:'0.8rem'}}>{job.date}</td>
-                          <td><span className="status-badge" style={{ background: style.bg, color: style.color, border: style.border }}>{job.status}</span></td>
-                          <td style={{color:'var(--text-muted)', fontSize:'0.85rem'}}>{job.remarks || '-'}</td>
+                          <td style={{color:'var(--text-muted)', fontSize:'0.8rem'}}>{dateVal}</td>
+                          <td><span className="status-badge" style={{ background: style.bg, color: style.color, border: style.border }}>{statusVal}</span></td>
+                          <td style={{color:'var(--text-muted)', fontSize:'0.85rem'}}>{remarksVal}</td>
                         </tr>
                       )})}
                   </tbody>
@@ -1646,7 +1652,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* STREAMING_CHUNK:Rendering Sidebar and Navigation Drawer... */}
       <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
         <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
           <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
@@ -1679,7 +1684,6 @@ function Dashboard() {
         </div>
       </div>
       
-      {/* STREAMING_CHUNK:Rendering closing Modals (Profile, TPO, Support)... */}
       {editProfileModal && (
         <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
           <div className="report-card" style={{ maxWidth: '700px' }}>
@@ -1816,24 +1820,24 @@ function Dashboard() {
               
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
-                  {data.tpoInfo?.profilePhoto || data.tpoInfo?.photo ? <img src={getDriveImageUrl(data.tpoInfo?.profilePhoto || data.tpoInfo?.photo)} style={{width: '100%', height: '100%', objectFit: 'cover'}} alt="TPO" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} /> : null}
-                  <i className="ph ph-user-tie" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', display: (!data.tpoInfo?.profilePhoto && !data.tpoInfo?.photo) ? 'block' : 'none' }}></i>
+                  {tpoPhoto && tpoPhoto !== "N/A" ? <img src={getDriveImageUrl(tpoPhoto)} style={{width: '100%', height: '100%', objectFit: 'cover'}} alt="TPO" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} /> : null}
+                  <i className="ph ph-user-tie" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', display: (!tpoPhoto || tpoPhoto === "N/A") ? 'block' : 'none' }}></i>
                 </div>
-                <h2 style={{ margin: '0 0 5px 0', color: '#fff' }}>{data.tpoInfo?.name || "Placement Officer"}</h2>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Sitting Branch: <strong style={{ color: 'var(--accent-cyan)' }}>{data.tpoInfo?.sittingBranch || "N/A"}</strong></div>
+                <h2 style={{ margin: '0 0 5px 0', color: '#fff' }}>{tpoName}</h2>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Sitting Branch: <strong style={{ color: 'var(--accent-cyan)' }}>{tpoSitting}</strong></div>
               </div>
             </div>
             
             <div style={{ padding: '0 2rem 2rem 2rem', marginTop: '-20px', position: 'relative', zIndex: 3 }}>
               <div style={{ background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', marginBottom: '20px', textAlign: 'left', fontSize: '0.9rem', border: '1px solid var(--card-border)' }}>
-                <div style={{ marginBottom: '10px' }}><strong>Email:</strong> <span style={{ color: 'var(--accent-cyan)' }}>{data.tpoInfo?.email || data.tpoInfo?.mailId || "placement@ipcsglobal.com"}</span></div>
-                <div style={{ marginBottom: '10px' }}><strong>Phone:</strong> <span>{data.tpoInfo?.phone || data.tpoInfo?.contactNumber || "N/A"}</span></div>
-                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--card-border)' }}><strong>Assigned Regions:</strong> <span style={{ color: 'var(--text-muted)' }}>{data.tpoInfo?.assignedBranches || data.tpoInfo?.assignedRegions || "N/A"}</span></div>
+                <div style={{ marginBottom: '10px' }}><strong>Email:</strong> <span style={{ color: 'var(--accent-cyan)' }}>{tpoEmail}</span></div>
+                <div style={{ marginBottom: '10px' }}><strong>Phone:</strong> <span>{tpoPhone}</span></div>
+                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--card-border)' }}><strong>Assigned Regions:</strong> <span style={{ color: 'var(--text-muted)' }}>{tpoAssigned}</span></div>
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                <a href={`tel:${data.tpoInfo?.phone || data.tpoInfo?.contactNumber || ''}`} className="btn-action" style={{ flex: 1, background: '#2563eb', textDecoration: 'none' }}><i className="ph-fill ph-phone"></i> Call</a>
-                <a href={`https://wa.me/${(data.tpoInfo?.phone || data.tpoInfo?.contactNumber) ? (data.tpoInfo.phone || data.tpoInfo.contactNumber).toString().replace(/\D/g,'') : ''}`} className="btn-action" style={{ flex: 1, background: '#22c55e', textDecoration: 'none' }}><i className="ph-fill ph-whatsapp-logo"></i> WhatsApp</a>
-                <a href={`mailto:${data.tpoInfo?.email || data.tpoInfo?.mailId || 'placement@ipcsglobal.com'}?cc=placementcell.ipcs@gmail.com&subject=Student Inquiry: ${user?.name} (${user?.rollNo})`} className="btn-action" style={{ flex: 1, background: '#ef4444', textDecoration: 'none' }}><i className="ph-fill ph-envelope"></i> Mail</a>
+                <a href={`tel:${tpoPhone}`} className="btn-action" style={{ flex: 1, background: '#2563eb', textDecoration: 'none' }}><i className="ph-fill ph-phone"></i> Call</a>
+                <a href={`https://wa.me/${tpoPhone.toString().replace(/\D/g,'')}`} className="btn-action" style={{ flex: 1, background: '#22c55e', textDecoration: 'none' }}><i className="ph-fill ph-whatsapp-logo"></i> WhatsApp</a>
+                <a href={`mailto:${tpoEmail}?cc=placementcell.ipcs@gmail.com&subject=Student Inquiry: ${user?.name} (${user?.rollNo})`} className="btn-action" style={{ flex: 1, background: '#ef4444', textDecoration: 'none' }}><i className="ph-fill ph-envelope"></i> Mail</a>
               </div>
             </div>
           </div>
