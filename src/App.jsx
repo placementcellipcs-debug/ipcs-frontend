@@ -4,7 +4,6 @@ import axios from 'axios';
 import Cropper from 'react-easy-crop';
 import loadingVideo from './assets/video.mp4';
 
-/* STREAMING_CHUNK:Initializing global styles and variables... */
 const GlobalStyle = () => {
   useEffect(() => {
     if (!document.getElementById('phosphor-icons')) {
@@ -48,7 +47,7 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* STREAMING_CHUNK:Configuring landing page and auth card styles... */
+      /* --- LANDING PAGE (LOGIN) STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%); display: flex; flex-direction: column; }
       .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
       .nav-links { display: flex; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
@@ -72,7 +71,7 @@ const GlobalStyle = () => {
       .alert-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
       .alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
 
-      /* STREAMING_CHUNK:Adding Video Loader CSS... */
+      /* --- VIDEO LOADER STYLES --- */
       .video-loader-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-in-out; }
       .video-loader-overlay.fade-out { opacity: 0; pointer-events: none; }
       .video-loader-overlay video { width: 100%; height: 100%; object-fit: cover; }
@@ -89,7 +88,6 @@ const GlobalStyle = () => {
       .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.1rem; }
       .form-footer-bar { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid var(--card-border); }
 
-      /* STREAMING_CHUNK:Setting up animations and modal overlays... */
       @keyframes fadeInReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -123,7 +121,7 @@ const GlobalStyle = () => {
       .dashboard-content { padding: 2rem; max-width: 1300px; width: 100%; margin: 0 auto; animation: fadeInUp 0.3s ease; }
       .dash-top-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
       
-      /* STREAMING_CHUNK:Styling Hero banner with Faded Background Logo... */
+      /* Dashboard Hero Banner with Student Photo & Gradient System */
       .hero-banner { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
       .hero-banner::after { content: ''; position: absolute; right: -5%; top: 0; height: 100%; width: 50%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat right center; background-size: contain; opacity: 0.1; mask-image: linear-gradient(to right, transparent, black); -webkit-mask-image: linear-gradient(to right, transparent, black); pointer-events: none; z-index: 0; }
       .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); position: relative; z-index: 2; }
@@ -162,7 +160,7 @@ const GlobalStyle = () => {
       .ev-meta { display: flex; align-items: center; gap: 15px; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
       .ev-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
       
-      /* STREAMING_CHUNK:Adding Smart Notifications CSS... */
+      /* --- LIQUID GLASS NOTIFICATIONS --- */
       .notif-dropdown { position: absolute; top: 55px; right: 0; width: 340px; background: rgba(19, 25, 36, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); z-index: 1000; overflow: hidden; transform-origin: top right; animation: fadeInUp 0.2s ease; }
       .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; gap: 4px; }
       .notif-item:hover { background: rgba(255,255,255,0.1); }
@@ -202,7 +200,9 @@ const GlobalStyle = () => {
       .star-rating .star:hover { transform: scale(1.5); }
       .star-rating .star.selected { color: #f59e0b; }
 
-      /* STREAMING_CHUNK:Styling the Profile Layout and Document boxes... */
+      /* --- APP STATUS GRID --- */
+      .app-stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+
       /* --- PROFILE & SETTINGS --- */
       .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 1.8rem; align-items: start; }
       .profile-left-col { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 1.5rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
@@ -245,6 +245,7 @@ const GlobalStyle = () => {
         .profile-grid, .settings-container, .dash-top-row { grid-template-columns: 1fr; }
         .stats-row { grid-template-columns: 1fr; }
         .talentino-summary-grid { grid-template-columns: 1fr; }
+        .app-stats-grid { grid-template-columns: repeat(3, 1fr); }
       }
       @media (max-width: 768px) {
         .landing-nav { flex-direction: column; gap: 1rem; padding: 1.5rem; }
@@ -255,6 +256,7 @@ const GlobalStyle = () => {
         .top-header { padding: 0 1rem; }
         .dashboard-content { padding: 1rem; }
         .resume-grid { grid-template-columns: 1fr; }
+        .app-stats-grid { grid-template-columns: 1fr 1fr; }
         .notif-dropdown { position: fixed; top: 65px; left: 5%; right: 5%; width: 90%; }
         .doc-box { flex-direction: column; align-items: flex-start; gap: 1rem; }
       }
@@ -266,7 +268,6 @@ const GlobalStyle = () => {
   );
 };
 
-/* STREAMING_CHUNK:Initializing state variables and logic... */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
@@ -280,8 +281,6 @@ function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState(null);
-  
-  // Video Loader States
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [fadeVideo, setFadeVideo] = useState(false);
 
@@ -296,7 +295,6 @@ function Login() {
         localStorage.setItem('talentino_student_token', response.data.token);
         localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
         
-        // Trigger 6-second video loader before entering dashboard
         setIsLoggingIn(true);
         setTimeout(() => setFadeVideo(true), 5500); 
         setTimeout(() => navigate('/dashboard'), 6000);
@@ -306,7 +304,6 @@ function Login() {
     }
   };
 
-  // The Video Overlay screen
   if (isLoggingIn) {
     return (
       <div className={`video-loader-overlay ${fadeVideo ? 'fade-out' : ''}`}>
@@ -363,16 +360,13 @@ function Login() {
 // ==========================================
 // 3. SIGNUP COMPONENT
 // ==========================================
-/* STREAMING_CHUNK:Rendering Registration and Profile logic... */
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState(null);
-  
   const [showTncModal, setShowTncModal] = useState(false);
   const [tncScrolled, setTncScrolled] = useState(false);
   const [tncAccepted, setTncAccepted] = useState(false);
-
   const [showCropModal, setShowCropModal] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -627,7 +621,6 @@ function Signup() {
         </form>
       </div>
 
-      {/* STREAMING_CHUNK:Image crop and Terms modal layouts... */}
       {showCropModal && (
         <div className="report-modal-overlay">
           <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
@@ -697,7 +690,6 @@ function Signup() {
 // ==========================================
 // 4. MAIN DASHBOARD ECOSYSTEM
 // ==========================================
-/* STREAMING_CHUNK:Configuring robust dashboard logic and APIs... */
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
@@ -806,7 +798,6 @@ function Dashboard() {
     }
   };
 
-  /* STREAMING_CHUNK:Notification logic and filtering arrays... */
   const getNotifications = () => {
     let notifs = [];
     (data.appliedJobs || []).forEach(job => {
@@ -1007,7 +998,32 @@ function Dashboard() {
     return 0; // Both expired or both active
   });
 
-  /* STREAMING_CHUNK:Rendering Dashboard structure and Navbar... */
+  // --------------------------------------------------------
+  // STATUS TAB ANALYTICS LOGIC
+  // --------------------------------------------------------
+  const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
+  (data.appliedJobs || []).forEach(job => {
+    const s = (job.status || '').toLowerCase();
+    if (s.includes('offer') || s.includes('placed') || s.includes('selected')) { appStats.offers++; appStats.attended++; }
+    else if (s.includes('not attended')) { appStats.notAttended++; }
+    else if (s.includes('attended') || s.includes('completed')) { appStats.attended++; }
+    else if (s.includes('reject')) { appStats.rejected++; appStats.attended++; }
+  });
+
+  let journeyText = "Keep applying! Your placement journey is just beginning.";
+  if (appStats.offers > 0) journeyText = `Outstanding progress! You have secured ${appStats.offers} placement offer(s).`;
+  else if (appStats.attended > 0) journeyText = "You are successfully getting interviews. Keep refining your skills, the right offer is near!";
+  else if (appStats.applied >= 5) journeyText = "You have been actively applying. Stay patient and continue preparing, interviews will follow soon.";
+
+  const getStatusStyle = (status) => {
+    const s = (status || '').toLowerCase();
+    if (s.includes('placed') || s.includes('offer') || s.includes('selected')) return { bg: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid #22c55e' };
+    if (s.includes('not attended') || s.includes('reject')) return { bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid #ef4444' };
+    if (s.includes('schedule')) return { bg: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: '1px solid #f59e0b' };
+    if (s.includes('no response')) return { bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: '1px solid #64748b' };
+    return { bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid #0284c7' };
+  };
+
   return (
     <div className="app-layout">
       <div className="top-header">
@@ -1152,7 +1168,6 @@ function Dashboard() {
             </>
           )}
 
-          {/* STREAMING_CHUNK:Rendering polished Profile layout... */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -1262,7 +1277,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Settings and Guide tab layouts... */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
@@ -1369,7 +1383,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Talentino attendance module... */}
           {activeTab === 'talentino' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -1476,7 +1489,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Vacancies grid and Job Details Modals... */}
           {activeTab === 'vacancies' && (
             <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
@@ -1549,19 +1561,57 @@ function Dashboard() {
                 <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Application Status</h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Track the current status of all your applied job openings</p>
               </div>
+
+              <div className="app-stats-grid">
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Jobs Applied</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{appStats.applied}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Attended</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{appStats.attended}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Offers Got</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>{appStats.offers}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Not Attended</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{appStats.notAttended}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Rejected</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#94a3b8' }}>{appStats.rejected}</div>
+                 </div>
+              </div>
+
+              <div style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <i className="ph-fill ph-chart-line-up" style={{ fontSize: '2rem', color: 'var(--accent-purple)' }}></i>
+                <div>
+                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Journey Analysis</div>
+                   <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.95rem' }}>{journeyText}</div>
+                </div>
+              </div>
+
               <div className="location-table-card">
                 <table className="vac-table">
-                  <thead><tr><th>NewsLetter ID</th><th>Company</th><th>Applied Date & Time</th><th>Current Status</th></tr></thead>
+                  <thead><tr><th>NewsLetter ID</th><th>Company & Position</th><th>Applied Date & Time</th><th>Current Status</th><th>Remarks</th></tr></thead>
                   <tbody>
-                    {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="4" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
-                      (data.appliedJobs || []).map((job, idx) => (
+                    {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="5" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
+                      (data.appliedJobs || []).map((job, idx) => {
+                        const style = getStatusStyle(job.status);
+                        return(
                         <tr key={idx}>
                           <td style={{color:'var(--accent-purple)', fontWeight:700}}>{job.jobId}</td>
-                          <td style={{fontWeight:600}}>{job.company}</td>
+                          <td>
+                             <div style={{fontWeight:600}}>{job.company}</div>
+                             <div style={{fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px'}}>{job.position || 'Position N/A'}</div>
+                          </td>
                           <td style={{color:'var(--text-muted)', fontSize:'0.8rem'}}>{job.date}</td>
-                          <td><span className="status-badge status-applied">{job.status}</span></td>
+                          <td><span className="status-badge" style={{ background: style.bg, color: style.color, border: style.border }}>{job.status}</span></td>
+                          <td style={{color:'var(--text-muted)', fontSize:'0.85rem'}}>{job.remarks || '-'}</td>
                         </tr>
-                    ))}
+                      )})}
                   </tbody>
                 </table>
               </div>
@@ -1573,7 +1623,7 @@ function Dashboard() {
 
       <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
         <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
-          <div className="drawer-header-cover">
+          <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
             <div className="drawer-close-btn" onClick={() => setDrawerOpen(false)}><i className="ph ph-x"></i></div>
             <div className="drawer-profile-row">
               <div className="drawer-avatar">
@@ -1603,7 +1653,6 @@ function Dashboard() {
         </div>
       </div>
       
-      {/* STREAMING_CHUNK:Rendering closing Modals (Profile, Modals, Support)... */}
       {editProfileModal && (
         <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
           <div className="report-card" style={{ maxWidth: '700px' }}>
