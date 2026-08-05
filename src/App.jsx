@@ -1,36 +1,62 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Cropper from 'react-easy-crop';
 import loadingVideo from './assets/video.mp4';
 
+// ==========================================
+// 1. GLOBAL STYLES & FONT INJECTIONS
+// ==========================================
 const GlobalStyle = () => {
   useEffect(() => {
+    // Inject Phosphor Icons (Dashboard)
     if (!document.getElementById('phosphor-icons')) {
       const script = document.createElement('script');
       script.id = 'phosphor-icons';
       script.src = 'https://unpkg.com/@phosphor-icons/web';
       document.head.appendChild(script);
     }
+    // Inject FontAwesome (Marketing Site)
+    if (!document.getElementById('font-awesome')) {
+      const link = document.createElement('link');
+      link.id = 'font-awesome';
+      link.rel = 'stylesheet';
+      link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+      document.head.appendChild(link);
+    }
   }, []);
 
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+      @import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+      
       :root {
+        /* Dashboard Variables */
         --bg-dark: #0b0f17; --card-bg: #131924; --card-border: #1e293b; --input-bg: #1e293b;
         --input-border: #334155; --accent-cyan: #38bdf8; --accent-blue: #3b82f6; --accent-purple: #a855f7;
         --text-main: #f8fafc; --text-muted: #94a3b8; --hover-bg: #1e293b; --table-header: #1e293b;
+        
+        /* Marketing Site Variables */
+        --primary-green: #10b981; --dark-green: #059669; --dark-blue: #1e40af;
+        --gradient-primary: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+        --gradient-dark: linear-gradient(135deg, #059669 0%, #1e40af 100%);
+        --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-light: #9ca3af;
+        --bg-primary: #111827; --bg-secondary: #1f2937; --bg-black: #000000; --border-color: #374151;
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5); --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
+      
       [data-theme="light"] {
         --bg-dark: #f8fafc; --card-bg: #ffffff; --card-border: #e2e8f0; --input-bg: #f1f5f9;
         --input-border: #cbd5e1; --accent-cyan: #0284c7; --accent-blue: #2563eb; --accent-purple: #7e22ce;
         --text-main: #0f172a; --text-muted: #475569; --hover-bg: #f1f5f9; --table-header: #f1f5f9;
       }
-      * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; }
-      body { background-color: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+      
+      * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+      body { background-color: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; scroll-behavior: smooth;}
       .hidden { display: none !important; }
       
+      /* --- GENERAL UI COMPONENTS --- */
       .btn-action { padding: 0.8rem 1.4rem; background: var(--accent-blue); color: #ffffff; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
       .btn-action:hover:not(:disabled) { opacity: 0.95; transform: translateY(-1px); }
       .btn-action:disabled { background: var(--input-border); color: var(--text-muted); cursor: not-allowed; }
@@ -47,7 +73,7 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* --- LANDING PAGE (LOGIN) STYLES --- */
+      /* --- AUTH & LOGIN STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%); display: flex; flex-direction: column; }
       .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
       .nav-links { display: flex; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
@@ -71,7 +97,6 @@ const GlobalStyle = () => {
       .alert-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
       .alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
 
-      /* --- VIDEO LOADER STYLES --- */
       .video-loader-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-in-out; }
       .video-loader-overlay.fade-out { opacity: 0; pointer-events: none; }
       .video-loader-overlay video { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s ease; }
@@ -96,15 +121,6 @@ const GlobalStyle = () => {
       .report-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; animation: fadeInReveal 0.3s ease;}
       .modal-header-border { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.8rem; }
       .tnc-content-box { height: 350px; overflow-y: auto; font-size: 0.85rem; color: var(--text-main); background: var(--input-bg); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--input-border); line-height: 1.7; position: relative; }
-      .tnc-content-box h4 { color: var(--text-main); font-size: 0.9rem; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; }
-      .tnc-content-box h4:first-child { margin-top: 0; }
-      .tnc-content-box ul { margin-top: 0; padding-left: 20px; margin-bottom: 20px; }
-      .tnc-content-box p { margin-top: 0; margin-bottom: 15px; }
-
-      .celebration-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 23, 0.85); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); border-radius: 20px; }
-      .celebration-content { text-align: center; animation: fadeInUp 0.4s ease; }
-      .party-emoji { font-size: 4rem; display: block; margin-bottom: 10px; animation: pulse 1s infinite; }
-      @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1) rotate(5deg); } 100% { transform: scale(1); } }
 
       /* --- DASHBOARD STYLES --- */
       .app-layout { display: flex; flex-direction: column; width: 100vw; min-height: 100vh; }
@@ -122,7 +138,6 @@ const GlobalStyle = () => {
       .dashboard-content { padding: 2rem; max-width: 1300px; width: 100%; margin: 0 auto; animation: fadeInUp 0.3s ease; }
       .dash-top-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
       
-      /* Dashboard Hero Banner with Student Photo & Gradient System */
       .hero-banner { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
       .hero-banner::after { content: ''; position: absolute; right: -5%; top: 0; height: 100%; width: 50%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat right center; background-size: contain; opacity: 0.1; mask-image: linear-gradient(to right, transparent, black); -webkit-mask-image: linear-gradient(to right, transparent, black); pointer-events: none; z-index: 0; }
       .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); position: relative; z-index: 2; }
@@ -133,7 +148,6 @@ const GlobalStyle = () => {
       .full-date-subtext { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; position: relative; z-index: 2;}
       
       .vacancy-quick-banner { background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%); border: 1px solid #6366f1; border-radius: 16px; padding: 1.2rem 1.8rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
-      .vacancy-quick-banner:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); }
       
       .quick-actions-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
       .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
@@ -148,7 +162,6 @@ const GlobalStyle = () => {
       .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px; line-height: 1.1; }
       .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
 
-      /* --- EVENTS --- */
       .upcoming-wrapper { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
       .event-row-card { display: flex; align-items: center; background: var(--bg-dark); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; transition: border-color 0.2s; }
       .event-row-card:hover { border-color: var(--accent-cyan); }
@@ -168,7 +181,6 @@ const GlobalStyle = () => {
       .notif-read { opacity: 0.45; }
       .notif-read strong { text-decoration: line-through; }
 
-      /* --- SIDE DRAWER WITH COVER BANNER --- */
       .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 99999; display: flex; justify-content: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
       .drawer-overlay.open { opacity: 1; pointer-events: auto; }
       .drawer-card { width: 100%; max-width: 340px; height: 100%; background: var(--card-bg); color: var(--text-main); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow:-10px 0 40px rgba(0,0,0,0.5); }
@@ -189,7 +201,6 @@ const GlobalStyle = () => {
       .btn-logout-drawer { width: 100%; padding: 0.8rem; background: #3b82f6; color: #ffffff; border: none; border-radius: 30px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-bottom: 1rem; transition: background 0.2s; }
       .btn-logout-drawer:hover { background: #2563eb; }
 
-      /* --- TALENTINO --- */
       .talentino-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
       .talentino-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
       .t-stat-num { font-size: 2.2rem; font-weight: 800; color: var(--text-main); line-height: 1; margin-bottom: 10px; }
@@ -200,7 +211,6 @@ const GlobalStyle = () => {
       .star-rating .star:hover { transform: scale(1.5); }
       .star-rating .star.selected { color: #f59e0b; }
 
-      /* --- APP STATUS GRID --- */
       .app-stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
 
       /* --- PROFILE & SETTINGS --- */
@@ -226,7 +236,7 @@ const GlobalStyle = () => {
       .vac-table tr { border-bottom: 1px solid var(--card-border); transition: background 0.3s; }
       .vac-table tr:hover td { background: var(--hover-bg); }
       
-      .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+      .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; text-align: center; }
       .animate-fade-in { animation: fadeInUp 0.4s ease forwards; }
 
       .resume-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
@@ -234,7 +244,7 @@ const GlobalStyle = () => {
       .resume-card:hover { transform: translateY(-2px); border-color: var(--accent-cyan); }
       .resume-icon-box { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
 
-      /* --- MEDIA QUERIES FOR DYNAMIC RESPONSIVENESS --- */
+      /* --- MEDIA QUERIES FOR MARKETING SITE & DASHBOARD --- */
       @media (max-width: 1200px) {
         .stats-row { grid-template-columns: repeat(2, 1fr); }
       }
@@ -263,17 +273,86 @@ const GlobalStyle = () => {
         .dashboard-content, .landing-grid { max-width: 1600px; }
         body { font-size: 17px; }
       }
+
+      /* --- MARKETING SITE CSS (Converted from style.css) --- */
+      .glass-panel { background: rgba(12, 21, 43, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+      .gradient-text { background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .animate-float { animation: float 6s ease-in-out infinite; }
+      .animate-pulse-glow { animation: pulse-glow 3s infinite; }
+      .animate-marquee-left { animation: marquee-left 120s linear infinite; }
+      .animate-marquee-right { animation: marquee-right 120s linear infinite; }
+      
+      @keyframes float { 0%, 100% { transform: translateY(0px) } 50% { transform: translateY(-10px) } }
+      @keyframes pulse-glow { 0%, 100% { opacity: 0.3; transform: scale(1) } 50% { opacity: 0.6; transform: scale(1.05) } }
+      @keyframes marquee-left { 0% { transform: translateX(0%) } 100% { transform: translateX(-50%) } }
+      @keyframes marquee-right { 0% { transform: translateX(-50%) } 100% { transform: translateX(0%) } }
+
+      .company-name { flex-shrink: 0; font-size: 1.25rem; font-weight: 600; color: #f8fafc; padding: 0.75rem 1.5rem; border: 1.5px solid #334155; border-radius: 8px; background: #131924; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: all 0.3s ease; }
+      .company-name:hover { color: #3b82f6; border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); }
+      
+      .student-poster-card { flex-shrink: 0; width: 280px; height: 380px; border-radius: 15px; overflow: hidden; background: #131924; border: 2px solid #334155; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; }
+      .student-poster-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2); border-color: #10b981; }
+      .poster-image-container { width: 100%; height: 100%; background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+      .poster-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+      .poster-icon { font-size: 5rem; color: rgba(255, 255, 255, 0.3); z-index: 1; }
+      
+      .testimonial-video-wrapper { position: relative; flex: 0 0 260px; width: 260px; border-radius: 20px; overflow: hidden; background: #000; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); transition: all 0.3s ease; cursor: pointer; border: 2px solid #334155; aspect-ratio: 3 / 4; }
+      .testimonial-video-wrapper:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); border-color: #10b981; }
+      .video-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #059669 0%, #1e40af 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; position: relative; overflow: hidden; }
+      .video-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+      .video-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 2rem 1.5rem 1.5rem; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); color: white; z-index: 2; pointer-events: none; }
+      .video-overlay h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; }
+      .video-overlay p { font-size: 0.85rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem; }
+      .video-overlay span { font-size: 0.8rem; opacity: 0.9; display: block; line-height: 1.4; }
+
+      .zonal-card { display: flex; background: #131924; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); border: 2px solid #334155; transition: all 0.3s; margin-bottom: 4rem;}
+      .zonal-card:hover { border-color: #10b981; box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15); }
+      .zonal-image-wrapper { flex: 0 0 40%; min-height: 400px; background: linear-gradient(135deg, #059669 0%, #1e40af 100%); display: flex; align-items: center; justify-content: center; position: relative; }
+      .zonal-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+      .zonal-badge { position: absolute; top: 2rem; left: 2rem; background: #10b981; color: white; padding: 0.5rem 1.2rem; border-radius: 50px; font-weight: 700; font-size: 0.9rem; z-index: 2; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
+      .zonal-content { flex: 1; padding: 3rem; display: flex; flex-direction: column; justify-content: center; text-align: left;}
+      .zonal-content h3 { font-size: 2.2rem; color: #f8fafc; margin-bottom: 0.5rem; font-weight: 800;}
+      .zonal-content .position { color: #3b82f6; font-weight: 700; font-size: 1.2rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+      .zonal-content .bio { color: #d1d5db; font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem; }
+
+      .tpo-card { width: 100%; background: #131924; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: all 0.3s; border: 1px solid #334155; text-align: center; display: flex; flex-direction: column; }
+      .tpo-card:hover { transform: translateY(-8px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-color: #3b82f6; }
+      .tpo-image-wrapper { height: 220px; background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); display: flex; align-items: center; justify-content: center; position: relative; }
+      .tpo-image { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+      .tpo-info { padding: 1.5rem 1rem; flex: 1; display: flex; flex-direction: column; }
+      .tpo-info h4 { font-size: 1.1rem; color: #f8fafc; margin-bottom: 0.25rem; font-weight: 700;}
+      .tpo-info .position { color: #10b981; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem; }
+      .tpo-info .bio { color: #d1d5db; font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem; flex: 1; }
+
+      .footer { background: #000000; color: white; padding: 4rem 0 2rem; border-top: 3px solid #10b981; margin-top: 4rem;}
+      .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 3rem; margin-bottom: 3rem; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 0 2rem;}
+      .footer-brand .logo { color: white; margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px;}
+      .footer-brand p { color: #9ca3af; font-size: 0.95rem; line-height: 1.6;}
+      .footer-links h4, .footer-newsletter h4 { font-size: 1.1rem; margin-bottom: 1.5rem; color: white; font-weight: 700;}
+      .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; padding: 0;}
+      .footer-links a { color: #9ca3af; text-decoration: none; transition: all 0.3s; font-size: 0.95rem;}
+      .footer-links a:hover { color: #10b981; padding-left: 5px; }
+      .footer-bottom { padding-top: 2rem; border-top: 1px solid #374151; text-align: center; color: #6b7280; font-size: 0.9rem;}
+
+      @media (max-width: 992px) {
+        .zonal-card { flex-direction: column; }
+        .zonal-image-wrapper { min-height: 300px; }
+        .footer-grid { grid-template-columns: 1fr 1fr; }
+      }
+      @media (max-width: 768px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      }
     `}</style>
   );
 };
 
+// ==========================================
+// 2. CONSTANTS & DATA
+// ==========================================
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
-// --------------------------------------------------------
-// BRANCH COORDINATES (Update with exact building lat/lng for accurate 150m check)
-// --------------------------------------------------------
 const BRANCH_LOCATIONS = {
   "Kochi": { lat: 9.9816, lng: 76.2999 }, 
   "Calicut": { lat: 11.2588, lng: 75.7804 },
@@ -310,428 +389,483 @@ const BRANCH_LOCATIONS = {
   "Riyadh (Saudi Arabia)": { lat: 24.7136, lng: 46.6753 }
 };
 
-// ==========================================
-// 2. LOGIN / LANDING PAGE COMPONENT
-// ==========================================
-function Login() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [status, setStatus] = useState(null);
-  
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [fadeVideo, setFadeVideo] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (!email || !password) { setStatus({ type: 'error', message: 'Please enter both email and password.' }); return; }
-    setStatus({ type: 'info', message: 'Verifying credentials...' });
-
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
-      if (response.data.success) {
-        localStorage.setItem('talentino_student_token', response.data.token);
-        localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
-        
-        setIsLoggingIn(true);
-        setTimeout(() => setFadeVideo(true), 5500); 
-        setTimeout(() => navigate('/dashboard'), 6000);
-      }
-    } catch (error) {
-      setStatus({ type: 'error', message: error.response?.data?.message || 'Server Error. Is the backend running?' });
+const siteData = {
+    statistics: [
+        { icon: "fa-briefcase", value: "3000+", label: "Students Placed" },
+        { icon: "fa-building", value: "120+", label: "Corporate Partners" },
+        { icon: "fa-globe", value: "50+", label: "Global Presence" },
+        { icon: "fa-award", value: "17+", label: "Years of Excellence" }
+    ],
+    companies: [
+        { name: "Siemens", desc: "Industrial Automation", icon: "fa-industry", quote: "Recruited over 80+ IPCS specialists", color: "cyan" },
+        { name: "Schneider", desc: "Energy & Automation", icon: "fa-bolt", quote: "Superb core hardware knowledge", color: "indigo" },
+        { name: "ABB Global", desc: "Robotics & Grid", icon: "fa-network-wired", quote: "Outstanding mechanical synergy", color: "orange" },
+        { name: "Cognizant", desc: "Software Consulting", icon: "fa-code", quote: "Top choice for technical logic", color: "purple" },
+        { name: "Infosys", desc: "Digital Transformation", icon: "fa-cloud", quote: "Great problem solving skillsets", color: "green" },
+        { name: "Wipro", desc: "Technology Services", icon: "fa-database", quote: "Excellent communication and vision", color: "pink" },
+        { name: "Intel", desc: "Embedded Circuits", icon: "fa-microchip", quote: "First-grade engineering brains", color: "red" },
+        { name: "Yaskawa", desc: "Motion Control", icon: "fa-robot", quote: "Unmatched precision training", color: "teal" },
+        { name: "Honeywell", desc: "Process Solutions", icon: "fa-server", quote: "IPCS training has top standards", color: "blue" },
+        { name: "L&T Control", desc: "Infrastructure IT", icon: "fa-chart-pie", quote: "Deeply analytical candidates", color: "amber" }
+    ],
+    placedImages: [
+        'Abdullah.png', 'Abhirami.png', 'ABUBACKER SIDDIQ.png', 'ADHITYA.jpg', 'Afnas.png',
+        'AJAY KUMAR C.png', 'AKSHAY.jpg', 'amrutha copy.png', 'Amrutha.png', 'anantha krishnan.png'
+    ],
+    testimonials: [
+        { name: 'Student 1', position: 'Placed Student', video: 'assets/videos/Test/Test1.mp4' },
+        { name: 'Student 2', position: 'Placed Student', video: 'assets/videos/Test/Test2.mp4' },
+        { name: 'Student 3', position: 'Placed Student', video: 'assets/videos/Test/Test3.mp4' },
+        { name: 'Student 4', position: 'Placed Student', video: 'assets/videos/Test/Test4.mp4' },
+        { name: 'Student 5', position: 'Placed Student', video: 'assets/videos/Test/Test5.mp4' }
+    ],
+    activities: [
+        { title: 'Placement Drive', description: 'Campus placement drive', video: 'assets/videos/Activites/Act1.mp4' },
+        { title: 'Mock Interview', description: 'Interview coaching', video: 'assets/videos/Activites/Act2.mp4' },
+        { title: 'Skill Workshop', description: 'Skill development', video: 'assets/videos/Activites/Act3.mp4' },
+        { title: 'Company Visit', description: 'Corporate interaction', video: 'assets/videos/Activites/Act4.mp4' },
+        { title: 'Group Discussion', description: 'GD Strategy session', video: 'assets/videos/Activites/Act5.mp4' }
+    ],
+    team: {
+        zonalOfficer: {
+            name: "Ms. Gifty KP",
+            position: "Zonal Placement Manager",
+            bio: "Ms. Gifty has over 9 years of diverse experience in the EdTech industry. Starting as a JAVA Trainer, she mastered technical expertise and teaching methodologies, eventually advancing to specialize in Training Excellence and Learning Management Systems (LMS).",
+            email: "gifty@ipcsglobal.com",
+            phone: "+91 9645446664",
+            linkedin: "https://www.linkedin.com/in/gifty-kp",
+            image: "1eiP135HOsuG3MEaEplNblmcLewjnKXp6" // Using placeholder drive ID as fallback
+        },
+        tpos: [
+            { name: "Ms. Bincy Bindhuraj", position: "Senior Corporate Relation Officer", bio: "North Kerala", email: "tpo1@placement.com" },
+            { name: "Mr. Visakh S", position: "Senior Corporate Relation Officer", bio: "South Kerala", email: "tpo2@placement.com" },
+            { name: "Ms. Thana Anjana", position: "Corporate Relation Officer", bio: "South & Central Thamil Nadu", email: "tpo3@placement.com" },
+            { name: "Mr. Pranav V S", position: "Corporate Relation Officer", bio: "Karnataka", email: "tpo4@placement.com" },
+            { name: "Ms. Fathima Rinsa", position: "Senior Corporate Relation Officer", bio: "Central Kerala", email: "tpo5@placement.com" }
+        ]
     }
-  };
+};
 
-  if (isLoggingIn) {
+// ==========================================
+// 3. MARKETING SITE (LANDING PAGE)
+// ==========================================
+function MarketingSite() {
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(null);
+  const [showPreloader, setShowPreloader] = useState(true);
+  const [tickerIndex, setTickerIndex] = useState(0);
+
+  const hiringUpdates = [
+    "Arunachalam got hired as a Industrial Automation Engineer",
+    "Raiha got Hired as a Digital Marketing Executive",
+    "Vishnu R got hired as a BMS Engineer at Schneider Electric.",
+    "Arya got hired as a Software Quality Assurance Engineer."
+  ];
+
+  useEffect(() => {
+    // Preloader
+    const timer = setTimeout(() => setShowPreloader(false), 1200);
+    
+    // Scroll listener for Navbar
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+
+    // Fade-in Intersection Observer
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Ticker
+    const tickerTimer = setInterval(() => {
+        setTickerIndex(prev => (prev + 1) % hiringUpdates.length);
+    }, 3500);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', handleScroll);
+        observer.disconnect();
+        clearInterval(tickerTimer);
+    };
+  }, []);
+
+  const openVideo = (videoUrl) => setActiveVideo(videoUrl);
+  const closeVideo = () => setActiveVideo(null);
+
+  if (showPreloader) {
     return (
-      <div className={`video-loader-overlay ${fadeVideo ? 'fade-out' : ''}`}>
-        <video 
-          src={loadingVideo} 
-          autoPlay 
-          muted 
-          playsInline 
-          onCanPlayThrough={() => setIsVideoReady(true)}
-          className={isVideoReady ? 'ready' : ''}
-        />
-      </div>
+        <div className="fixed inset-0 z-[10000] flex flex-col justify-center items-center" style={{ backgroundColor: 'var(--bg-dark)' }}>
+            <div className="relative flex flex-col items-center">
+                <div className="relative p-3 rounded-2xl border overflow-hidden shadow-2xl" style={{ backgroundColor: 'var(--bg-dark)', borderColor: 'var(--card-border)' }}>
+                    <img src={GLOBAL_LOGO_URL} alt="IPCS" className="h-16 w-16 object-contain" />
+                </div>
+                <div className="w-48 h-1.5 rounded-full overflow-hidden mt-5" style={{ backgroundColor: 'var(--card-bg)' }}>
+                    <div className="h-full w-full bg-gradient-to-r from-blue-500 to-cyan-400 animate-pulse"></div>
+                </div>
+            </div>
+        </div>
     );
   }
 
   return (
-    <div className="landing-wrapper">
-      <div className="landing-nav">
-        <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
-        <div className="nav-links">
-          <span>Home</span><span>Recruiters</span><span>Placements</span><span>Testimonials</span>
-        </div>
-      </div>
-      
-      <div className="landing-grid">
-        <div className="hero-section">
-          <div className="hero-badge"><i className="ph-fill ph-seal-check"></i> Talenzo (Connecting Talent with Opportunity)</div>
-          <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: 'var(--accent-cyan)' }}>Careers with IPCS</span></h1>
-          <p className="hero-desc">IPCS Global connects future-ready talent in Industrial Automation, Embedded Systems, IoT, and Digital Tech with leading blue-chip global firms. Experience zero-barrier career transitions.</p>
-        </div>
+    <div style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-main)', overflowX: 'hidden' }}>
+        
+        {/* NAVBAR */}
+        <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 py-4 px-6 md:px-12 ${isScrolled ? 'backdrop-blur-md shadow-lg border-b' : 'bg-transparent'}`} style={{ borderColor: isScrolled ? 'var(--card-border)' : 'transparent', backgroundColor: isScrolled ? 'rgba(11, 15, 23, 0.95)' : 'transparent' }}>
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+                <a href="#home" className="flex items-center space-x-3 group cursor-pointer" style={{ textDecoration: 'none' }}>
+                    <div className="relative bg-slate-900 p-1 rounded-lg border border-slate-700/50 overflow-hidden">
+                        <img src={GLOBAL_LOGO_URL} alt="Logo" className="h-8 w-8 object-contain rounded-md" />
+                    </div>
+                    <div>
+                        <span className="text-lg font-extrabold tracking-wide text-white block">IPCS <span style={{ color: 'var(--accent-cyan)' }}>GLOBAL</span></span>
+                        <span className="text-[9px] uppercase tracking-[0.2em] text-slate-400 block -mt-1">Placement</span>
+                    </div>
+                </a>
 
-        <div className="auth-card" style={{ margin: '0 auto' }}>
-          <div className="brand-logo-container">
-            <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" />
-          </div>
-          <h2 style={{ textAlign: 'center', margin: '0 0 6px 0' }}>Welcome back</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
+                <ul className="hidden lg:flex items-center space-x-8 text-sm font-medium m-0 p-0" style={{ listStyle: 'none' }}>
+                    <li><a href="#home" className="text-slate-300 hover:text-cyan-400 transition-colors py-2 relative group" style={{ textDecoration: 'none' }}>Home</a></li>
+                    <li><a href="#companies" className="text-slate-300 hover:text-cyan-400 transition-colors py-2 relative group" style={{ textDecoration: 'none' }}>Recruiters</a></li>
+                    <li><a href="#placedStudentsMarquee" className="text-slate-300 hover:text-cyan-400 transition-colors py-2 relative group" style={{ textDecoration: 'none' }}>Placements</a></li>
+                    <li><a href="#testimonials" className="text-slate-300 hover:text-cyan-400 transition-colors py-2 relative group" style={{ textDecoration: 'none' }}>Testimonials</a></li>
+                </ul>
 
-          <form onSubmit={handleLogin}>
-            <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-            <div className="form-group"><label>Password</label>
-              <div className="pwd-wrapper">
-                <input type={showPassword ? "text" : "password"} placeholder="Enter password" style={{ paddingRight: '40px' }} value={password} onChange={(e) => setPassword(e.target.value)} />
-                <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}>
-                  <i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i>
-                </span>
-              </div>
-            </div>
-            <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem' }}>Sign in &rarr;</button>
-          </form>
-
-          {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
-
-          <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// 3. SIGNUP COMPONENT
-// ==========================================
-function Signup() {
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [status, setStatus] = useState(null);
-  
-  const [showTncModal, setShowTncModal] = useState(false);
-  const [tncScrolled, setTncScrolled] = useState(false);
-  const [tncAccepted, setTncAccepted] = useState(false);
-
-  const [showCropModal, setShowCropModal] = useState(false);
-  const [imageSrc, setImageSrc] = useState(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [finalPhotoBase64, setFinalPhotoBase64] = useState('');
-
-  const [formData, setFormData] = useState({
-    rollNo: '', name: '', phone: '', email: '', age: '', gender: '', branch: '', 
-    course: '', joiningDate: '', fresherStatus: '', homeTown: '',
-    linkedin: '', instagram: '', placementReq: '', parentName: '', parentContact: '', 
-    friend1Name: '', friend1Phone: '', friend2Name: '', friend2Phone: '', password: '', confirmPassword: '',
-    qualification: '', customQualification: '', stream: '', customStream: ''
-  });
-
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const onFileChange = async (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.addEventListener('load', () => { setImageSrc(reader.result); setShowCropModal(true); });
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => { setCroppedAreaPixels(croppedAreaPixels); }, []);
-
-  const generateCroppedImage = () => {
-    const canvas = document.createElement('canvas');
-    const image = new Image();
-    image.src = imageSrc;
-    image.onload = () => {
-      canvas.width = 250; canvas.height = 250;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage( image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, 250, 250 );
-      setFinalPhotoBase64(canvas.toDataURL('image/jpeg'));
-      setShowCropModal(false);
-    };
-  };
-
-  const handleTncScroll = (e) => {
-    const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 25;
-    if (bottom) setTncScrolled(true);
-  };
-
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { setStatus({ type: 'error', message: 'Please enter a valid email format.' }); return; }
-    if (!/^\d{10}$/.test(formData.phone)) { setStatus({ type: 'error', message: 'Your phone number must be exactly 10 digits.' }); return; }
-    if (!/^\d{10}$/.test(formData.friend1Phone) || !/^\d{10}$/.test(formData.friend2Phone)) { setStatus({ type: 'error', message: 'Referral phone numbers must be exactly 10 digits.' }); return; }
-    if (formData.friend1Phone === formData.friend2Phone) { setStatus({ type: 'error', message: 'Friend 1 and Friend 2 referral phone numbers cannot be the same.' }); return; }
-    if (formData.password !== formData.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match!' }); return; }
-    if (!tncAccepted) { setStatus({ type: 'error', message: 'You must accept the Terms & Conditions.' }); return; }
-
-    const resolvedQualification = formData.qualification === 'Other' ? formData.customQualification : formData.qualification;
-    const resolvedStream = formData.stream === 'Other' ? formData.customStream : formData.stream;
-
-    if (!resolvedQualification.trim()) { setStatus({ type: 'error', message: 'Please specify your qualification.' }); return; }
-    if (!resolvedStream.trim()) { setStatus({ type: 'error', message: 'Please specify your stream/branch.' }); return; }
-
-    setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
-    const payload = { ...formData, qualification: resolvedQualification, stream: resolvedStream, photoBase64: finalPhotoBase64 };
-
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
-      if (response.data.success) {
-        setStatus({ type: 'success', message: 'Account created! Redirecting to login...' });
-        setTimeout(() => navigate('/'), 2500); 
-      }
-    } catch (error) {
-      setStatus({ type: 'error', message: error.response?.data?.message || 'Server Error.' });
-    }
-  };
-
-  return (
-    <div className="auth-wrapper" style={{ background: '#0b0f17' }}>
-      <div className="profile-reg-card">
-        <div className="reg-header">
-          <div><h2 style={{ margin: '0 0 4px 0' }}>Create Student Profile</h2><p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>Register records, course details, and placement preferences</p></div>
-          <div className="brand-logo-container" style={{ marginBottom: 0 }}>
-            <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" style={{ height: '38px' }} />
-          </div>
-        </div>
-
-        <form onSubmit={handleSignup}>
-          <div className="section-title" style={{ color: '#38bdf8' }}><i className="ph ph-user" style={{ fontSize: '1.2rem' }}></i> PRIMARY DETAILS</div>
-          <div className="primary-layout-row">
-            <div className="avatar-upload-box" onClick={() => document.getElementById('photoUpload').click()}>
-              <input type="file" id="photoUpload" accept="image/*" className="hidden" onChange={onFileChange} />
-              <div className="avatar-preview-circle">{finalPhotoBase64 ? <img src={finalPhotoBase64} alt="Profile" /> : (formData.name ? formData.name.charAt(0).toUpperCase() : 'U')}</div>
-              <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>Tap to Upload</span>
+                <div className="flex items-center space-x-4">
+                    <button type="button" onClick={() => navigate('/login')} className="hidden md:inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-xs font-semibold px-5 py-2.5 rounded-lg shadow-lg hover:-translate-y-0.5 transition-all" style={{ border: 'none', cursor: 'pointer' }}>
+                        <span>Student Login </span>
+                        <i className="fas fa-arrow-right text-[10px]"></i>
+                    </button>
+                    
+                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2.5 rounded-lg border border-slate-700/50 text-slate-300 focus:outline-none" style={{ background: 'transparent' }}>
+                        <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-lg`}></i>
+                    </button>
+                </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="grid-2col">
-                <div className="form-group" style={{ marginBottom: 0 }}><label>IPCS Roll Number *</label><input type="text" name="rollNo" placeholder="IPCS XXXXXX" onChange={handleChange} required /></div>
-                <div className="form-group" style={{ marginBottom: 0 }}><label>Full Name *</label><input type="text" name="name" placeholder="e.g. Vishnu Kumar" onChange={handleChange} required /></div>
-              </div>
-              <div className="grid-2col">
-                <div className="form-group" style={{ marginBottom: 0 }}><label>Phone Number *</label><input type="tel" name="phone" placeholder="10 Digit Number" onChange={handleChange} required /></div>
-                <div className="form-group" style={{ marginBottom: 0 }}><label>Email ID *</label><input type="email" name="email" placeholder="student@ipcsglobal.com" onChange={handleChange} required /></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid-3col" style={{ marginTop: '1.1rem' }}>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Age</label><input type="number" name="age" placeholder="e.g. 22" onChange={handleChange} /></div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Gender</label>
-              <select name="gender" onChange={handleChange} defaultValue="">
-                <option value="" disabled>Select</option><option value="Male">Male</option><option value="Female">Female</option>
-              </select>
-            </div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Branch Campus *</label>
-              <select name="branch" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Branch</option>
-                <optgroup label="Kerala">
-                  <option value="Kochi">Kochi</option><option value="Calicut">Calicut</option><option value="Trivandrum">Trivandrum</option>
-                  <option value="Attingal">Attingal</option><option value="Kollam">Kollam</option><option value="Kannur">Kannur</option>
-                  <option value="Thrissur">Thrissur</option><option value="Perinthalmanna">Perinthalmanna</option><option value="Kottayam">Kottayam</option>
-                  <option value="Pathanamthitta">Pathanamthitta</option><option value="Palakkad">Palakkad</option>
-                </optgroup>
-                <optgroup label="Tamil Nadu">
-                  <option value="Coimbatore">Coimbatore</option><option value="Chennai">Chennai</option><option value="Tambaram">Tambaram</option>
-                  <option value="Trichy">Trichy</option><option value="Salem">Salem</option><option value="Madurai">Madurai</option>
-                  <option value="Erode">Erode</option><option value="Tirunelveli">Tirunelveli</option>
-                </optgroup>
-                <optgroup label="Karnataka">
-                  <option value="Bangalore">Bangalore</option><option value="Mangalore">Mangalore</option><option value="Mysore">Mysore</option>
-                </optgroup>
-                <optgroup label="Maharashtra">
-                  <option value="Mumbai">Mumbai</option><option value="Pune">Pune</option><option value="Nagpur">Nagpur</option>
-                </optgroup>
-                <optgroup label="West Bengal">
-                  <option value="Kolkata">Kolkata</option><option value="Siliguri">Siliguri</option>
-                </optgroup>
-                <optgroup label="Other States in India">
-                  <option value="Hyderabad (Telangana)">Hyderabad (Telangana)</option><option value="Ranchi (Jharkhand)">Ranchi (Jharkhand)</option>
-                  <option value="Raipur (Chhattisgarh)">Raipur (Chhattisgarh)</option><option value="Bhopal (Madhya Pradesh)">Bhopal (Madhya Pradesh)</option>
-                </optgroup>
-                <optgroup label="International (GCC)">
-                  <option value="Dubai (UAE)">Dubai (UAE)</option><option value="Riyadh (Saudi Arabia)">Riyadh (Saudi Arabia)</option>
-                </optgroup>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid-2col" style={{ marginTop: '1.1rem' }}>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Parent/Guardian Name</label><input type="text" name="parentName" placeholder="Full Name" onChange={handleChange} /></div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Parent Contact No.</label><input type="tel" name="parentContact" placeholder="10 Digit Number" onChange={handleChange} /></div>
-          </div>
-
-          <div className="section-title" style={{ color: '#4ade80', marginTop: '2rem' }}><i className="ph ph-graduation-cap" style={{ fontSize: '1.2rem' }}></i> ACADEMIC & COURSE DETAILS</div>
-          <div className="grid-3col">
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Course Category *</label>
-              <select name="course" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Course Category</option>
-                <option value="Industrial Automation">Industrial Automation</option>
-                <option value="BMS & CCTV">BMS & CCTV</option>
-                <option value="Embedded and IOT">Embedded and IOT</option>
-                <option value="Python and Data Science">Python and Data Science</option>
-                <option value="Artificial Intelligence">Artificial Intelligence</option>
-                <option value="Python Full Stack">Python Full Stack</option>
-                <option value="Java Full Stack">Java Full Stack</option>
-                <option value="MERN Stack">MERN Stack</option>
-                <option value="Software Testing">Software Testing</option>
-                <option value="Digital Marketing">Digital Marketing</option>
-              </select>
-            </div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Joining Date *</label><input type="date" name="joiningDate" onChange={handleChange} required /></div>
-            
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label>Qualification *</label>
-              <select name="qualification" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Qualification</option>
-                <option value="SSLC">SSLC</option><option value="HSE">HSE</option><option value="ITI">ITI</option>
-                <option value="Diploma">Diploma</option><option value="B.Tech">B.Tech</option><option value="Bsc">Bsc</option>
-                <option value="PG">PG</option><option value="Other">Other</option>
-              </select>
-              {formData.qualification === 'Other' && (
-                <input type="text" name="customQualification" placeholder="Specify Qualification" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />
-              )}
-            </div>
-          </div>
-
-          <div className="grid-3col" style={{ marginTop: '1.1rem' }}>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label>Stream / Branch *</label>
-              <select name="stream" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Stream</option>
-                <option value="IT">IT</option><option value="EEE">EEE</option><option value="EC">EC</option>
-                <option value="Mechanical">Mechanical</option><option value="Science">Science</option><option value="Other">Other</option>
-              </select>
-              {formData.stream === 'Other' && (
-                <input type="text" name="customStream" placeholder="Specify Stream / Branch" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />
-              )}
-            </div>
-
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Experience Status *</label>
-              <select name="fresherStatus" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Status</option><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option>
-              </select>
-            </div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Home Town *</label><input type="text" name="homeTown" placeholder="e.g. Kozhikode" onChange={handleChange} required /></div>
-          </div>
-
-          <div className="grid-2col" style={{ marginTop: '1.1rem' }}>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>LinkedIn Link</label><input type="text" name="linkedin" placeholder="www.linkedin.com/in/..." onChange={handleChange} /></div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Instagram Handle</label><input type="text" name="instagram" placeholder="@username" onChange={handleChange} /></div>
-          </div>
-          <div className="form-group" style={{ marginTop: '1.1rem' }}><label>Placement Requirements</label><textarea name="placementReq" rows="2" placeholder="Preferred location, salary expectation..." onChange={handleChange}></textarea></div>
-
-          <div className="section-title" style={{ color: '#c084fc', marginTop: '2rem' }}><i className="ph ph-users" style={{ fontSize: '1.2rem' }}></i> REFERRALS & SECURITY CREDENTIALS</div>
-          <div className="grid-2col">
-            <div style={{ background: 'var(--input-bg)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--input-border)' }}>
-              <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase' }}>FRIEND 1 REFERRAL *</span>
-              <input type="text" name="friend1Name" placeholder="Full Name" style={{ marginBottom: '0.6rem' }} onChange={handleChange} required />
-              <input type="tel" name="friend1Phone" placeholder="10 Digit Contact Number" onChange={handleChange} required />
-            </div>
-            <div style={{ background: 'var(--input-bg)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--input-border)' }}>
-              <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase' }}>FRIEND 2 REFERRAL *</span>
-              <input type="text" name="friend2Name" placeholder="Full Name" style={{ marginBottom: '0.6rem' }} onChange={handleChange} required />
-              <input type="tel" name="friend2Phone" placeholder="10 Digit Contact Number" onChange={handleChange} required />
-            </div>
-          </div>
-
-          <div className="grid-2col" style={{ marginTop: '1.1rem' }}>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Password *</label>
-              <div className="pwd-wrapper">
-                <input type={showPassword ? "text" : "password"} name="password" placeholder="Create account password" onChange={handleChange} required style={{ paddingRight: '40px' }} />
-                <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}><i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i></span>
-              </div>
-            </div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Confirm Password *</label>
-              <div className="pwd-wrapper"><input type={showPassword ? "text" : "password"} name="confirmPassword" placeholder="Re-enter password" onChange={handleChange} required style={{ paddingRight: '40px' }} /></div>
-            </div>
-          </div>
-
-          <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '20px' }}>
-            <input type="checkbox" style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} checked={tncAccepted} onChange={(e) => setTncAccepted(e.target.checked)} />
-            <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: 1.4 }}>
-              I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span>
-            </label>
-          </div>
-
-          {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
-
-          <div className="form-footer-bar">
-            <button type="button" className="btn-cancel" onClick={() => navigate('/')}>Cancel</button>
-            <button type="submit" className="btn-action" style={{ padding: '0.8rem 2rem', background: '#2563eb' }}>Create Account &rarr;</button>
-          </div>
-        </form>
-      </div>
-
-      {showCropModal && (
-        <div className="report-modal-overlay">
-          <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
-            <div className="modal-header-border">
-              <h3 style={{ margin: 0, color: 'var(--text-main)' }}>Adjust Profile Photo</h3>
-              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setShowCropModal(false)}></i>
-            </div>
-            <div style={{ position: 'relative', width: '100%', height: '250px', background: '#333', borderRadius: '12px', overflow: 'hidden' }}>
-              <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={1} cropShape="round" onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={onCropComplete} />
-            </div>
-            <input type="range" min="1" max="3" step="0.1" value={zoom} onChange={(e) => setZoom(e.target.value)} style={{ margin: '20px 0', width: '100%' }} />
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button type="button" className="btn-action" style={{ flex: 1, background: '#22c55e' }} onClick={generateCroppedImage}>Confirm Photo</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showTncModal && (
-        <div className="report-modal-overlay">
-          <div className="report-card" style={{ maxWidth: '650px' }}>
-            <div className="modal-header-border">
-              <h3 style={{ margin: 0, color: 'var(--text-main)' }}>IPCS Placement Rule Set</h3>
-              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setShowTncModal(false)}></i>
-            </div>
-            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: 0, marginBottom: '1.5rem' }}>Below mentioned are the Rules to be followed by students for getting Placement Support from IPCS. Please scroll to the bottom to accept.</p>
-            <div className="tnc-content-box" onScroll={handleTncScroll}>
-              <h4>ELIGIBILITY CRITERIA FOR ATTENDING THE INTERVIEWS</h4>
-              <ul>
-                <li>Students who have completed at least 90% of the course.</li>
-                <li>Students who have paid the full fees.</li>
-                <li>Students who have passion for working & take their career seriously.</li>
-                <li>Candidates should be ready for any location.</li>
-              </ul>
-              <h4>DOS & DON’TS FOR THE CANDIDATES</h4>
-              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Job applications & Interview:</strong>
-              <ul>
-                <li>Check all criteria mentioned in the employment news, if everything suits to you then only APPLY.</li>
-                <li>Students should attend the interview on the date and time as allotted.</li>
-                <li>It is mandatory for Students to update the placement coordinator of their attendance.</li>
-                <li>Students not attending 3 interviews will be barred from Placement Support.</li>
-                <li>Students not applying for more than 15 days with a valid reason will be removed.</li>
-              </ul>
-              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Joining:</strong>
-              <ul>
-                <li>Students after being selected & given a date to join should adhere to that.</li>
-                <li>2 times after accepting the offer and not joining will be considered a Black Mark.</li>
-                <li>1 year commitment to the company getting recruited is mandatory.</li>
-              </ul>
-              <h4>DECLARATION</h4>
-              <p>I hereby declare that I have read & understood the terms & conditions of IPCS Placement Cell. I adhere to follow the rules & incase of any failure to do so; I understand that I won’t be eligible for Placement Support.</p>
-            </div>
-            {!tncScrolled ? (
-              <div style={{ textAlign: 'center', color: '#f59e0b', fontSize: '0.88rem', fontWeight: 700, marginTop: '15px' }}>↓ Please scroll to the end of the rules to Accept ↓</div>
-            ) : (
-              <div style={{ display: 'flex', marginTop: '20px' }}>
-                <button type="button" className="btn-action" style={{ width: '100%', background: '#22c55e' }} onClick={() => { setTncAccepted(true); setShowTncModal(false); }}>Accept</button>
-              </div>
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && (
+                <div className="lg:hidden fixed top-20 left-4 right-4 bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl z-50">
+                    <ul className="flex flex-col space-y-4 text-base font-semibold m-0 p-0" style={{ listStyle: 'none' }}>
+                        <li><a href="#home" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 block py-1.5" style={{ textDecoration: 'none' }}>Home</a></li>
+                        <li><a href="#companies" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 block py-1.5" style={{ textDecoration: 'none' }}>Recruiters</a></li>
+                        <li><a href="#placedStudentsMarquee" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 block py-1.5" style={{ textDecoration: 'none' }}>Placements</a></li>
+                        <li><a href="#testimonials" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 block py-1.5" style={{ textDecoration: 'none' }}>Testimonials</a></li>
+                        <li className="pt-4 border-t border-slate-800">
+                            <button onClick={() => navigate('/login')} className="w-full flex justify-center items-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold py-3 rounded-xl shadow-lg border-none cursor-pointer">
+                                <span>Student Login</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             )}
-          </div>
-        </div>
-      )}
+        </nav>
+
+        {/* HERO SECTION */}
+        <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden" id="home">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 z-0"></div>
+            <div className="absolute top-1/4 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] animate-pulse-glow z-0"></div>
+            <div class="absolute bottom-1/4 right-10 w-[450px] h-[450px] bg-cyan-400/10 rounded-full blur-[120px] animate-pulse-glow z-0" style={{animationDelay: '1.5s'}}></div>
+
+            <div className="max-w-7xl mx-auto px-6 md:px-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 mt-6">
+                <div className="lg:col-span-7 flex flex-col justify-center text-left space-y-6">
+                    <div className="inline-flex items-center space-x-2 bg-slate-900/65 backdrop-blur border border-slate-700/60 rounded-full py-1.5 px-4 w-fit shadow-md">
+                        <span className="flex h-2.5 w-2.5 relative">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
+                        </span>
+                        <span className="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-1.5">
+                            <i className="fas fa-award text-yellow-500"></i> India's Premier Technical Placement Ecosystem
+                        </span>
+                    </div>
+
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white m-0">
+                        Unlock Global Tech <br/>
+                        <span className="gradient-text leading-normal">Careers with IPCS</span>
+                    </h1>
+
+                    <p className="text-base sm:text-lg text-slate-300/90 max-w-2xl leading-relaxed m-0">
+                        IPCS Global connects future-ready talent in Industrial Automation, Embedded Systems, IoT, and Digital Tech with leading blue-chip global firms. Experience zero-barrier career transitions.
+                    </p>
+
+                    <div className="flex flex-wrap gap-4 items-center pt-2">
+                        <button onClick={() => navigate('/signup')} className="flex items-center space-x-3 bg-gradient-to-r from-blue-600 via-cyan-500 to-cyan-400 text-white font-bold py-4 px-8 rounded-xl shadow-lg border-none cursor-pointer hover:-translate-y-1 transition-transform">
+                            <span>Student Sign Up</span>
+                            <i className="fas fa-chevron-right text-sm"></i>
+                        </button>
+                    </div>
+
+                    <div className="pt-4 flex items-center space-x-3 border-t border-slate-800/80 max-w-lg">
+                        <div className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-lg p-2.5 flex items-center justify-center animate-bounce">
+                            <i className="fas fa-bolt"></i>
+                        </div>
+                        <div>
+                            <span className="text-xs uppercase font-extrabold text-cyan-400 tracking-wider">Live Hiring Updates</span>
+                            <p className="text-xs text-slate-400 mt-0.5 transition-opacity duration-500 font-mono m-0" key={tickerIndex}>{hiringUpdates[tickerIndex]}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="lg:col-span-5 relative flex justify-center items-center">
+                    <div className="relative w-full max-w-md p-8 rounded-3xl glass-panel shadow-2xl overflow-hidden z-10 animate-float">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-400/5 rounded-full blur-3xl"></div>
+                        <div className="flex items-center justify-between border-b border-slate-800 pb-5 mb-6">
+                            <div className="flex items-center space-x-3">
+                                <div className="bg-blue-500/20 p-2 rounded-xl border border-blue-500/30 text-blue-500">
+                                    <i className="fas fa-bolt text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-white text-md m-0">Hiring Dashboard</h3>
+                                    <p className="text-xs text-slate-400 font-medium m-0">Realtime Campus Intake</p>
+                                </div>
+                            </div>
+                            <span className="text-[10px] font-semibold px-2.5 py-1 bg-green-500/15 border border-green-500/30 text-green-400 rounded-full animate-pulse">
+                                ACTIVE STAGE
+                            </span>
+                        </div>
+
+                        <div className="space-y-4">
+                            {siteData.statistics.slice(0,3).map((stat, i) => (
+                                <div key={i} className="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 flex items-center justify-between group transition duration-300">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-10 h-10 rounded-full bg-cyan-400/10 flex items-center justify-center text-cyan-400">
+                                            <i className={`fas ${stat.icon}`}></i>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold m-0">{stat.label}</p>
+                                            <h4 className="text-xl font-extrabold text-slate-100 mt-0.5 m-0">{stat.value}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {/* FEATURES */}
+        <section className="py-24 relative overflow-hidden border-t border-slate-900" id="features" style={{ backgroundColor: 'var(--bg-dark)' }}>
+            <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+                <div className="text-center max-w-3xl mx-auto mb-16 fade-in">
+                    <span className="inline-block text-cyan-400 text-xs font-extrabold uppercase tracking-widest bg-cyan-400/10 py-1.5 px-4 rounded-full mb-3">Professional training edge</span>
+                    <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight m-0">The IPCS Training-to-Hired Ecosystem</h2>
+                    <p className="text-slate-400 mt-4 text-sm md:text-base">How we prepare and secure global packages for thousands of learners annually through active technical incubation.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="p-8 rounded-3xl bg-slate-900/85 border border-slate-800 hover:border-cyan-400/30 transition-all duration-300 group fade-in">
+                        <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 text-2xl mb-6 group-hover:scale-110 transition duration-300"><i className="fas fa-laptop-code"></i></div>
+                        <h3 className="text-lg font-extrabold text-white mb-3 mt-0">Industry-Grade Labs</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed m-0">Students train directly on advanced PLC panels, SCADA software, and IoT developmental sensors mimicking real factory environments.</p>
+                    </div>
+                    <div className="p-8 rounded-3xl bg-slate-900/85 border border-slate-800 hover:border-blue-500/30 transition-all duration-300 group fade-in">
+                        <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 text-2xl mb-6 group-hover:scale-110 transition duration-300"><i className="fas fa-file-invoice"></i></div>
+                        <h3 className="text-lg font-extrabold text-white mb-3 mt-0">Mock Technical Audits</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed m-0">We simulate real HR assessment algorithms and core electronics technical panel interview protocols every single week.</p>
+                    </div>
+                    <div className="p-8 rounded-3xl bg-slate-900/85 border border-slate-800 hover:border-yellow-500/30 transition-all duration-300 group fade-in">
+                        <div className="w-14 h-14 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-yellow-400 text-2xl mb-6 group-hover:scale-110 transition duration-300"><i className="fas fa-globe"></i></div>
+                        <h3 className="text-lg font-extrabold text-white mb-3 mt-0">Global Outreach</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed m-0">Active tie-ups in Gulf nations, Singapore, Germany, and India help match local and global talent demand scales.</p>
+                    </div>
+                    <div className="p-8 rounded-3xl bg-slate-900/85 border border-slate-800 hover:border-green-500/30 transition-all duration-300 group fade-in">
+                        <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center text-green-400 text-2xl mb-6 group-hover:scale-110 transition duration-300"><i className="fas fa-user-shield"></i></div>
+                        <h3 className="text-lg font-extrabold text-white mb-3 mt-0">Corporate Placement</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed m-0">Access to exclusive on-campus recruitment cycles,pool drives and fast-track hiring pipelines with premium corporate partners.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {/* COMPANIES MARQUEE */}
+        <section className="py-24 relative border-t border-slate-900" id="companies" style={{ backgroundColor: 'var(--bg-dark)' }}>
+            <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 mb-12 fade-in">
+                <div className="text-center max-w-3xl mx-auto">
+                    <span className="inline-block text-cyan-400 text-xs font-extrabold uppercase tracking-widest bg-cyan-400/10 py-1.5 px-4 rounded-full mb-3">IPCS Valued Partners</span>
+                    <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight m-0">Trusted By Top Tier Global Brands</h2>
+                </div>
+            </div>
+
+            <div className="w-full overflow-hidden flex flex-col space-y-6 relative select-none">
+                <div className="absolute left-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-r from-[#0b0f17] to-transparent z-10 pointer-events-none"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-l from-[#0b0f17] to-transparent z-10 pointer-events-none"></div>
+
+                <div className="flex overflow-x-hidden relative">
+                    <div className="flex space-x-6 animate-marquee-left py-4">
+                        {siteData.companies.slice(0,5).map((c, i) => (
+                            <div key={i} className="company-name w-64 p-6 flex flex-col justify-between items-start" style={{ textAlign: 'left' }}>
+                                <div className="flex items-center space-x-3">
+                                    <div className={`w-12 h-12 rounded-xl bg-${c.color}-400/10 flex items-center justify-center text-${c.color}-400`}><i className={`fas ${c.icon} text-xl`}></i></div>
+                                    <div><h4 className="font-extrabold text-white m-0">{c.name}</h4><p className="text-[10px] text-slate-500 uppercase tracking-wider m-0">{c.desc}</p></div>
+                                </div>
+                                <p className="text-xs text-slate-400 mt-4 italic m-0">"{c.quote}"</p>
+                            </div>
+                        ))}
+                        {/* Duplicate for infinite effect */}
+                        {siteData.companies.slice(0,5).map((c, i) => (
+                            <div key={i+'dup'} className="company-name w-64 p-6 flex flex-col justify-between items-start" style={{ textAlign: 'left' }}>
+                                <div className="flex items-center space-x-3">
+                                    <div className={`w-12 h-12 rounded-xl bg-${c.color}-400/10 flex items-center justify-center text-${c.color}-400`}><i className={`fas ${c.icon} text-xl`}></i></div>
+                                    <div><h4 className="font-extrabold text-white m-0">{c.name}</h4><p className="text-[10px] text-slate-500 uppercase tracking-wider m-0">{c.desc}</p></div>
+                                </div>
+                                <p className="text-xs text-slate-400 mt-4 italic m-0">"{c.quote}"</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex overflow-x-hidden relative">
+                    <div className="flex space-x-6 animate-marquee-right py-4">
+                        {siteData.companies.slice(5,10).map((c, i) => (
+                            <div key={i} className="company-name w-64 p-6 flex flex-col justify-between items-start" style={{ textAlign: 'left' }}>
+                                <div className="flex items-center space-x-3">
+                                    <div className={`w-12 h-12 rounded-xl bg-${c.color}-400/10 flex items-center justify-center text-${c.color}-400`}><i className={`fas ${c.icon} text-xl`}></i></div>
+                                    <div><h4 className="font-extrabold text-white m-0">{c.name}</h4><p className="text-[10px] text-slate-500 uppercase tracking-wider m-0">{c.desc}</p></div>
+                                </div>
+                                <p className="text-xs text-slate-400 mt-4 italic m-0">"{c.quote}"</p>
+                            </div>
+                        ))}
+                        {/* Duplicate for infinite effect */}
+                        {siteData.companies.slice(5,10).map((c, i) => (
+                            <div key={i+'dup'} className="company-name w-64 p-6 flex flex-col justify-between items-start" style={{ textAlign: 'left' }}>
+                                <div className="flex items-center space-x-3">
+                                    <div className={`w-12 h-12 rounded-xl bg-${c.color}-400/10 flex items-center justify-center text-${c.color}-400`}><i className={`fas ${c.icon} text-xl`}></i></div>
+                                    <div><h4 className="font-extrabold text-white m-0">{c.name}</h4><p className="text-[10px] text-slate-500 uppercase tracking-wider m-0">{c.desc}</p></div>
+                                </div>
+                                <p className="text-xs text-slate-400 mt-4 italic m-0">"{c.quote}"</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {/* TESTIMONIALS */}
+        <section className="py-24 relative bg-slate-900 border-t border-slate-800" id="testimonials">
+            <div className="max-w-7xl mx-auto px-6 md:px-12 text-center mb-12 fade-in">
+                <span className="inline-block text-cyan-400 text-xs font-extrabold uppercase tracking-widest bg-cyan-400/10 py-1.5 px-4 rounded-full mb-3">Student Stories</span>
+                <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight m-0">Video Testimonials</h2>
+            </div>
+            
+            <div className="w-full overflow-hidden relative pb-10">
+                <div className="flex space-x-6 animate-marquee-left px-6">
+                    {siteData.testimonials.map((t, i) => (
+                        <div key={i} className="testimonial-video-wrapper" onClick={() => openVideo(t.video)}>
+                            <div className="video-placeholder">
+                                <i className="fas fa-play-circle text-4xl text-cyan-400 absolute z-10" style={{top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}></i>
+                                {/* Mockup image since videos won't autoplay cleanly in a grid without user interaction */}
+                                <div style={{width:'100%', height:'100%', background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'}}></div>
+                            </div>
+                            <div className="video-overlay text-left">
+                                <h4 className="m-0 text-white">{t.name}</h4>
+                                <p className="m-0 text-cyan-400">{t.position}</p>
+                            </div>
+                        </div>
+                    ))}
+                    {siteData.testimonials.map((t, i) => (
+                        <div key={i+'dup'} className="testimonial-video-wrapper" onClick={() => openVideo(t.video)}>
+                            <div className="video-placeholder">
+                                <i className="fas fa-play-circle text-4xl text-cyan-400 absolute z-10" style={{top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}></i>
+                                <div style={{width:'100%', height:'100%', background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'}}></div>
+                            </div>
+                            <div className="video-overlay text-left">
+                                <h4 className="m-0 text-white">{t.name}</h4>
+                                <p className="m-0 text-cyan-400">{t.position}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        {/* TEAM SECTION */}
+        <section className="py-24 relative border-t border-slate-900" style={{ backgroundColor: 'var(--bg-dark)' }}>
+            <div className="max-w-7xl mx-auto px-6 md:px-12 text-center mb-16 fade-in">
+                <span className="inline-block text-cyan-400 text-xs font-extrabold uppercase tracking-widest bg-cyan-400/10 py-1.5 px-4 rounded-full mb-3">Our Team</span>
+                <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight m-0">Meet Placement Officers</h2>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-6 md:px-12">
+                <div className="zonal-card fade-in">
+                    <div className="zonal-image-wrapper">
+                        <div className="zonal-badge">Zonal Head</div>
+                        <i className="fas fa-user-tie text-[8rem] text-white/20"></i>
+                    </div>
+                    <div className="zonal-content">
+                        <h3>{siteData.team.zonalOfficer.name}</h3>
+                        <p className="position">{siteData.team.zonalOfficer.position}</p>
+                        <p className="bio">{siteData.team.zonalOfficer.bio}</p>
+                        <div className="flex gap-6 mb-6">
+                            <div className="flex items-center gap-3"><i className="fas fa-envelope text-blue-500 bg-blue-500/10 p-3 rounded-full"></i> <span className="text-slate-300">{siteData.team.zonalOfficer.email}</span></div>
+                            <div className="flex items-center gap-3"><i className="fas fa-phone text-green-500 bg-green-500/10 p-3 rounded-full"></i> <span className="text-slate-300">{siteData.team.zonalOfficer.phone}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 fade-in">
+                    {siteData.team.tpos.map((tpo, i) => (
+                        <div key={i} className="tpo-card">
+                            <div className="tpo-image-wrapper">
+                                <i className="fas fa-user-tie text-5xl text-white/30"></i>
+                            </div>
+                            <div className="tpo-info">
+                                <h4>{tpo.name}</h4>
+                                <p className="position m-0">{tpo.position}</p>
+                                <p className="bio mt-2">{tpo.bio}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        {/* FOOTER */}
+        <footer className="footer">
+            <div className="footer-grid">
+                <div className="footer-brand text-left">
+                    <div className="logo footer-logo text-white text-2xl font-bold mb-4">IPCS Global</div>
+                    <p className="text-slate-400">Building careers and creating futures for students worldwide.</p>
+                </div>
+                <div className="footer-links text-left">
+                    <h4 className="text-white font-bold mb-4">Quick Links</h4>
+                    <ul className="space-y-2 m-0 p-0" style={{listStyle:'none'}}>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#companies">Recruiters</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                    </ul>
+                </div>
+                <div className="footer-links text-left">
+                    <h4 className="text-white font-bold mb-4">Portal Actions</h4>
+                    <ul className="space-y-2 m-0 p-0" style={{listStyle:'none'}}>
+                        <li><span onClick={() => navigate('/login')} className="cursor-pointer hover:text-cyan-400 transition">Student Login</span></li>
+                        <li><span onClick={() => navigate('/signup')} className="cursor-pointer hover:text-cyan-400 transition">Create Account</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div className="footer-bottom mt-8 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
+                <p>&copy; 2026 IPCS Placement Cell. All rights reserved.</p>
+            </div>
+        </footer>
+
+        {/* VIDEO MODAL */}
+        {activeVideo && (
+            <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
+                <div className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-slate-700 shadow-2xl p-2">
+                    <button onClick={closeVideo} className="absolute top-4 right-4 z-50 w-10 h-10 bg-white/10 hover:bg-red-500 rounded-full flex items-center justify-center text-white border-none cursor-pointer transition">
+                        <i className="fas fa-times text-xl"></i>
+                    </button>
+                    <video src={activeVideo} controls autoPlay className="w-full h-auto max-h-[80vh] rounded-xl"></video>
+                </div>
+            </div>
+        )}
+
     </div>
   );
 }
@@ -739,6 +873,7 @@ function Signup() {
 // ==========================================
 // 4. MAIN DASHBOARD ECOSYSTEM
 // ==========================================
+/* STREAMING_CHUNK:Configuring robust dashboard logic and APIs... */
 function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -830,7 +965,7 @@ function Dashboard() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('talentino_student_user') || '{}');
-    if (!storedUser.email) { navigate('/'); return; }
+    if (!storedUser.email) { navigate('/login'); return; }
     setUser(storedUser);
     fetchDashboard(storedUser);
     const interval = setInterval(() => { fetchDashboard(storedUser); }, 15000);
@@ -1022,10 +1157,12 @@ function Dashboard() {
     } catch(err) { setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error' }); }
   };
 
+  // Improved Date Parsers for robust filtering
   const isPastDate = (dateStr) => {
     if (!dateStr || dateStr.toLowerCase() === 'open') return false;
     let parts = dateStr.split(/[-/]/);
     if (parts.length === 3) {
+        // Assume DD/MM/YYYY or DD-MM-YYYY format from the sheet
         let d = new Date(parts[2], parts[1] - 1, parts[0]);
         let now = new Date(); now.setHours(0,0,0,0);
         return d < now;
@@ -1037,7 +1174,9 @@ function Dashboard() {
     if (!dateStr || dateStr === "N/A" || dateStr === "undefined") return null;
     let parts = dateStr.split(/[-/]/);
     if (parts.length === 3) {
+       // If year is first (YYYY-MM-DD)
        if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
+       // If year is last (DD-MM-YYYY)
        return new Date(parts[2], parts[1]-1, parts[0]);
     }
     let d = new Date(dateStr);
@@ -1066,8 +1205,10 @@ function Dashboard() {
   // --------------------------------------------------------
   // SMART FILTERING LOGIC
   // --------------------------------------------------------
+  
   const studentJoinDate = parseSafeDate(user.joiningDate);
 
+  // Events: Today & Future only
   const todayDate = new Date();
   todayDate.setHours(0,0,0,0);
   const filteredEvents = (data.events || []).filter(ev => {
@@ -1077,8 +1218,10 @@ function Dashboard() {
     return d >= todayDate;
   });
 
+  // Vacancies: After student joining date + Expired at Bottom
   const processedVacancies = (data.vacancies || []).filter(vac => {
     if (!studentJoinDate) return true;
+    // Check if the vacancy lastDate or open date is after student joined
     const vacLastDate = parseSafeDate(vac.lastDate);
     if (!vacLastDate) return true;
     return vacLastDate >= studentJoinDate;
@@ -1087,7 +1230,7 @@ function Dashboard() {
     const bExp = isPastDate(b.lastDate);
     if (aExp && !bExp) return 1;
     if (!aExp && bExp) return -1;
-    return 0; 
+    return 0; // Both expired or both active
   });
 
   // --------------------------------------------------------
@@ -1116,6 +1259,7 @@ function Dashboard() {
     return { bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid #0284c7' };
   };
 
+  // TPO Data Fallbacks (Fixes missing Assigned Branches & Photos)
   const tpo = data.tpoInfo || {};
   const tpoPhoto = tpo.profilePhoto || tpo.photo || tpo['Profile Photo'];
   const tpoName = tpo.name || tpo['TPO Name'] || "Placement Officer";
@@ -1124,6 +1268,7 @@ function Dashboard() {
   const tpoPhone = tpo.phone || tpo.contactNumber || tpo['Contact Number'] || "N/A";
   const tpoAssigned = tpo.assignedBranches || tpo.assignedRegions || tpo['Assigned Branches'] || "N/A";
 
+  /* STREAMING_CHUNK:Rendering Dashboard structure and Navbar... */
   return (
     <div className="app-layout">
       <div className="top-header">
@@ -1268,6 +1413,7 @@ function Dashboard() {
             </>
           )}
 
+          {/* STREAMING_CHUNK:Rendering polished Profile layout... */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -1377,6 +1523,7 @@ function Dashboard() {
             </div>
           )}
 
+          {/* STREAMING_CHUNK:Rendering Settings and Guide tab layouts... */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
@@ -1483,6 +1630,7 @@ function Dashboard() {
             </div>
           )}
 
+          {/* STREAMING_CHUNK:Rendering Talentino attendance module... */}
           {activeTab === 'talentino' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -1589,6 +1737,7 @@ function Dashboard() {
             </div>
           )}
 
+          {/* STREAMING_CHUNK:Rendering Vacancies grid and Job Details Modals... */}
           {activeTab === 'vacancies' && (
             <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
@@ -1655,6 +1804,7 @@ function Dashboard() {
             </div>
           )}
 
+          {/* STREAMING_CHUNK:Rendering Application Status Analytics... */}
           {activeTab === 'status' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -1728,6 +1878,7 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* STREAMING_CHUNK:Rendering Sidebar and Navigation Drawer... */}
       <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
         <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
           <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
@@ -1760,6 +1911,7 @@ function Dashboard() {
         </div>
       </div>
       
+      {/* STREAMING_CHUNK:Rendering closing Modals (Profile, Modals, Support)... */}
       {editProfileModal && (
         <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
           <div className="report-card" style={{ maxWidth: '700px' }}>
@@ -1895,7 +2047,7 @@ function Dashboard() {
               <i className="ph ph-x" style={{ position: 'absolute', top: '15px', right: '15px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem', zIndex: 10 }} onClick={() => setTpoModal(false)}></i>
               
               <div style={{ position: 'relative', zIndex: 2 }}>
-                <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
+                <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justify-content: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
                   {tpoPhoto && tpoPhoto !== "N/A" ? <img src={getDriveImageUrl(tpoPhoto)} style={{width: '100%', height: '100%', objectFit: 'cover'}} alt="TPO" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} /> : null}
                   <i className="ph ph-user-tie" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', display: (!tpoPhoto || tpoPhoto === "N/A") ? 'block' : 'none' }}></i>
                 </div>
@@ -1965,7 +2117,8 @@ export default function App() {
       <GlobalStyle />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<MarketingSite />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
