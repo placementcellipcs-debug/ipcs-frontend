@@ -48,18 +48,15 @@ const GlobalStyle = () => {
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
       /* --- LANDING PAGE (LOGIN) STYLES --- */
-      .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%); display: flex; flex-direction: column; }
+      .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%), linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 100% 100%, 40px 40px, 40px 40px; display: flex; flex-direction: column; }
       .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-      .nav-links { display: flex; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
-      .nav-links span { cursor: pointer; transition: color 0.2s; }
-      .nav-links span:hover { color: var(--text-main); }
-      .landing-grid { display: grid; grid-template-columns: 1fr 440px; gap: 4rem; padding: 4rem; flex: 1; align-items: center; max-width: 1400px; margin: 0 auto; width: 100%; }
-      .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: var(--accent-cyan); padding: 6px 16px; border-radius: 30px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1.5rem; }
+      .landing-grid { display: grid; grid-template-columns: 1fr 480px; gap: 4rem; padding: 4rem; flex: 1; align-items: center; max-width: 1400px; margin: 0 auto; width: 100%; }
+      .hero-badge { display: inline-flex; align-items: center; gap: 12px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: var(--accent-cyan); padding: 8px 18px; border-radius: 30px; margin-bottom: 1.5rem; text-align: left; text-transform: uppercase; }
       .hero-title { font-size: 4rem; font-weight: 800; line-height: 1.1; margin: 0 0 1.5rem 0; color: #ffffff; letter-spacing: -1px; }
       .hero-desc { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; max-width: 500px; margin-bottom: 2.5rem; }
       
       .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100vw; padding: 20px; }
-      .auth-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.2rem 1.8rem; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      .auth-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.2rem 1.8rem; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); margin: 0 auto; }
       .brand-logo-container { display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; }
       .auth-logo-img { max-width: 220px; height: auto; object-fit: contain; }
       .switch-mode { text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted); }
@@ -324,6 +321,9 @@ function Login() {
   const [fadeVideo, setFadeVideo] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
+  // New state to toggle between Dashboard stats card and the Authentication form
+  const [showAuthForm, setShowAuthForm] = useState(false);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) { setStatus({ type: 'error', message: 'Please enter both email and password.' }); return; }
@@ -363,41 +363,120 @@ function Login() {
     <div className="landing-wrapper">
       <div className="landing-nav">
         <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
-        <div className="nav-links">
-          <span>Home</span><span>Recruiters</span><span>Placements</span><span>Testimonials</span>
-        </div>
+        {/* Navigation links have been removed as requested */}
       </div>
       
       <div className="landing-grid">
         <div className="hero-section">
-          <div className="hero-badge"><i className="ph-fill ph-seal-check"></i> Talenzo (Connecting Talent with Opportunity)</div>
+          {/* Modified badge to show text on two lines */}
+          <div className="hero-badge">
+            <i className="ph-fill ph-seal-check"></i>
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.3' }}>
+              <span style={{ fontWeight: 800 }}>Talenzo</span>
+              <span style={{ fontSize: '0.65rem', opacity: 0.85, fontWeight: 700 }}>Connecting Talent with Opportunity</span>
+            </div>
+          </div>
+          
           <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: 'var(--accent-cyan)' }}>Careers with IPCS</span></h1>
           <p className="hero-desc">IPCS Global connects future-ready talent in Industrial Automation, Embedded Systems, IoT, and Digital Tech with leading blue-chip global firms. Experience zero-barrier career transitions.</p>
+
+          {!showAuthForm && (
+            <>
+              {/* Login / Signup toggle button replacing the original Search active placement */}
+              <button
+                className="btn-action"
+                style={{ padding: '1rem 2rem', fontSize: '1.05rem', borderRadius: '30px', background: 'linear-gradient(90deg, #0284c7 0%, #38bdf8 100%)', boxShadow: '0 10px 25px rgba(2, 132, 199, 0.4)' }}
+                onClick={() => setShowAuthForm(true)}
+              >
+                Login / Signup <i className="ph-bold ph-caret-right"></i>
+              </button>
+
+              {/* Live updates ticker section */}
+              <div className="live-updates-container" style={{ marginTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <div style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', width: '40px', height: '40px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <i className="ph-fill ph-lightning" style={{ fontSize: '1.4rem' }}></i>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-cyan)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>Live Hiring Updates</div>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Anand Manikantan got hired as a Data Analyst & Python Developer.</div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
-        <div className="auth-card" style={{ margin: '0 auto' }}>
-          <div className="brand-logo-container">
-            <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" />
-          </div>
-          <h2 style={{ textAlign: 'center', margin: '0 0 6px 0' }}>Welcome back</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
+        <div style={{ width: '100%', margin: '0 auto' }}>
+          {!showAuthForm ? (
+            /* Hiring Dashboard display shown initially */
+            <div className="hiring-stats-card" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <div style={{ background: '#0284c7', color: '#fff', width: '45px', height: '45px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
+                    <i className="ph-fill ph-lightning"></i>
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff' }}>Hiring Dashboard</h3>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Realtime Campus Intake</span>
+                  </div>
+                </div>
+                <div style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '1px' }}>
+                  ACTIVE STAGE
+                </div>
+              </div>
 
-          <form onSubmit={handleLogin}>
-            <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-            <div className="form-group"><label>Password</label>
-              <div className="pwd-wrapper">
-                <input type={showPassword ? "text" : "password"} placeholder="Enter password" style={{ paddingRight: '40px' }} value={password} onChange={(e) => setPassword(e.target.value)} />
-                <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}>
-                  <i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i>
-                </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <div style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}><i className="ph-fill ph-users"></i></div>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>Total Students Hired</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>1.5 M +</div>
+                  </div>
+                </div>
+                
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}><i className="ph-fill ph-buildings"></i></div>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>Enterprise Recruiters</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>25 K +</div>
+                  </div>
+                </div>
+                
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}><i className="ph-fill ph-medal"></i></div>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>Presence Across Countries</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>50 +</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem' }}>Sign in &rarr;</button>
-          </form>
+          ) : (
+            /* Active Login Form */
+            <div className="auth-card">
+              <div className="brand-logo-container">
+                <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" />
+              </div>
+              <h2 style={{ textAlign: 'center', margin: '0 0 6px 0' }}>Welcome back</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
 
-          {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
+              <form onSubmit={handleLogin}>
+                <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+                <div className="form-group"><label>Password</label>
+                  <div className="pwd-wrapper">
+                    <input type={showPassword ? "text" : "password"} placeholder="Enter password" style={{ paddingRight: '40px' }} value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}>
+                      <i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i>
+                    </span>
+                  </div>
+                </div>
+                <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem' }}>Sign in &rarr;</button>
+              </form>
 
-          <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
+              {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
+
+              <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -746,7 +825,6 @@ function Dashboard() {
   const [data, setData] = useState({ stats: {}, events: [], appliedJobs: [], vacancies: [], attendanceHistory: [], tpoInfo: {} });
   const [theme, setTheme] = useState('dark');
   
-  // Safe Tab State via Hash Routing (Fixes Mobile Back Button bug)
   const [activeTab, setActiveTab] = useState(() => {
      const hash = window.location.hash.replace('#', '');
      return hash || 'dashboard';
@@ -782,7 +860,6 @@ function Dashboard() {
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
 
-  // Sync hash changes (Mobile back button listener)
   useEffect(() => {
     const handleHashChange = () => {
         const hash = window.location.hash.replace('#', '') || 'dashboard';
@@ -976,9 +1053,6 @@ function Dashboard() {
     } catch(err) { setIssueStatus({ type: 'error', message: 'Submission failed' }); }
   };
 
-  // --------------------------------------------------------
-  // GPS & GEOFENCING LOGIC (With exact math)
-  // --------------------------------------------------------
   const captureGPS = () => {
     if(!data.isScheduledToday || data.hasMarkedToday) return; 
     setLocStatus("Capturing...");
@@ -1063,9 +1137,6 @@ function Dashboard() {
     } catch(err) { setActionStatus({ type: 'error', message: 'Server Error applying for job' }); }
   };
 
-  // --------------------------------------------------------
-  // SMART FILTERING LOGIC
-  // --------------------------------------------------------
   const studentJoinDate = parseSafeDate(user.joiningDate);
 
   const todayDate = new Date();
@@ -1090,9 +1161,6 @@ function Dashboard() {
     return 0; 
   });
 
-  // --------------------------------------------------------
-  // STATUS TAB ANALYTICS LOGIC
-  // --------------------------------------------------------
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
   (data.appliedJobs || []).forEach(job => {
     const s = (job.status || job.Status || '').toLowerCase();
@@ -1895,7 +1963,7 @@ function Dashboard() {
               <i className="ph ph-x" style={{ position: 'absolute', top: '15px', right: '15px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem', zIndex: 10 }} onClick={() => setTpoModal(false)}></i>
               
               <div style={{ position: 'relative', zIndex: 2 }}>
-                <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
+                <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justify: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
                   {tpoPhoto && tpoPhoto !== "N/A" ? <img src={getDriveImageUrl(tpoPhoto)} style={{width: '100%', height: '100%', objectFit: 'cover'}} alt="TPO" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} /> : null}
                   <i className="ph ph-user-tie" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', display: (!tpoPhoto || tpoPhoto === "N/A") ? 'block' : 'none' }}></i>
                 </div>
