@@ -270,6 +270,45 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
+// --------------------------------------------------------
+// BRANCH COORDINATES (Update with exact building lat/lng for accurate 150m check)
+// --------------------------------------------------------
+const BRANCH_LOCATIONS = {
+  "Kochi": { lat: 9.9816, lng: 76.2999 }, 
+  "Calicut": { lat: 11.2588, lng: 75.7804 },
+  "Trivandrum": { lat: 8.5241, lng: 76.9366 },
+  "Attingal": { lat: 8.6943, lng: 76.8184 },
+  "Kollam": { lat: 8.8932, lng: 76.6141 },
+  "Kannur": { lat: 11.8745, lng: 75.3704 },
+  "Thrissur": { lat: 10.5276, lng: 76.2144 },
+  "Perinthalmanna": { lat: 10.9760, lng: 76.2254 },
+  "Kottayam": { lat: 9.5916, lng: 76.5222 },
+  "Pathanamthitta": { lat: 9.2648, lng: 76.7870 },
+  "Palakkad": { lat: 10.7867, lng: 76.6548 },
+  "Coimbatore": { lat: 11.0168, lng: 76.9558 },
+  "Chennai": { lat: 13.0827, lng: 80.2707 },
+  "Tambaram": { lat: 12.9249, lng: 80.1000 },
+  "Trichy": { lat: 10.7905, lng: 78.7047 },
+  "Salem": { lat: 11.6643, lng: 78.1460 },
+  "Madurai": { lat: 9.9252, lng: 78.1198 },
+  "Erode": { lat: 11.3410, lng: 77.7172 },
+  "Tirunelveli": { lat: 8.7139, lng: 77.7567 },
+  "Bangalore": { lat: 12.9716, lng: 77.5946 },
+  "Mangalore": { lat: 12.9141, lng: 74.8560 },
+  "Mysore": { lat: 12.2958, lng: 76.6394 },
+  "Mumbai": { lat: 19.0760, lng: 72.8777 },
+  "Pune": { lat: 18.5204, lng: 73.8567 },
+  "Nagpur": { lat: 21.1458, lng: 79.0882 },
+  "Kolkata": { lat: 22.5726, lng: 88.3639 },
+  "Siliguri": { lat: 26.7271, lng: 88.3953 },
+  "Hyderabad (Telangana)": { lat: 17.3850, lng: 78.4867 },
+  "Ranchi (Jharkhand)": { lat: 23.3441, lng: 85.3096 },
+  "Raipur (Chhattisgarh)": { lat: 21.2514, lng: 81.6296 },
+  "Bhopal (Madhya Pradesh)": { lat: 23.2599, lng: 77.4126 },
+  "Dubai (UAE)": { lat: 25.2048, lng: 55.2708 },
+  "Riyadh (Saudi Arabia)": { lat: 24.7136, lng: 46.6753 }
+};
+
 // ==========================================
 // 2. LOGIN / LANDING PAGE COMPONENT
 // ==========================================
@@ -916,6 +955,9 @@ function Dashboard() {
     } catch(err) { setIssueStatus({ type: 'error', message: 'Submission failed' }); }
   };
 
+  // --------------------------------------------------------
+  // GPS & GEOFENCING LOGIC (With exact math)
+  // --------------------------------------------------------
   const captureGPS = () => {
     if(!data.isScheduledToday || data.hasMarkedToday) return; 
     setLocStatus("Capturing...");
@@ -930,6 +972,29 @@ function Dashboard() {
   };
 
   const submitAttendance = async () => {
+    // Distance Verification Check
+    if (gpsCoords && user.branch) {
+      const branchCoords = BRANCH_LOCATIONS[user.branch];
+      if (branchCoords) {
+        const R = 6371e3; // metres
+        const dLat = (branchCoords.lat - gpsCoords.lat) * Math.PI / 180;
+        const dLon = (branchCoords.lng - gpsCoords.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(gpsCoords.lat * Math.PI / 180) * Math.cos(branchCoords.lat * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+
+        if (distance > 150) {
+           setAttStatus({ 
+             type: 'error', 
+             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 150 meters to mark attendance. (Ensure exact branch coordinates are set in App.jsx)` 
+           });
+           return;
+        }
+      }
+    }
+
     setAttStatus({ type: 'info', message: 'Verifying location and submitting...' });
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, { email: user.email, name: user.name, branch: user.branch, course: user.course, rating, location: locStatus, userLat: gpsCoords.lat, userLng: gpsCoords.lng, feedback });
@@ -985,7 +1050,6 @@ function Dashboard() {
   // --------------------------------------------------------
   // SMART FILTERING LOGIC
   // --------------------------------------------------------
-  
   const studentJoinDate = parseSafeDate(user.joiningDate);
 
   // Events: Today & Future only
@@ -1039,7 +1103,7 @@ function Dashboard() {
     return { bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid #0284c7' };
   };
 
-  // TPO Data Fallbacks (Fixes missing Assigned Branches & Photos)
+  // TPO Data Fallbacks
   const tpo = data.tpoInfo || {};
   const tpoPhoto = tpo.profilePhoto || tpo.photo || tpo['Profile Photo'];
   const tpoName = tpo.name || tpo['TPO Name'] || "Placement Officer";
@@ -1443,7 +1507,7 @@ function Dashboard() {
                   <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1.8rem', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
                     <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
                       <i className="ph ph-calendar-check" style={{ color: data.isScheduledToday ? '#3b82f6' : '#ef4444', fontSize: '1.2rem' }}></i>
-                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:00:00 - 17:00:00)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
+                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:30 AM - 07:00 PM)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
                     </div>
                     
                     <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
@@ -1898,3 +1962,4 @@ export default function App() {
     </>
   );
 }
+```eof
