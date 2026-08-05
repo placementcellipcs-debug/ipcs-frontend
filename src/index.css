@@ -176,11 +176,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-cyan); }
 .animate-spin {
   animation: spin 1s linear infinite;
 }
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
   --bg-dark: #080c14;
