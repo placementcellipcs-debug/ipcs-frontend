@@ -1002,9 +1002,6 @@ return (
         </div>
       )}
 
-    </div>
-  </div>
-
   {/* SIDE DRAWER */}
   <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
     <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
