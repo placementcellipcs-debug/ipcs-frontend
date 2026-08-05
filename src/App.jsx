@@ -343,10 +343,8 @@ function Login() {
   const [fadeVideo, setFadeVideo] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
-  // State to toggle between the Hiring Dashboard box and the Login Form box
   const [showAuthForm, setShowAuthForm] = useState(false);
 
-  // Live updates slide-show state
   const [liveUpdates, setLiveUpdates] = useState([
     { name: "Anand Manikantan", role: "Data Analyst & Python Developer" },
     { name: "Sreejith S", role: "Automation Engineer" },
@@ -356,7 +354,6 @@ function Login() {
   ]);
   const [tickerIndex, setTickerIndex] = useState(0);
 
-  // Fetch data from opening_applied for placed students
   useEffect(() => {
     const fetchPlacedStudents = async () => {
       try {
@@ -365,14 +362,12 @@ function Login() {
           setLiveUpdates(res.data.updates);
         }
       } catch (err) {
-        // Fallback to initial state if endpoint doesn't exist yet
         console.log("Using local fallback live updates data");
       }
     };
     fetchPlacedStudents();
   }, []);
 
-  // Slide show interval
   useEffect(() => {
     if (liveUpdates.length > 0) {
       const interval = setInterval(() => {
@@ -424,7 +419,6 @@ function Login() {
       </div>
       
       <div className="landing-grid">
-        {/* Left Side: Stays completely static as per requirement */}
         <div className="hero-section">
           <div className="hero-badge">
             <i className="ph-fill ph-seal-check"></i>
@@ -461,10 +455,8 @@ function Login() {
           </div>
         </div>
 
-        {/* Right Side: Transitions between Dashboard Stats and Login Form */}
         <div className="right-panel-wrapper">
           {!showAuthForm ? (
-            /* Hiring Dashboard display shown initially */
             <div className="hiring-dashboard-card animate-fade-in">
               <div className="hiring-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -508,7 +500,6 @@ function Login() {
               </div>
             </div>
           ) : (
-            /* Active Login Form */
             <div className="auth-card animate-fade-in">
               <div className="brand-logo-container">
                 <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" />
@@ -2097,21 +2088,5 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </>
-  );
-}
-// Import Pages
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard'; // Move your Dashboard logic here
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<div>Signup Component Here</div>} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="*" element={<div className="flex h-screen items-center justify-center text-white bg-[#080c14]">404 Not Found</div>} />
-      </Routes>
-    </BrowserRouter>
   );
 }
