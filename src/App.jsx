@@ -1,22 +1,18 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Cropper from 'react-easy-crop';
 import loadingVideo from './assets/video.mp4';
 
-// ==========================================
-// 1. GLOBAL STYLES & FONT INJECTIONS
-// ==========================================
+/* STREAMING_CHUNK:Initializing global styles and variables... */
 const GlobalStyle = () => {
   useEffect(() => {
-    // Inject Phosphor Icons (Dashboard)
     if (!document.getElementById('phosphor-icons')) {
       const script = document.createElement('script');
       script.id = 'phosphor-icons';
       script.src = 'https://unpkg.com/@phosphor-icons/web';
       document.head.appendChild(script);
     }
-    // Inject FontAwesome (Marketing Site)
     if (!document.getElementById('font-awesome')) {
       const link = document.createElement('link');
       link.id = 'font-awesome';
@@ -31,32 +27,19 @@ const GlobalStyle = () => {
       @import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
       
       :root {
-        /* Dashboard Variables */
         --bg-dark: #0b0f17; --card-bg: #131924; --card-border: #1e293b; --input-bg: #1e293b;
         --input-border: #334155; --accent-cyan: #38bdf8; --accent-blue: #3b82f6; --accent-purple: #a855f7;
         --text-main: #f8fafc; --text-muted: #94a3b8; --hover-bg: #1e293b; --table-header: #1e293b;
-        
-        /* Marketing Site Variables */
-        --primary-green: #10b981; --dark-green: #059669; --dark-blue: #1e40af;
-        --gradient-primary: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-        --gradient-dark: linear-gradient(135deg, #059669 0%, #1e40af 100%);
-        --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-light: #9ca3af;
-        --bg-primary: #111827; --bg-secondary: #1f2937; --bg-black: #000000; --border-color: #374151;
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5); --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      
       [data-theme="light"] {
         --bg-dark: #f8fafc; --card-bg: #ffffff; --card-border: #e2e8f0; --input-bg: #f1f5f9;
         --input-border: #cbd5e1; --accent-cyan: #0284c7; --accent-blue: #2563eb; --accent-purple: #7e22ce;
         --text-main: #0f172a; --text-muted: #475569; --hover-bg: #f1f5f9; --table-header: #f1f5f9;
       }
-      
       * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
-      body { background-color: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; scroll-behavior: smooth;}
+      body { background-color: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; scroll-behavior: smooth; }
       .hidden { display: none !important; }
       
-      /* --- GENERAL UI COMPONENTS --- */
       .btn-action { padding: 0.8rem 1.4rem; background: var(--accent-blue); color: #ffffff; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
       .btn-action:hover:not(:disabled) { opacity: 0.95; transform: translateY(-1px); }
       .btn-action:disabled { background: var(--input-border); color: var(--text-muted); cursor: not-allowed; }
@@ -73,7 +56,7 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* --- AUTH & LOGIN STYLES --- */
+      /* --- LANDING PAGE (LOGIN) STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%); display: flex; flex-direction: column; }
       .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
       .nav-links { display: flex; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
@@ -97,6 +80,7 @@ const GlobalStyle = () => {
       .alert-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
       .alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
 
+      /* --- VIDEO LOADER STYLES --- */
       .video-loader-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-in-out; }
       .video-loader-overlay.fade-out { opacity: 0; pointer-events: none; }
       .video-loader-overlay video { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s ease; }
@@ -244,37 +228,7 @@ const GlobalStyle = () => {
       .resume-card:hover { transform: translateY(-2px); border-color: var(--accent-cyan); }
       .resume-icon-box { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
 
-      /* --- MEDIA QUERIES FOR MARKETING SITE & DASHBOARD --- */
-      @media (max-width: 1200px) {
-        .stats-row { grid-template-columns: repeat(2, 1fr); }
-      }
-      @media (max-width: 900px) {
-        .landing-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; padding: 2rem; }
-        .hero-desc { margin: 0 auto 2.5rem auto; }
-        .profile-grid, .settings-container, .dash-top-row { grid-template-columns: 1fr; }
-        .stats-row { grid-template-columns: 1fr; }
-        .talentino-summary-grid { grid-template-columns: 1fr; }
-        .app-stats-grid { grid-template-columns: repeat(3, 1fr); }
-      }
-      @media (max-width: 768px) {
-        .landing-nav { flex-direction: column; gap: 1rem; padding: 1.5rem; }
-        .hero-title { font-size: 2.8rem; }
-        .grid-2col, .grid-3col, .info-grid { grid-template-columns: 1fr; }
-        .primary-layout-row { grid-template-columns: 1fr; gap: 1rem; }
-        .vacancy-quick-banner { flex-direction: column; gap: 15px; text-align: center; }
-        .top-header { padding: 0 1rem; }
-        .dashboard-content { padding: 1rem; }
-        .resume-grid { grid-template-columns: 1fr; }
-        .app-stats-grid { grid-template-columns: 1fr 1fr; }
-        .notif-dropdown { position: fixed; top: 65px; left: 5%; right: 5%; width: 90%; }
-        .doc-box { flex-direction: column; align-items: flex-start; gap: 1rem; }
-      }
-      @media (min-width: 1800px) {
-        .dashboard-content, .landing-grid { max-width: 1600px; }
-        body { font-size: 17px; }
-      }
-
-      /* --- MARKETING SITE CSS (Converted from style.css) --- */
+      /* --- MARKETING SITE CSS CONVERTED --- */
       .glass-panel { background: rgba(12, 21, 43, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
       .gradient-text { background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       .animate-float { animation: float 6s ease-in-out infinite; }
@@ -334,21 +288,44 @@ const GlobalStyle = () => {
       .footer-links a:hover { color: #10b981; padding-left: 5px; }
       .footer-bottom { padding-top: 2rem; border-top: 1px solid #374151; text-align: center; color: #6b7280; font-size: 0.9rem;}
 
-      @media (max-width: 992px) {
+      /* --- MEDIA QUERIES FOR MARKETING SITE & DASHBOARD --- */
+      @media (max-width: 1200px) {
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 900px) {
+        .landing-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; padding: 2rem; }
+        .hero-desc { margin: 0 auto 2.5rem auto; }
+        .profile-grid, .settings-container, .dash-top-row { grid-template-columns: 1fr; }
+        .stats-row { grid-template-columns: 1fr; }
+        .talentino-summary-grid { grid-template-columns: 1fr; }
+        .app-stats-grid { grid-template-columns: repeat(3, 1fr); }
         .zonal-card { flex-direction: column; }
         .zonal-image-wrapper { min-height: 300px; }
         .footer-grid { grid-template-columns: 1fr 1fr; }
       }
       @media (max-width: 768px) {
+        .landing-nav { flex-direction: column; gap: 1rem; padding: 1.5rem; }
+        .hero-title { font-size: 2.8rem; }
+        .grid-2col, .grid-3col, .info-grid { grid-template-columns: 1fr; }
+        .primary-layout-row { grid-template-columns: 1fr; gap: 1rem; }
+        .vacancy-quick-banner { flex-direction: column; gap: 15px; text-align: center; }
+        .top-header { padding: 0 1rem; }
+        .dashboard-content { padding: 1rem; }
+        .resume-grid { grid-template-columns: 1fr; }
+        .app-stats-grid { grid-template-columns: 1fr 1fr; }
+        .notif-dropdown { position: fixed; top: 65px; left: 5%; right: 5%; width: 90%; }
+        .doc-box { flex-direction: column; align-items: flex-start; gap: 1rem; }
         .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      }
+      @media (min-width: 1800px) {
+        .dashboard-content, .landing-grid { max-width: 1600px; }
+        body { font-size: 17px; }
       }
     `}</style>
   );
 };
 
-// ==========================================
-// 2. CONSTANTS & DATA
-// ==========================================
+/* STREAMING_CHUNK:Configuring robust dashboard logic and APIs... */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
@@ -434,7 +411,7 @@ const siteData = {
             email: "gifty@ipcsglobal.com",
             phone: "+91 9645446664",
             linkedin: "https://www.linkedin.com/in/gifty-kp",
-            image: "1eiP135HOsuG3MEaEplNblmcLewjnKXp6" // Using placeholder drive ID as fallback
+            image: "1eiP135HOsuG3MEaEplNblmcLewjnKXp6"
         },
         tpos: [
             { name: "Ms. Bincy Bindhuraj", position: "Senior Corporate Relation Officer", bio: "North Kerala", email: "tpo1@placement.com" },
@@ -446,6 +423,7 @@ const siteData = {
     }
 };
 
+/* STREAMING_CHUNK:MarketingSite component safely integrated... */
 // ==========================================
 // 3. MARKETING SITE (LANDING PAGE)
 // ==========================================
@@ -543,7 +521,7 @@ function MarketingSite() {
                         <i className="fas fa-arrow-right text-[10px]"></i>
                     </button>
                     
-                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2.5 rounded-lg border border-slate-700/50 text-slate-300 focus:outline-none" style={{ background: 'transparent' }}>
+                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2.5 rounded-lg border border-slate-700/50 text-slate-300 focus:outline-none" style={{ background: 'transparent', cursor: 'pointer' }}>
                         <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-lg`}></i>
                     </button>
                 </div>
@@ -571,7 +549,7 @@ function MarketingSite() {
         <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden" id="home">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 z-0"></div>
             <div className="absolute top-1/4 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] animate-pulse-glow z-0"></div>
-            <div class="absolute bottom-1/4 right-10 w-[450px] h-[450px] bg-cyan-400/10 rounded-full blur-[120px] animate-pulse-glow z-0" style={{animationDelay: '1.5s'}}></div>
+            <div className="absolute bottom-1/4 right-10 w-[450px] h-[450px] bg-cyan-400/10 rounded-full blur-[120px] animate-pulse-glow z-0" style={{animationDelay: '1.5s'}}></div>
 
             <div className="max-w-7xl mx-auto px-6 md:px-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 mt-6">
                 <div className="lg:col-span-7 flex flex-col justify-center text-left space-y-6">
@@ -708,7 +686,6 @@ function MarketingSite() {
                                 <p className="text-xs text-slate-400 mt-4 italic m-0">"{c.quote}"</p>
                             </div>
                         ))}
-                        {/* Duplicate for infinite effect */}
                         {siteData.companies.slice(0,5).map((c, i) => (
                             <div key={i+'dup'} className="company-name w-64 p-6 flex flex-col justify-between items-start" style={{ textAlign: 'left' }}>
                                 <div className="flex items-center space-x-3">
@@ -732,7 +709,6 @@ function MarketingSite() {
                                 <p className="text-xs text-slate-400 mt-4 italic m-0">"{c.quote}"</p>
                             </div>
                         ))}
-                        {/* Duplicate for infinite effect */}
                         {siteData.companies.slice(5,10).map((c, i) => (
                             <div key={i+'dup'} className="company-name w-64 p-6 flex flex-col justify-between items-start" style={{ textAlign: 'left' }}>
                                 <div className="flex items-center space-x-3">
@@ -760,7 +736,6 @@ function MarketingSite() {
                         <div key={i} className="testimonial-video-wrapper" onClick={() => openVideo(t.video)}>
                             <div className="video-placeholder">
                                 <i className="fas fa-play-circle text-4xl text-cyan-400 absolute z-10" style={{top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}></i>
-                                {/* Mockup image since videos won't autoplay cleanly in a grid without user interaction */}
                                 <div style={{width:'100%', height:'100%', background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'}}></div>
                             </div>
                             <div className="video-overlay text-left">
@@ -802,7 +777,7 @@ function MarketingSite() {
                         <h3>{siteData.team.zonalOfficer.name}</h3>
                         <p className="position">{siteData.team.zonalOfficer.position}</p>
                         <p className="bio">{siteData.team.zonalOfficer.bio}</p>
-                        <div className="flex gap-6 mb-6">
+                        <div className="flex gap-6 mb-6 flex-wrap">
                             <div className="flex items-center gap-3"><i className="fas fa-envelope text-blue-500 bg-blue-500/10 p-3 rounded-full"></i> <span className="text-slate-300">{siteData.team.zonalOfficer.email}</span></div>
                             <div className="flex items-center gap-3"><i className="fas fa-phone text-green-500 bg-green-500/10 p-3 rounded-full"></i> <span className="text-slate-300">{siteData.team.zonalOfficer.phone}</span></div>
                         </div>
@@ -871,7 +846,428 @@ function MarketingSite() {
 }
 
 // ==========================================
-// 4. MAIN DASHBOARD ECOSYSTEM
+// 4. LOGIN / LANDING PAGE COMPONENT (REPLACED BY MARKETING SITE, BUT KEPT FOR ROUTING)
+// ==========================================
+function Login() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [status, setStatus] = useState(null);
+  
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [fadeVideo, setFadeVideo] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!email || !password) { setStatus({ type: 'error', message: 'Please enter both email and password.' }); return; }
+    setStatus({ type: 'info', message: 'Verifying credentials...' });
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
+      if (response.data.success) {
+        localStorage.setItem('talentino_student_token', response.data.token);
+        localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
+        
+        setIsLoggingIn(true);
+        setTimeout(() => setFadeVideo(true), 5500); 
+        setTimeout(() => navigate('/dashboard'), 6000);
+      }
+    } catch (error) {
+      setStatus({ type: 'error', message: error.response?.data?.message || 'Server Error. Is the backend running?' });
+    }
+  };
+
+  if (isLoggingIn) {
+    return (
+      <div className={`video-loader-overlay ${fadeVideo ? 'fade-out' : ''}`}>
+        <video 
+          src={loadingVideo} 
+          autoPlay 
+          muted 
+          playsInline 
+          onCanPlayThrough={() => setIsVideoReady(true)}
+          className={isVideoReady ? 'ready' : ''}
+          onEnded={() => navigate('/dashboard')} 
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="landing-wrapper">
+      <div className="landing-nav">
+        <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
+        <div className="nav-links">
+          <span onClick={() => navigate('/')}>Home</span>
+        </div>
+      </div>
+      
+      <div className="landing-grid" style={{ gridTemplateColumns: '1fr', justifyContent: 'center' }}>
+        <div className="auth-card" style={{ margin: '0 auto' }}>
+          <div className="brand-logo-container">
+            <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" />
+          </div>
+          <h2 style={{ textAlign: 'center', margin: '0 0 6px 0' }}>Welcome back</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
+
+          <form onSubmit={handleLogin}>
+            <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+            <div className="form-group"><label>Password</label>
+              <div className="pwd-wrapper">
+                <input type={showPassword ? "text" : "password"} placeholder="Enter password" style={{ paddingRight: '40px' }} value={password} onChange={(e) => setPassword(e.target.value)} />
+                <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}>
+                  <i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i>
+                </span>
+              </div>
+            </div>
+            <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem' }}>Sign in &rarr;</button>
+          </form>
+
+          {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
+
+          <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// 5. SIGNUP COMPONENT
+// ==========================================
+function Signup() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [status, setStatus] = useState(null);
+  
+  const [showTncModal, setShowTncModal] = useState(false);
+  const [tncScrolled, setTncScrolled] = useState(false);
+  const [tncAccepted, setTncAccepted] = useState(false);
+
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [finalPhotoBase64, setFinalPhotoBase64] = useState('');
+
+  const [formData, setFormData] = useState({
+    rollNo: '', name: '', phone: '', email: '', age: '', gender: '', branch: '', 
+    course: '', joiningDate: '', fresherStatus: '', homeTown: '',
+    linkedin: '', instagram: '', placementReq: '', parentName: '', parentContact: '', 
+    friend1Name: '', friend1Phone: '', friend2Name: '', friend2Phone: '', password: '', confirmPassword: '',
+    qualification: '', customQualification: '', stream: '', customStream: ''
+  });
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const onFileChange = async (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.addEventListener('load', () => { setImageSrc(reader.result); setShowCropModal(true); });
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => { setCroppedAreaPixels(croppedAreaPixels); }, []);
+
+  const generateCroppedImage = () => {
+    const canvas = document.createElement('canvas');
+    const image = new Image();
+    image.src = imageSrc;
+    image.onload = () => {
+      canvas.width = 250; canvas.height = 250;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage( image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, 250, 250 );
+      setFinalPhotoBase64(canvas.toDataURL('image/jpeg'));
+      setShowCropModal(false);
+    };
+  };
+
+  const handleTncScroll = (e) => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 25;
+    if (bottom) setTncScrolled(true);
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { setStatus({ type: 'error', message: 'Please enter a valid email format.' }); return; }
+    if (!/^\d{10}$/.test(formData.phone)) { setStatus({ type: 'error', message: 'Your phone number must be exactly 10 digits.' }); return; }
+    if (!/^\d{10}$/.test(formData.friend1Phone) || !/^\d{10}$/.test(formData.friend2Phone)) { setStatus({ type: 'error', message: 'Referral phone numbers must be exactly 10 digits.' }); return; }
+    if (formData.friend1Phone === formData.friend2Phone) { setStatus({ type: 'error', message: 'Friend 1 and Friend 2 referral phone numbers cannot be the same.' }); return; }
+    if (formData.password !== formData.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match!' }); return; }
+    if (!tncAccepted) { setStatus({ type: 'error', message: 'You must accept the Terms & Conditions.' }); return; }
+
+    const resolvedQualification = formData.qualification === 'Other' ? formData.customQualification : formData.qualification;
+    const resolvedStream = formData.stream === 'Other' ? formData.customStream : formData.stream;
+
+    if (!resolvedQualification.trim()) { setStatus({ type: 'error', message: 'Please specify your qualification.' }); return; }
+    if (!resolvedStream.trim()) { setStatus({ type: 'error', message: 'Please specify your stream/branch.' }); return; }
+
+    setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
+    const payload = { ...formData, qualification: resolvedQualification, stream: resolvedStream, photoBase64: finalPhotoBase64 };
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
+      if (response.data.success) {
+        setStatus({ type: 'success', message: 'Account created! Redirecting to login...' });
+        setTimeout(() => navigate('/login'), 2500); 
+      }
+    } catch (error) {
+      setStatus({ type: 'error', message: error.response?.data?.message || 'Server Error.' });
+    }
+  };
+
+  return (
+    <div className="auth-wrapper" style={{ background: '#0b0f17' }}>
+      <div className="profile-reg-card">
+        <div className="reg-header">
+          <div><h2 style={{ margin: '0 0 4px 0' }}>Create Student Profile</h2><p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>Register records, course details, and placement preferences</p></div>
+          <div className="brand-logo-container" style={{ marginBottom: 0 }}>
+            <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" style={{ height: '38px' }} />
+          </div>
+        </div>
+
+        <form onSubmit={handleSignup}>
+          <div className="section-title" style={{ color: '#38bdf8' }}><i className="ph ph-user" style={{ fontSize: '1.2rem' }}></i> PRIMARY DETAILS</div>
+          <div className="primary-layout-row">
+            <div className="avatar-upload-box" onClick={() => document.getElementById('photoUpload').click()}>
+              <input type="file" id="photoUpload" accept="image/*" className="hidden" onChange={onFileChange} />
+              <div className="avatar-preview-circle">{finalPhotoBase64 ? <img src={finalPhotoBase64} alt="Profile" /> : (formData.name ? formData.name.charAt(0).toUpperCase() : 'U')}</div>
+              <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>Tap to Upload</span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="grid-2col">
+                <div className="form-group" style={{ marginBottom: 0 }}><label>IPCS Roll Number *</label><input type="text" name="rollNo" placeholder="IPCS XXXXXX" onChange={handleChange} required /></div>
+                <div className="form-group" style={{ marginBottom: 0 }}><label>Full Name *</label><input type="text" name="name" placeholder="e.g. Vishnu Kumar" onChange={handleChange} required /></div>
+              </div>
+              <div className="grid-2col">
+                <div className="form-group" style={{ marginBottom: 0 }}><label>Phone Number *</label><input type="tel" name="phone" placeholder="10 Digit Number" onChange={handleChange} required /></div>
+                <div className="form-group" style={{ marginBottom: 0 }}><label>Email ID *</label><input type="email" name="email" placeholder="student@ipcsglobal.com" onChange={handleChange} required /></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid-3col" style={{ marginTop: '1.1rem' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Age</label><input type="number" name="age" placeholder="e.g. 22" onChange={handleChange} /></div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Gender</label>
+              <select name="gender" onChange={handleChange} defaultValue="">
+                <option value="" disabled>Select</option><option value="Male">Male</option><option value="Female">Female</option>
+              </select>
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Branch Campus *</label>
+              <select name="branch" onChange={handleChange} defaultValue="" required>
+                <option value="" disabled>Select Branch</option>
+                <optgroup label="Kerala">
+                  <option value="Kochi">Kochi</option><option value="Calicut">Calicut</option><option value="Trivandrum">Trivandrum</option>
+                  <option value="Attingal">Attingal</option><option value="Kollam">Kollam</option><option value="Kannur">Kannur</option>
+                  <option value="Thrissur">Thrissur</option><option value="Perinthalmanna">Perinthalmanna</option><option value="Kottayam">Kottayam</option>
+                  <option value="Pathanamthitta">Pathanamthitta</option><option value="Palakkad">Palakkad</option>
+                </optgroup>
+                <optgroup label="Tamil Nadu">
+                  <option value="Coimbatore">Coimbatore</option><option value="Chennai">Chennai</option><option value="Tambaram">Tambaram</option>
+                  <option value="Trichy">Trichy</option><option value="Salem">Salem</option><option value="Madurai">Madurai</option>
+                  <option value="Erode">Erode</option><option value="Tirunelveli">Tirunelveli</option>
+                </optgroup>
+                <optgroup label="Karnataka">
+                  <option value="Bangalore">Bangalore</option><option value="Mangalore">Mangalore</option><option value="Mysore">Mysore</option>
+                </optgroup>
+                <optgroup label="Maharashtra">
+                  <option value="Mumbai">Mumbai</option><option value="Pune">Pune</option><option value="Nagpur">Nagpur</option>
+                </optgroup>
+                <optgroup label="West Bengal">
+                  <option value="Kolkata">Kolkata</option><option value="Siliguri">Siliguri</option>
+                </optgroup>
+                <optgroup label="Other States in India">
+                  <option value="Hyderabad (Telangana)">Hyderabad (Telangana)</option><option value="Ranchi (Jharkhand)">Ranchi (Jharkhand)</option>
+                  <option value="Raipur (Chhattisgarh)">Raipur (Chhattisgarh)</option><option value="Bhopal (Madhya Pradesh)">Bhopal (Madhya Pradesh)</option>
+                </optgroup>
+                <optgroup label="International (GCC)">
+                  <option value="Dubai (UAE)">Dubai (UAE)</option><option value="Riyadh (Saudi Arabia)">Riyadh (Saudi Arabia)</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid-2col" style={{ marginTop: '1.1rem' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Parent/Guardian Name</label><input type="text" name="parentName" placeholder="Full Name" onChange={handleChange} /></div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Parent Contact No.</label><input type="tel" name="parentContact" placeholder="10 Digit Number" onChange={handleChange} /></div>
+          </div>
+
+          <div className="section-title" style={{ color: '#4ade80', marginTop: '2rem' }}><i className="ph ph-graduation-cap" style={{ fontSize: '1.2rem' }}></i> ACADEMIC & COURSE DETAILS</div>
+          <div className="grid-3col">
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Course Category *</label>
+              <select name="course" onChange={handleChange} defaultValue="" required>
+                <option value="" disabled>Select Course Category</option>
+                <option value="Industrial Automation">Industrial Automation</option>
+                <option value="BMS & CCTV">BMS & CCTV</option>
+                <option value="Embedded and IOT">Embedded and IOT</option>
+                <option value="Python and Data Science">Python and Data Science</option>
+                <option value="Artificial Intelligence">Artificial Intelligence</option>
+                <option value="Python Full Stack">Python Full Stack</option>
+                <option value="Java Full Stack">Java Full Stack</option>
+                <option value="MERN Stack">MERN Stack</option>
+                <option value="Software Testing">Software Testing</option>
+                <option value="Digital Marketing">Digital Marketing</option>
+              </select>
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Joining Date *</label><input type="date" name="joiningDate" onChange={handleChange} required /></div>
+            
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Qualification *</label>
+              <select name="qualification" onChange={handleChange} defaultValue="" required>
+                <option value="" disabled>Select Qualification</option>
+                <option value="SSLC">SSLC</option><option value="HSE">HSE</option><option value="ITI">ITI</option>
+                <option value="Diploma">Diploma</option><option value="B.Tech">B.Tech</option><option value="Bsc">Bsc</option>
+                <option value="PG">PG</option><option value="Other">Other</option>
+              </select>
+              {formData.qualification === 'Other' && (
+                <input type="text" name="customQualification" placeholder="Specify Qualification" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />
+              )}
+            </div>
+          </div>
+
+          <div className="grid-3col" style={{ marginTop: '1.1rem' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Stream / Branch *</label>
+              <select name="stream" onChange={handleChange} defaultValue="" required>
+                <option value="" disabled>Select Stream</option>
+                <option value="IT">IT</option><option value="EEE">EEE</option><option value="EC">EC</option>
+                <option value="Mechanical">Mechanical</option><option value="Science">Science</option><option value="Other">Other</option>
+              </select>
+              {formData.stream === 'Other' && (
+                <input type="text" name="customStream" placeholder="Specify Stream / Branch" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />
+              )}
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Experience Status *</label>
+              <select name="fresherStatus" onChange={handleChange} defaultValue="" required>
+                <option value="" disabled>Select Status</option><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option>
+              </select>
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Home Town *</label><input type="text" name="homeTown" placeholder="e.g. Kozhikode" onChange={handleChange} required /></div>
+          </div>
+
+          <div className="grid-2col" style={{ marginTop: '1.1rem' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>LinkedIn Link</label><input type="text" name="linkedin" placeholder="www.linkedin.com/in/..." onChange={handleChange} /></div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Instagram Handle</label><input type="text" name="instagram" placeholder="@username" onChange={handleChange} /></div>
+          </div>
+          <div className="form-group" style={{ marginTop: '1.1rem' }}><label>Placement Requirements</label><textarea name="placementReq" rows="2" placeholder="Preferred location, salary expectation..." onChange={handleChange}></textarea></div>
+
+          <div className="section-title" style={{ color: '#c084fc', marginTop: '2rem' }}><i className="ph ph-users" style={{ fontSize: '1.2rem' }}></i> REFERRALS & SECURITY CREDENTIALS</div>
+          <div className="grid-2col">
+            <div style={{ background: 'var(--input-bg)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--input-border)' }}>
+              <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase' }}>FRIEND 1 REFERRAL *</span>
+              <input type="text" name="friend1Name" placeholder="Full Name" style={{ marginBottom: '0.6rem' }} onChange={handleChange} required />
+              <input type="tel" name="friend1Phone" placeholder="10 Digit Contact Number" onChange={handleChange} required />
+            </div>
+            <div style={{ background: 'var(--input-bg)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--input-border)' }}>
+              <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase' }}>FRIEND 2 REFERRAL *</span>
+              <input type="text" name="friend2Name" placeholder="Full Name" style={{ marginBottom: '0.6rem' }} onChange={handleChange} required />
+              <input type="tel" name="friend2Phone" placeholder="10 Digit Contact Number" onChange={handleChange} required />
+            </div>
+          </div>
+
+          <div className="grid-2col" style={{ marginTop: '1.1rem' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Password *</label>
+              <div className="pwd-wrapper">
+                <input type={showPassword ? "text" : "password"} name="password" placeholder="Create account password" onChange={handleChange} required style={{ paddingRight: '40px' }} />
+                <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}><i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i></span>
+              </div>
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Confirm Password *</label>
+              <div className="pwd-wrapper"><input type={showPassword ? "text" : "password"} name="confirmPassword" placeholder="Re-enter password" onChange={handleChange} required style={{ paddingRight: '40px' }} /></div>
+            </div>
+          </div>
+
+          <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '20px' }}>
+            <input type="checkbox" style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} checked={tncAccepted} onChange={(e) => setTncAccepted(e.target.checked)} />
+            <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: 1.4 }}>
+              I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span>
+            </label>
+          </div>
+
+          {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
+
+          <div className="form-footer-bar">
+            <button type="button" className="btn-cancel" onClick={() => navigate('/')}>Cancel</button>
+            <button type="submit" className="btn-action" style={{ padding: '0.8rem 2rem', background: '#2563eb' }}>Create Account &rarr;</button>
+          </div>
+        </form>
+      </div>
+
+      {showCropModal && (
+        <div className="report-modal-overlay">
+          <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
+            <div className="modal-header-border">
+              <h3 style={{ margin: 0, color: 'var(--text-main)' }}>Adjust Profile Photo</h3>
+              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setShowCropModal(false)}></i>
+            </div>
+            <div style={{ position: 'relative', width: '100%', height: '250px', background: '#333', borderRadius: '12px', overflow: 'hidden' }}>
+              <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={1} cropShape="round" onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={onCropComplete} />
+            </div>
+            <input type="range" min="1" max="3" step="0.1" value={zoom} onChange={(e) => setZoom(e.target.value)} style={{ margin: '20px 0', width: '100%' }} />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button type="button" className="btn-action" style={{ flex: 1, background: '#22c55e' }} onClick={generateCroppedImage}>Confirm Photo</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showTncModal && (
+        <div className="report-modal-overlay">
+          <div className="report-card" style={{ maxWidth: '650px' }}>
+            <div className="modal-header-border">
+              <h3 style={{ margin: 0, color: 'var(--text-main)' }}>IPCS Placement Rule Set</h3>
+              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setShowTncModal(false)}></i>
+            </div>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: 0, marginBottom: '1.5rem' }}>Below mentioned are the Rules to be followed by students for getting Placement Support from IPCS. Please scroll to the bottom to accept.</p>
+            <div className="tnc-content-box" onScroll={handleTncScroll}>
+              <h4>ELIGIBILITY CRITERIA FOR ATTENDING THE INTERVIEWS</h4>
+              <ul>
+                <li>Students who have completed at least 90% of the course.</li>
+                <li>Students who have paid the full fees.</li>
+                <li>Students who have passion for working & take their career seriously.</li>
+                <li>Candidates should be ready for any location.</li>
+              </ul>
+              <h4>DOS & DON’TS FOR THE CANDIDATES</h4>
+              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Job applications & Interview:</strong>
+              <ul>
+                <li>Check all criteria mentioned in the employment news, if everything suits to you then only APPLY.</li>
+                <li>Students should attend the interview on the date and time as allotted.</li>
+                <li>It is mandatory for Students to update the placement coordinator of their attendance.</li>
+                <li>Students not attending 3 interviews will be barred from Placement Support.</li>
+                <li>Students not applying for more than 15 days with a valid reason will be removed.</li>
+              </ul>
+              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Joining:</strong>
+              <ul>
+                <li>Students after being selected & given a date to join should adhere to that.</li>
+                <li>2 times after accepting the offer and not joining will be considered a Black Mark.</li>
+                <li>1 year commitment to the company getting recruited is mandatory.</li>
+              </ul>
+              <h4>DECLARATION</h4>
+              <p>I hereby declare that I have read & understood the terms & conditions of IPCS Placement Cell. I adhere to follow the rules & incase of any failure to do so; I understand that I won’t be eligible for Placement Support.</p>
+            </div>
+            {!tncScrolled ? (
+              <div style={{ textAlign: 'center', color: '#f59e0b', fontSize: '0.88rem', fontWeight: 700, marginTop: '15px' }}>↓ Please scroll to the end of the rules to Accept ↓</div>
+            ) : (
+              <div style={{ display: 'flex', marginTop: '20px' }}>
+                <button type="button" className="btn-action" style={{ width: '100%', background: '#22c55e' }} onClick={() => { setTncAccepted(true); setShowTncModal(false); }}>Accept</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==========================================
+// 6. MAIN DASHBOARD ECOSYSTEM
 // ==========================================
 /* STREAMING_CHUNK:Configuring robust dashboard logic and APIs... */
 function Dashboard() {
@@ -1111,9 +1507,6 @@ function Dashboard() {
     } catch(err) { setIssueStatus({ type: 'error', message: 'Submission failed' }); }
   };
 
-  // --------------------------------------------------------
-  // GPS & GEOFENCING LOGIC (With exact math)
-  // --------------------------------------------------------
   const captureGPS = () => {
     if(!data.isScheduledToday || data.hasMarkedToday) return; 
     setLocStatus("Capturing...");
@@ -1162,7 +1555,6 @@ function Dashboard() {
     if (!dateStr || dateStr.toLowerCase() === 'open') return false;
     let parts = dateStr.split(/[-/]/);
     if (parts.length === 3) {
-        // Assume DD/MM/YYYY or DD-MM-YYYY format from the sheet
         let d = new Date(parts[2], parts[1] - 1, parts[0]);
         let now = new Date(); now.setHours(0,0,0,0);
         return d < now;
@@ -1174,9 +1566,7 @@ function Dashboard() {
     if (!dateStr || dateStr === "N/A" || dateStr === "undefined") return null;
     let parts = dateStr.split(/[-/]/);
     if (parts.length === 3) {
-       // If year is first (YYYY-MM-DD)
        if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
-       // If year is last (DD-MM-YYYY)
        return new Date(parts[2], parts[1]-1, parts[0]);
     }
     let d = new Date(dateStr);
@@ -1205,10 +1595,8 @@ function Dashboard() {
   // --------------------------------------------------------
   // SMART FILTERING LOGIC
   // --------------------------------------------------------
-  
   const studentJoinDate = parseSafeDate(user.joiningDate);
 
-  // Events: Today & Future only
   const todayDate = new Date();
   todayDate.setHours(0,0,0,0);
   const filteredEvents = (data.events || []).filter(ev => {
@@ -1218,10 +1606,8 @@ function Dashboard() {
     return d >= todayDate;
   });
 
-  // Vacancies: After student joining date + Expired at Bottom
   const processedVacancies = (data.vacancies || []).filter(vac => {
     if (!studentJoinDate) return true;
-    // Check if the vacancy lastDate or open date is after student joined
     const vacLastDate = parseSafeDate(vac.lastDate);
     if (!vacLastDate) return true;
     return vacLastDate >= studentJoinDate;
@@ -1230,7 +1616,7 @@ function Dashboard() {
     const bExp = isPastDate(b.lastDate);
     if (aExp && !bExp) return 1;
     if (!aExp && bExp) return -1;
-    return 0; // Both expired or both active
+    return 0; 
   });
 
   // --------------------------------------------------------
@@ -1259,7 +1645,6 @@ function Dashboard() {
     return { bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid #0284c7' };
   };
 
-  // TPO Data Fallbacks (Fixes missing Assigned Branches & Photos)
   const tpo = data.tpoInfo || {};
   const tpoPhoto = tpo.profilePhoto || tpo.photo || tpo['Profile Photo'];
   const tpoName = tpo.name || tpo['TPO Name'] || "Placement Officer";
