@@ -122,6 +122,7 @@ const GlobalStyle = () => {
       .dashboard-content { padding: 2rem; max-width: 1300px; width: 100%; margin: 0 auto; animation: fadeInUp 0.3s ease; }
       .dash-top-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
       
+      /* Dashboard Hero Banner with Student Photo & Gradient System */
       .hero-banner { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
       .hero-banner::after { content: ''; position: absolute; right: -5%; top: 0; height: 100%; width: 50%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat right center; background-size: contain; opacity: 0.1; mask-image: linear-gradient(to right, transparent, black); -webkit-mask-image: linear-gradient(to right, transparent, black); pointer-events: none; z-index: 0; }
       .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); position: relative; z-index: 2; }
@@ -353,7 +354,6 @@ function Login() {
           playsInline 
           onCanPlayThrough={() => setIsVideoReady(true)}
           className={isVideoReady ? 'ready' : ''}
-          onEnded={() => navigate('/dashboard')} 
         />
       </div>
     );
@@ -741,11 +741,17 @@ function Signup() {
 // ==========================================
 function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState({});
   const [data, setData] = useState({ stats: {}, events: [], appliedJobs: [], vacancies: [], attendanceHistory: [], tpoInfo: {} });
   const [theme, setTheme] = useState('dark');
   
-  const [activeTab, setActiveTab] = useState('dashboard');
+  // Safe Tab State via Hash Routing (Fixes Mobile Back Button bug)
+  const [activeTab, setActiveTab] = useState(() => {
+     const hash = window.location.hash.replace('#', '');
+     return hash || 'dashboard';
+  });
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [tpoModal, setTpoModal] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
@@ -775,6 +781,22 @@ function Dashboard() {
   const [pwdStatus, setPwdStatus] = useState(null);
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
+
+  // Sync hash changes (Mobile back button listener)
+  useEffect(() => {
+    const handleHashChange = () => {
+        const hash = window.location.hash.replace('#', '') || 'dashboard';
+        setActiveTab(hash);
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const changeTab = (tab) => {
+    window.location.hash = tab;
+    setActiveTab(tab);
+    setDrawerOpen(false);
+  };
 
   const getDriveImageUrl = (url) => {
     if (!url || url === "N/A" || typeof url !== 'string') return null;
@@ -815,7 +837,6 @@ function Dashboard() {
     return () => clearInterval(interval);
   }, [navigate, fetchDashboard]);
 
-  // Auto-close notifications logic
   useEffect(() => {
     if (showNotif) {
       const timer = setTimeout(() => setShowNotif(false), 5000);
@@ -875,7 +896,7 @@ function Dashboard() {
     const updated = [...new Set([...readNotifs, n.id])];
     setReadNotifs(updated);
     localStorage.setItem('talentino_read_notifs', JSON.stringify(updated));
-    setActiveTab(n.tab);
+    changeTab(n.tab);
     setShowNotif(false);
   };
 
@@ -972,11 +993,10 @@ function Dashboard() {
   };
 
   const submitAttendance = async () => {
-    // Distance Verification Check
     if (gpsCoords && user.branch) {
       const branchCoords = BRANCH_LOCATIONS[user.branch];
       if (branchCoords) {
-        const R = 6371e3; // metres
+        const R = 6371e3; 
         const dLat = (branchCoords.lat - gpsCoords.lat) * Math.PI / 180;
         const dLon = (branchCoords.lng - gpsCoords.lng) * Math.PI / 180;
         const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -1002,12 +1022,10 @@ function Dashboard() {
     } catch(err) { setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error' }); }
   };
 
-  // Improved Date Parsers for robust filtering
   const isPastDate = (dateStr) => {
     if (!dateStr || dateStr.toLowerCase() === 'open') return false;
     let parts = dateStr.split(/[-/]/);
     if (parts.length === 3) {
-        // Assume DD/MM/YYYY or DD-MM-YYYY format from the sheet
         let d = new Date(parts[2], parts[1] - 1, parts[0]);
         let now = new Date(); now.setHours(0,0,0,0);
         return d < now;
@@ -1019,9 +1037,7 @@ function Dashboard() {
     if (!dateStr || dateStr === "N/A" || dateStr === "undefined") return null;
     let parts = dateStr.split(/[-/]/);
     if (parts.length === 3) {
-       // If year is first (YYYY-MM-DD)
        if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
-       // If year is last (DD-MM-YYYY)
        return new Date(parts[2], parts[1]-1, parts[0]);
     }
     let d = new Date(dateStr);
@@ -1052,7 +1068,6 @@ function Dashboard() {
   // --------------------------------------------------------
   const studentJoinDate = parseSafeDate(user.joiningDate);
 
-  // Events: Today & Future only
   const todayDate = new Date();
   todayDate.setHours(0,0,0,0);
   const filteredEvents = (data.events || []).filter(ev => {
@@ -1062,10 +1077,8 @@ function Dashboard() {
     return d >= todayDate;
   });
 
-  // Vacancies: After student joining date + Expired at Bottom
   const processedVacancies = (data.vacancies || []).filter(vac => {
     if (!studentJoinDate) return true;
-    // Check if the vacancy lastDate or open date is after student joined
     const vacLastDate = parseSafeDate(vac.lastDate);
     if (!vacLastDate) return true;
     return vacLastDate >= studentJoinDate;
@@ -1074,7 +1087,7 @@ function Dashboard() {
     const bExp = isPastDate(b.lastDate);
     if (aExp && !bExp) return 1;
     if (!aExp && bExp) return -1;
-    return 0; // Both expired or both active
+    return 0; 
   });
 
   // --------------------------------------------------------
@@ -1103,7 +1116,6 @@ function Dashboard() {
     return { bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid #0284c7' };
   };
 
-  // TPO Data Fallbacks
   const tpo = data.tpoInfo || {};
   const tpoPhoto = tpo.profilePhoto || tpo.photo || tpo['Profile Photo'];
   const tpoName = tpo.name || tpo['TPO Name'] || "Placement Officer";
@@ -1117,7 +1129,7 @@ function Dashboard() {
       <div className="top-header">
         <div className="header-left">
           {activeTab !== 'dashboard' ? (
-            <button type="button" onClick={() => setActiveTab('dashboard')} style={{ background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-main)', padding: '6px 14px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button type="button" onClick={() => changeTab('dashboard')} style={{ background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-main)', padding: '6px 14px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <i className="ph ph-arrow-left"></i> Dashboard
             </button>
           ) : (
@@ -1184,15 +1196,15 @@ function Dashboard() {
                 <div className="quick-actions-card">
                   <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>Quick Actions</h3>
                   <div className="quick-actions-grid">
-                    <div className="qa-btn" onClick={() => setActiveTab('talentino')}><div className="qa-icon" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-user-check"></i></div><div>Talentino</div></div>
+                    <div className="qa-btn" onClick={() => changeTab('talentino')}><div className="qa-icon" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-user-check"></i></div><div>Talentino</div></div>
                     <div className="qa-btn" onClick={() => setTpoModal(true)}><div className="qa-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-address-book"></i></div><div>Contact TPO</div></div>
                     <div className="qa-btn" onClick={() => setHelpModal(true)}><div className="qa-icon" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}><i className="ph-fill ph-headset"></i></div><div>Request Help</div></div>
-                    <div className="qa-btn" onClick={() => setActiveTab('profile')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-user"></i></div><div>Profile</div></div>
+                    <div className="qa-btn" onClick={() => changeTab('profile')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-user"></i></div><div>Profile</div></div>
                   </div>
                 </div>
               </div>
               
-              <div className="vacancy-quick-banner" onClick={() => setActiveTab('vacancies')}>
+              <div className="vacancy-quick-banner" onClick={() => changeTab('vacancies')}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <div style={{ background: 'rgba(255,255,255,0.1)', padding: '12px', borderRadius: '12px', color: '#a855f7' }}><i className="ph ph-briefcase" style={{ fontSize: '1.5rem' }}></i></div>
                   <div>
@@ -1208,15 +1220,15 @@ function Dashboard() {
                   <div className="stat-icon-wrapper" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-check-circle"></i></div>
                   <div><div className="stat-num">{data.stats?.attended || 0}</div><div className="stat-label">Talentino Attended</div></div>
                 </div>
-                <div className="stat-card-new" onClick={() => setActiveTab('status')} style={{cursor:'pointer'}}>
+                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}>
                   <div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-briefcase"></i></div>
                   <div><div className="stat-num">{data.stats?.applied || 0}</div><div className="stat-label">Jobs Applied</div></div>
                 </div>
-                <div className="stat-card-new" onClick={() => setActiveTab('status')} style={{cursor:'pointer'}}>
+                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}>
                   <div className="stat-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-calendar-check"></i></div>
                   <div><div className="stat-num">{data.stats?.interviews || 0}</div><div className="stat-label">Interviews Scheduled</div></div>
                 </div>
-                <div className="stat-card-new" onClick={() => setActiveTab('status')} style={{cursor:'pointer'}}>
+                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}>
                   <div className="stat-icon-wrapper" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-certificate"></i></div>
                   <div><div className="stat-num">{data.stats?.offers || 0}</div><div className="stat-label">Offers Received</div></div>
                 </div>
@@ -1731,15 +1743,15 @@ function Dashboard() {
             </div>
           </div>
           <div className="drawer-menu">
-            <div className="drawer-item" onClick={() => { setActiveTab('dashboard'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-house"></i> Dashboard</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setActiveTab('talentino'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setActiveTab('profile'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setActiveTab('status'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setActiveTab('vacancies'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setActiveTab('guide'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-book-open"></i> Guide</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('dashboard')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-house"></i> Dashboard</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('talentino')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('profile')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('status')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('vacancies')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('guide')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-book-open"></i> Guide</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => { setTpoModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-address-book"></i> Contact TPO</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => { setHelpModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-info"></i> Request Help</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setActiveTab('settings'); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-gear"></i> Settings</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('settings')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-gear"></i> Settings</div><span>&rsaquo;</span></div>
           </div>
           <div className="drawer-footer">
             <button className="btn-logout-drawer" onClick={handleLogout}>Log Out</button>
@@ -1928,20 +1940,20 @@ function Dashboard() {
 
 function NotFound() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', textAlign: 'center', padding: '1.5rem', background: '#f7fafc', color: '#1e293b' }}>
-      <div style={{ maxWidth: '500px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ position: 'relative', width: '280px', height: '200px', marginBottom: '1.5rem' }}>
-          <div style={{ position: 'absolute', borderRadius: '50%', width: '35px', height: '35px', background: '#f43f5e', top: '10px', right: '35px' }}></div>
-          <div style={{ position: 'absolute', borderRadius: '50%', width: '45px', height: '45px', background: '#fde047', top: '0px', left: '20px' }}></div>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', fontSize: '5rem', fontWeight: 900, color: '#94a3b8' }}>
-            <span>4</span><span style={{ color: '#38bdf8' }}>0</span><span>4</span>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', textAlign: 'center', padding: '1.5rem', background: 'var(--bg-dark)', color: 'var(--text-main)' }}>
+      <div style={{ maxWidth: '500px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'var(--card-bg)', padding: '3rem 2rem', borderRadius: '20px', border: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'relative', width: '100%', maxWidth: '280px', height: '180px', marginBottom: '1.5rem' }}>
+          <div style={{ position: 'absolute', borderRadius: '50%', width: '35px', height: '35px', background: '#ef4444', top: '10px', right: '15%' }}></div>
+          <div style={{ position: 'absolute', borderRadius: '50%', width: '45px', height: '45px', background: '#f59e0b', top: '0px', left: '10%' }}></div>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', fontSize: '5rem', fontWeight: 900, color: 'var(--text-muted)', height: '100%' }}>
+            <span>4</span><span style={{ color: 'var(--accent-cyan)' }}>0</span><span>4</span>
           </div>
-          <div style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', width: '220px', height: '40px', background: '#38bdf8', borderRadius: '50px 50px 30px 30px' }}></div>
+          <div style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', width: '80%', height: '20px', background: 'var(--accent-blue)', borderRadius: '50px' }}></div>
         </div>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem' }}>Oops!</h1>
-        <p style={{ fontSize: '1.125rem', color: '#64748b', marginBottom: '0.25rem' }}>Who spilled the paint?</p>
-        <p style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '2rem' }}>The page you are looking for doesn't exist or has been moved.</p>
-        <a href="/" style={{ background: '#2563eb', color: '#ffffff', padding: '0.75rem 1.75rem', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}>GO BACK HOME</a>
+        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-main)' }}>Oops!</h1>
+        <p style={{ fontSize: '1.125rem', color: 'var(--accent-cyan)', marginBottom: '0.25rem', fontWeight: 600 }}>Who spilled the paint?</p>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>The page you are looking for doesn't exist or has been moved.</p>
+        <a href="/" style={{ background: 'var(--accent-blue)', color: '#ffffff', padding: '0.8rem 2rem', borderRadius: '10px', fontWeight: 700, textDecoration: 'none', transition: 'opacity 0.2s', display: 'inline-block' }}>Go Back Home &rarr;</a>
       </div>
     </div>
   );
