@@ -48,19 +48,42 @@ const GlobalStyle = () => {
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
       /* --- LANDING PAGE (LOGIN) STYLES --- */
-      .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%), linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 100% 100%, 40px 40px, 40px 40px; display: flex; flex-direction: column; }
-      .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-      .landing-grid { display: grid; grid-template-columns: 1fr 480px; gap: 4rem; padding: 4rem; flex: 1; align-items: center; max-width: 1400px; margin: 0 auto; width: 100%; }
-      .hero-badge { display: inline-flex; align-items: center; gap: 12px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: var(--accent-cyan); padding: 8px 18px; border-radius: 30px; margin-bottom: 1.5rem; text-align: left; text-transform: uppercase; }
-      .hero-title { font-size: 4rem; font-weight: 800; line-height: 1.1; margin: 0 0 1.5rem 0; color: #ffffff; letter-spacing: -1px; }
-      .hero-desc { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; max-width: 500px; margin-bottom: 2.5rem; }
+      .landing-wrapper { min-height: 100vh; width: 100vw; background: #080c14; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+      .landing-wrapper::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(14, 165, 233, 0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
       
-      .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100vw; padding: 20px; }
-      .auth-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.2rem 1.8rem; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); margin: 0 auto; }
+      .landing-nav { position: relative; z-index: 10; display: flex; justify-content: flex-start; align-items: center; padding: 2rem 4rem; }
+      .landing-grid { position: relative; z-index: 10; display: grid; grid-template-columns: 1fr 480px; gap: 4rem; padding: 2rem 4rem; flex: 1; align-items: center; max-width: 1400px; margin: 0 auto; width: 100%; }
+      
+      .hero-badge { display: inline-flex; align-items: center; gap: 12px; background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2); border-radius: 30px; padding: 8px 18px; margin-bottom: 2rem; }
+      .hero-badge i { color: #38bdf8; font-size: 1.2rem; }
+      .hero-badge-text { display: flex; flex-direction: column; }
+      .hero-badge-title { font-size: 0.85rem; font-weight: 800; color: #38bdf8; letter-spacing: 1px; line-height: 1.2; }
+      .hero-badge-subtitle { font-size: 0.55rem; font-weight: 700; color: #38bdf8; opacity: 0.8; letter-spacing: 0.5px; text-transform: uppercase; }
+      
+      .hero-title { font-size: 4.2rem; font-weight: 800; line-height: 1.1; margin: 0 0 1.5rem 0; color: #ffffff; letter-spacing: -1.5px; }
+      .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; max-width: 500px; margin-bottom: 2.5rem; }
+      
+      .btn-glow { background: linear-gradient(90deg, #0ea5e9, #38bdf8); color: #ffffff; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4); transition: transform 0.2s, box-shadow 0.2s; }
+      .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.6); }
+
+      .ticker-container { margin-top: 3.5rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; display: flex; align-items: center; gap: 15px; }
+      .ticker-icon { width: 36px; height: 36px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.2rem; flex-shrink: 0; }
+      
+      @keyframes tickerFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .ticker-animate { animation: tickerFadeUp 0.5s ease forwards; }
+
+      .right-panel-wrapper { width: 100%; max-width: 440px; margin: 0 auto; position: relative; }
+      
+      .hiring-dashboard-card { background: #111827; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 2.2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+      .hiring-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem; }
+      .hiring-stat-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 18px; margin-bottom: 1rem; }
+      
+      .auth-card { background: #111827; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 2.5rem 2.2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
       .brand-logo-container { display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; }
       .auth-logo-img { max-width: 220px; height: auto; object-fit: contain; }
       .switch-mode { text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted); }
-      .switch-mode span { color: var(--accent-cyan); text-decoration: none; font-weight: 600; cursor: pointer; }
+      .switch-mode span { color: var(--accent-cyan); text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s; }
+      .switch-mode span:hover { color: #ffffff; }
       .tnc-link { color: var(--accent-cyan); text-decoration: underline; cursor: pointer; font-weight: 600; }
 
       .alert { padding: 0.8rem; margin-top: 1rem; border-radius: 8px; text-align: center; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;}
@@ -119,7 +142,6 @@ const GlobalStyle = () => {
       .dashboard-content { padding: 2rem; max-width: 1300px; width: 100%; margin: 0 auto; animation: fadeInUp 0.3s ease; }
       .dash-top-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
       
-      /* Dashboard Hero Banner with Student Photo & Gradient System */
       .hero-banner { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
       .hero-banner::after { content: ''; position: absolute; right: -5%; top: 0; height: 100%; width: 50%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat right center; background-size: contain; opacity: 0.1; mask-image: linear-gradient(to right, transparent, black); -webkit-mask-image: linear-gradient(to right, transparent, black); pointer-events: none; z-index: 0; }
       .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); position: relative; z-index: 2; }
@@ -269,7 +291,7 @@ const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1t
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
 // --------------------------------------------------------
-// BRANCH COORDINATES (Update with exact building lat/lng for accurate 150m check)
+// BRANCH COORDINATES
 // --------------------------------------------------------
 const BRANCH_LOCATIONS = {
   "Kochi": { lat: 9.9816, lng: 76.2999 }, 
@@ -321,8 +343,44 @@ function Login() {
   const [fadeVideo, setFadeVideo] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
-  // New state to toggle between Dashboard stats card and the Authentication form
+  // State to toggle between the Hiring Dashboard box and the Login Form box
   const [showAuthForm, setShowAuthForm] = useState(false);
+
+  // Live updates slide-show state
+  const [liveUpdates, setLiveUpdates] = useState([
+    { name: "Anand Manikantan", role: "Data Analyst & Python Developer" },
+    { name: "Sreejith S", role: "Automation Engineer" },
+    { name: "Akhil Krishnan", role: "Embedded Systems Intern" },
+    { name: "Mohammed Sinan", role: "Digital Marketing Executive" },
+    { name: "Vishnu Kumar", role: "PLC Programmer" }
+  ]);
+  const [tickerIndex, setTickerIndex] = useState(0);
+
+  // Fetch data from opening_applied for placed students
+  useEffect(() => {
+    const fetchPlacedStudents = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/public/live-hiring`);
+        if (res.data.success && res.data.updates && res.data.updates.length > 0) {
+          setLiveUpdates(res.data.updates);
+        }
+      } catch (err) {
+        // Fallback to initial state if endpoint doesn't exist yet
+        console.log("Using local fallback live updates data");
+      }
+    };
+    fetchPlacedStudents();
+  }, []);
+
+  // Slide show interval
+  useEffect(() => {
+    if (liveUpdates.length > 0) {
+      const interval = setInterval(() => {
+        setTickerIndex((prev) => (prev + 1) % liveUpdates.length);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [liveUpdates.length]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -363,100 +421,99 @@ function Login() {
     <div className="landing-wrapper">
       <div className="landing-nav">
         <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
-        {/* Navigation links have been removed as requested */}
       </div>
       
       <div className="landing-grid">
+        {/* Left Side: Stays completely static as per requirement */}
         <div className="hero-section">
-          {/* Modified badge to show text on two lines */}
           <div className="hero-badge">
             <i className="ph-fill ph-seal-check"></i>
-            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.3' }}>
-              <span style={{ fontWeight: 800 }}>Talenzo</span>
-              <span style={{ fontSize: '0.65rem', opacity: 0.85, fontWeight: 700 }}>Connecting Talent with Opportunity</span>
+            <div className="hero-badge-text">
+              <span className="hero-badge-title">TALENZO</span>
+              <span className="hero-badge-subtitle">Connecting Talent with Opportunity</span>
             </div>
           </div>
           
-          <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: 'var(--accent-cyan)' }}>Careers with IPCS</span></h1>
+          <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: '#38bdf8' }}>Careers with IPCS</span></h1>
           <p className="hero-desc">IPCS Global connects future-ready talent in Industrial Automation, Embedded Systems, IoT, and Digital Tech with leading blue-chip global firms. Experience zero-barrier career transitions.</p>
 
-          {!showAuthForm && (
-            <>
-              {/* Login / Signup toggle button replacing the original Search active placement */}
-              <button
-                className="btn-action"
-                style={{ padding: '1rem 2rem', fontSize: '1.05rem', borderRadius: '30px', background: 'linear-gradient(90deg, #0284c7 0%, #38bdf8 100%)', boxShadow: '0 10px 25px rgba(2, 132, 199, 0.4)' }}
-                onClick={() => setShowAuthForm(true)}
-              >
-                Login / Signup <i className="ph-bold ph-caret-right"></i>
-              </button>
+          <button 
+            className="btn-glow" 
+            onClick={() => setShowAuthForm(true)}
+          >
+            Login / Signup <i className="ph-bold ph-caret-right"></i>
+          </button>
 
-              {/* Live updates ticker section */}
-              <div className="live-updates-container" style={{ marginTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', width: '40px', height: '40px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <i className="ph-fill ph-lightning" style={{ fontSize: '1.4rem' }}></i>
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-cyan)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>Live Hiring Updates</div>
-                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Anand Manikantan got hired as a Data Analyst & Python Developer.</div>
-                </div>
+          <div className="ticker-container">
+            <div className="ticker-icon">
+              <i className="ph-fill ph-lightning"></i>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '2px' }}>Live Hiring Updates</div>
+              <div key={tickerIndex} className="ticker-animate" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                {liveUpdates.length > 0 ? (
+                  <span>{liveUpdates[tickerIndex].name} got hired as a {liveUpdates[tickerIndex].role}.</span>
+                ) : (
+                  <span>Loading recent placements...</span>
+                )}
               </div>
-            </>
-          )}
+            </div>
+          </div>
         </div>
 
-        <div style={{ width: '100%', margin: '0 auto' }}>
+        {/* Right Side: Transitions between Dashboard Stats and Login Form */}
+        <div className="right-panel-wrapper">
           {!showAuthForm ? (
             /* Hiring Dashboard display shown initially */
-            <div className="hiring-stats-card" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '1.5rem' }}>
+            <div className="hiring-dashboard-card animate-fade-in">
+              <div className="hiring-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  <div style={{ background: '#0284c7', color: '#fff', width: '45px', height: '45px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
+                  <div style={{ background: '#0284c7', color: '#ffffff', width: '42px', height: '42px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
                     <i className="ph-fill ph-lightning"></i>
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff' }}>Hiring Dashboard</h3>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Realtime Campus Intake</span>
+                    <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff' }}>Hiring Dashboard</h3>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Realtime Campus Intake</span>
                   </div>
                 </div>
-                <div style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '1px' }}>
+                <div style={{ border: '1px solid rgba(34, 197, 94, 0.3)', color: '#4ade80', padding: '6px 14px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px' }}>
                   ACTIVE STAGE
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <div style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}><i className="ph-fill ph-users"></i></div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div className="hiring-stat-box">
+                  <div style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-users"></i></div>
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>Total Students Hired</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>1.5 M +</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Total Students Hired</div>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>1.5 M +</div>
                   </div>
                 </div>
                 
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}><i className="ph-fill ph-buildings"></i></div>
+                <div className="hiring-stat-box">
+                  <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-buildings"></i></div>
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>Enterprise Recruiters</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>25 K +</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Enterprise Recruiters</div>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>25 K +</div>
                   </div>
                 </div>
                 
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}><i className="ph-fill ph-medal"></i></div>
+                <div className="hiring-stat-box">
+                  <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-medal"></i></div>
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>Presence Across Countries</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>50 +</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Presence Across Countries</div>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>50 +</div>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             /* Active Login Form */
-            <div className="auth-card">
+            <div className="auth-card animate-fade-in">
               <div className="brand-logo-container">
                 <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" />
               </div>
-              <h2 style={{ textAlign: 'center', margin: '0 0 6px 0' }}>Welcome back</h2>
+              <h2 style={{ textAlign: 'center', margin: '0 0 6px 0', color: '#ffffff' }}>Welcome back</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
 
               <form onSubmit={handleLogin}>
@@ -469,7 +526,7 @@ function Login() {
                     </span>
                   </div>
                 </div>
-                <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem' }}>Sign in &rarr;</button>
+                <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem', padding: '1rem', borderRadius: '10px' }}>Sign in &rarr;</button>
               </form>
 
               {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
@@ -1963,7 +2020,7 @@ function Dashboard() {
               <i className="ph ph-x" style={{ position: 'absolute', top: '15px', right: '15px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem', zIndex: 10 }} onClick={() => setTpoModal(false)}></i>
               
               <div style={{ position: 'relative', zIndex: 2 }}>
-                <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justify: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
+                <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
                   {tpoPhoto && tpoPhoto !== "N/A" ? <img src={getDriveImageUrl(tpoPhoto)} style={{width: '100%', height: '100%', objectFit: 'cover'}} alt="TPO" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} /> : null}
                   <i className="ph ph-user-tie" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', display: (!tpoPhoto || tpoPhoto === "N/A") ? 'block' : 'none' }}></i>
                 </div>
