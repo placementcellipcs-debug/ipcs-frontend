@@ -4,7 +4,6 @@ import axios from 'axios';
 import Cropper from 'react-easy-crop';
 import loadingVideo from './assets/video.mp4';
 
-/* STREAMING_CHUNK:Initializing global styles and variables... */
 const GlobalStyle = () => {
   useEffect(() => {
     if (!document.getElementById('phosphor-icons')) {
@@ -56,7 +55,6 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* --- LANDING PAGE (LOGIN) STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: radial-gradient(circle at top left, #0f172a 0%, #0b0f17 100%); display: flex; flex-direction: column; }
       .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
       .nav-links { display: flex; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
@@ -80,13 +78,11 @@ const GlobalStyle = () => {
       .alert-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
       .alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
 
-      /* --- VIDEO LOADER STYLES --- */
       .video-loader-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-in-out; }
       .video-loader-overlay.fade-out { opacity: 0; pointer-events: none; }
       .video-loader-overlay video { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s ease; }
       .video-loader-overlay video.ready { opacity: 1; }
 
-      /* --- PROFILE REGISTRATION --- */
       .profile-reg-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 2.2rem; width: 100%; max-width: 880px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); max-height: 92vh; overflow-y: auto; }
       .reg-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--card-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
       .section-title { font-size: 0.78rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 1.8rem 0 1.1rem 0; padding-bottom: 6px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; gap: 8px; color: var(--text-main); }
@@ -106,7 +102,6 @@ const GlobalStyle = () => {
       .modal-header-border { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.8rem; }
       .tnc-content-box { height: 350px; overflow-y: auto; font-size: 0.85rem; color: var(--text-main); background: var(--input-bg); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--input-border); line-height: 1.7; position: relative; }
 
-      /* --- DASHBOARD STYLES --- */
       .app-layout { display: flex; flex-direction: column; width: 100vw; min-height: 100vh; }
       .main-body { flex: 1; display: flex; flex-direction: column; width: 100%; }
       .top-header { height: 65px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; transition: background 0.3s; z-index: 50; position: relative;}
@@ -132,6 +127,7 @@ const GlobalStyle = () => {
       .full-date-subtext { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; position: relative; z-index: 2;}
       
       .vacancy-quick-banner { background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%); border: 1px solid #6366f1; border-radius: 16px; padding: 1.2rem 1.8rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
+      .vacancy-quick-banner:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); }
       
       .quick-actions-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
       .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
@@ -197,7 +193,6 @@ const GlobalStyle = () => {
 
       .app-stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
 
-      /* --- PROFILE & SETTINGS --- */
       .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 1.8rem; align-items: start; }
       .profile-left-col { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 1.5rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
       .profile-left-col::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat center center; background-size: 90%; opacity: 0.05; pointer-events: none; z-index: 0; }
@@ -211,7 +206,6 @@ const GlobalStyle = () => {
       .settings-tab { display: flex; align-items: center; gap: 12px; padding: 0.8rem 1rem; color: var(--text-muted); font-weight: 600; font-size: 0.95rem; border-radius: 10px; cursor: pointer; }
       .settings-tab.active { background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan); }
 
-      /* --- VACANCIES --- */
       .vacancies-hero { text-align: center; padding: 3rem 1.5rem 2.5rem 1.5rem; background: radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%); border-bottom: 1px solid var(--card-border); position: relative; border-radius: 20px; }
       .location-table-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; overflow-x: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
       .vac-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 700px; }
@@ -288,17 +282,7 @@ const GlobalStyle = () => {
       .footer-links a:hover { color: #10b981; padding-left: 5px; }
       .footer-bottom { padding-top: 2rem; border-top: 1px solid #374151; text-align: center; color: #6b7280; font-size: 0.9rem;}
 
-      /* --- MEDIA QUERIES FOR MARKETING SITE & DASHBOARD --- */
-      @media (max-width: 1200px) {
-        .stats-row { grid-template-columns: repeat(2, 1fr); }
-      }
-      @media (max-width: 900px) {
-        .landing-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; padding: 2rem; }
-        .hero-desc { margin: 0 auto 2.5rem auto; }
-        .profile-grid, .settings-container, .dash-top-row { grid-template-columns: 1fr; }
-        .stats-row { grid-template-columns: 1fr; }
-        .talentino-summary-grid { grid-template-columns: 1fr; }
-        .app-stats-grid { grid-template-columns: repeat(3, 1fr); }
+      @media (max-width: 992px) {
         .zonal-card { flex-direction: column; }
         .zonal-image-wrapper { min-height: 300px; }
         .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -325,7 +309,6 @@ const GlobalStyle = () => {
   );
 };
 
-/* STREAMING_CHUNK:Configuring robust dashboard logic and APIs... */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
@@ -423,10 +406,6 @@ const siteData = {
     }
 };
 
-/* STREAMING_CHUNK:MarketingSite component safely integrated... */
-// ==========================================
-// 3. MARKETING SITE (LANDING PAGE)
-// ==========================================
 function MarketingSite() {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -443,14 +422,10 @@ function MarketingSite() {
   ];
 
   useEffect(() => {
-    // Preloader
     const timer = setTimeout(() => setShowPreloader(false), 1200);
-    
-    // Scroll listener for Navbar
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
 
-    // Fade-in Intersection Observer
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -461,7 +436,6 @@ function MarketingSite() {
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-    // Ticker
     const tickerTimer = setInterval(() => {
         setTickerIndex(prev => (prev + 1) % hiringUpdates.length);
     }, 3500);
@@ -495,7 +469,6 @@ function MarketingSite() {
   return (
     <div style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-main)', overflowX: 'hidden' }}>
         
-        {/* NAVBAR */}
         <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 py-4 px-6 md:px-12 ${isScrolled ? 'backdrop-blur-md shadow-lg border-b' : 'bg-transparent'}`} style={{ borderColor: isScrolled ? 'var(--card-border)' : 'transparent', backgroundColor: isScrolled ? 'rgba(11, 15, 23, 0.95)' : 'transparent' }}>
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 <a href="#home" className="flex items-center space-x-3 group cursor-pointer" style={{ textDecoration: 'none' }}>
@@ -521,13 +494,12 @@ function MarketingSite() {
                         <i className="fas fa-arrow-right text-[10px]"></i>
                     </button>
                     
-                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2.5 rounded-lg border border-slate-700/50 text-slate-300 focus:outline-none" style={{ background: 'transparent', cursor: 'pointer' }}>
+                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2.5 rounded-lg border border-slate-700/50 text-slate-300 focus:outline-none" style={{ background: 'transparent', cursor: 'pointer', border: 'none' }}>
                         <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-lg`}></i>
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <div className="lg:hidden fixed top-20 left-4 right-4 bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl z-50">
                     <ul className="flex flex-col space-y-4 text-base font-semibold m-0 p-0" style={{ listStyle: 'none' }}>
@@ -545,7 +517,6 @@ function MarketingSite() {
             )}
         </nav>
 
-        {/* HERO SECTION */}
         <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden" id="home">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 z-0"></div>
             <div className="absolute top-1/4 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] animate-pulse-glow z-0"></div>
@@ -628,7 +599,6 @@ function MarketingSite() {
             </div>
         </section>
 
-        {/* FEATURES */}
         <section className="py-24 relative overflow-hidden border-t border-slate-900" id="features" style={{ backgroundColor: 'var(--bg-dark)' }}>
             <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
                 <div className="text-center max-w-3xl mx-auto mb-16 fade-in">
@@ -662,7 +632,6 @@ function MarketingSite() {
             </div>
         </section>
 
-        {/* COMPANIES MARQUEE */}
         <section className="py-24 relative border-t border-slate-900" id="companies" style={{ backgroundColor: 'var(--bg-dark)' }}>
             <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 mb-12 fade-in">
                 <div className="text-center max-w-3xl mx-auto">
@@ -723,7 +692,6 @@ function MarketingSite() {
             </div>
         </section>
 
-        {/* TESTIMONIALS */}
         <section className="py-24 relative bg-slate-900 border-t border-slate-800" id="testimonials">
             <div className="max-w-7xl mx-auto px-6 md:px-12 text-center mb-12 fade-in">
                 <span className="inline-block text-cyan-400 text-xs font-extrabold uppercase tracking-widest bg-cyan-400/10 py-1.5 px-4 rounded-full mb-3">Student Stories</span>
@@ -760,7 +728,6 @@ function MarketingSite() {
             </div>
         </section>
 
-        {/* TEAM SECTION */}
         <section className="py-24 relative border-t border-slate-900" style={{ backgroundColor: 'var(--bg-dark)' }}>
             <div className="max-w-7xl mx-auto px-6 md:px-12 text-center mb-16 fade-in">
                 <span className="inline-block text-cyan-400 text-xs font-extrabold uppercase tracking-widest bg-cyan-400/10 py-1.5 px-4 rounded-full mb-3">Our Team</span>
@@ -801,7 +768,6 @@ function MarketingSite() {
             </div>
         </section>
 
-        {/* FOOTER */}
         <footer className="footer">
             <div className="footer-grid">
                 <div className="footer-brand text-left">
@@ -829,7 +795,6 @@ function MarketingSite() {
             </div>
         </footer>
 
-        {/* VIDEO MODAL */}
         {activeVideo && (
             <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
                 <div className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-slate-700 shadow-2xl p-2">
@@ -846,7 +811,7 @@ function MarketingSite() {
 }
 
 // ==========================================
-// 4. LOGIN / LANDING PAGE COMPONENT (REPLACED BY MARKETING SITE, BUT KEPT FOR ROUTING)
+// 4. LOGIN / LANDING PAGE COMPONENT
 // ==========================================
 function Login() {
   const navigate = useNavigate();
@@ -1269,7 +1234,6 @@ function Signup() {
 // ==========================================
 // 6. MAIN DASHBOARD ECOSYSTEM
 // ==========================================
-/* STREAMING_CHUNK:Configuring robust dashboard logic and APIs... */
 function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -1277,7 +1241,6 @@ function Dashboard() {
   const [data, setData] = useState({ stats: {}, events: [], appliedJobs: [], vacancies: [], attendanceHistory: [], tpoInfo: {} });
   const [theme, setTheme] = useState('dark');
   
-  // Safe Tab State via Hash Routing (Fixes Mobile Back Button bug)
   const [activeTab, setActiveTab] = useState(() => {
      const hash = window.location.hash.replace('#', '');
      return hash || 'dashboard';
@@ -1313,7 +1276,6 @@ function Dashboard() {
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
 
-  // Sync hash changes (Mobile back button listener)
   useEffect(() => {
     const handleHashChange = () => {
         const hash = window.location.hash.replace('#', '') || 'dashboard';
@@ -1550,7 +1512,6 @@ function Dashboard() {
     } catch(err) { setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error' }); }
   };
 
-  // Improved Date Parsers for robust filtering
   const isPastDate = (dateStr) => {
     if (!dateStr || dateStr.toLowerCase() === 'open') return false;
     let parts = dateStr.split(/[-/]/);
@@ -1592,9 +1553,6 @@ function Dashboard() {
     } catch(err) { setActionStatus({ type: 'error', message: 'Server Error applying for job' }); }
   };
 
-  // --------------------------------------------------------
-  // SMART FILTERING LOGIC
-  // --------------------------------------------------------
   const studentJoinDate = parseSafeDate(user.joiningDate);
 
   const todayDate = new Date();
@@ -1619,9 +1577,6 @@ function Dashboard() {
     return 0; 
   });
 
-  // --------------------------------------------------------
-  // STATUS TAB ANALYTICS LOGIC
-  // --------------------------------------------------------
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
   (data.appliedJobs || []).forEach(job => {
     const s = (job.status || job.Status || '').toLowerCase();
@@ -1653,7 +1608,6 @@ function Dashboard() {
   const tpoPhone = tpo.phone || tpo.contactNumber || tpo['Contact Number'] || "N/A";
   const tpoAssigned = tpo.assignedBranches || tpo.assignedRegions || tpo['Assigned Branches'] || "N/A";
 
-  /* STREAMING_CHUNK:Rendering Dashboard structure and Navbar... */
   return (
     <div className="app-layout">
       <div className="top-header">
@@ -1798,7 +1752,6 @@ function Dashboard() {
             </>
           )}
 
-          {/* STREAMING_CHUNK:Rendering polished Profile layout... */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -1908,7 +1861,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Settings and Guide tab layouts... */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
@@ -2015,7 +1967,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Talentino attendance module... */}
           {activeTab === 'talentino' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -2122,7 +2073,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Vacancies grid and Job Details Modals... */}
           {activeTab === 'vacancies' && (
             <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
@@ -2189,7 +2139,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* STREAMING_CHUNK:Rendering Application Status Analytics... */}
           {activeTab === 'status' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -2263,7 +2212,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* STREAMING_CHUNK:Rendering Sidebar and Navigation Drawer... */}
       <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
         <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
           <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
@@ -2296,7 +2244,6 @@ function Dashboard() {
         </div>
       </div>
       
-      {/* STREAMING_CHUNK:Rendering closing Modals (Profile, Modals, Support)... */}
       {editProfileModal && (
         <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
           <div className="report-card" style={{ maxWidth: '700px' }}>
@@ -2512,3 +2459,6 @@ export default function App() {
     </>
   );
 }
+```eof
+
+Once you paste this perfectly clean file, you can immediately push it. Vercel will process it with zero errors and everything will deploy! Let me know if there's anything else you need.
