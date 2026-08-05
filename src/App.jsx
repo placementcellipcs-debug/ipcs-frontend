@@ -330,7 +330,7 @@ const BRANCH_LOCATIONS = {
 };
 
 // ==========================================
-// 2. LOGIN / LANDING PAGE COMPONENT
+// LOGIN / LANDING PAGE COMPONENT
 // ==========================================
 function Login() {
   const navigate = useNavigate();
@@ -532,7 +532,7 @@ function Login() {
 }
 
 // ==========================================
-// 3. SIGNUP COMPONENT
+// SIGNUP COMPONENT
 // ==========================================
 function Signup() {
   const navigate = useNavigate();
@@ -864,7 +864,7 @@ function Signup() {
 }
 
 // ==========================================
-// 4. MAIN DASHBOARD ECOSYSTEM
+// MAIN DASHBOARD ECOSYSTEM
 // ==========================================
 function Dashboard() {
   const navigate = useNavigate();
@@ -907,6 +907,32 @@ function Dashboard() {
   const [pwdStatus, setPwdStatus] = useState(null);
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
+
+  // --- NEW PLACEMENT DRIVE STATES ---
+  const [activeDrives, setActiveDrives] = useState([]);
+  const [currentDrivePopup, setCurrentDrivePopup] = useState(null);
+  const [driveActionStatus, setDriveActionStatus] = useState(null);
+  
+  // --- PUSH NOTIFICATION STATE ---
+  const [pushPermission, setPushPermission] = useState('default');
+
+  // Request Push Notification Permission on load
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().then(permission => {
+        setPushPermission(permission);
+      });
+    } else if ('Notification' in window) {
+      setPushPermission(Notification.permission);
+    }
+  }, []);
+
+  // Utility to send Push Notifications
+  const sendPushNotification = (title, body, icon = GLOBAL_LOGO_URL) => {
+    if ('Notification' in window && pushPermission === 'granted') {
+      new Notification(title, { body, icon });
+    }
+  };
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -953,14 +979,117 @@ function Dashboard() {
     } catch (error) { console.error("Data error", error); }
   }, []);
 
+  // --- 1. LAG FIX: CHANGE INTERVAL TO 5 MINUTES ---
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('talentino_student_user') || '{}');
     if (!storedUser.email) { navigate('/'); return; }
     setUser(storedUser);
     fetchDashboard(storedUser);
-    const interval = setInterval(() => { fetchDashboard(storedUser); }, 15000);
+    
+    // Changed from 15000 (15s) to 300000 (5 mins) to stop server crashing/lag
+    const interval = setInterval(() => { fetchDashboard(storedUser); }, 300000);[cite: 3]
     return () => clearInterval(interval);
   }, [navigate, fetchDashboard]);
+
+  // --- 2. POPUP FIX: BETTER DATA FILTERING ---
+  useEffect(() => {
+    if (data.events && data.events.length > 0) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const drives = data.events.filter(ev => {
+        // Look for 'Event' or 'type' just in case backend changes the key
+        const eventType = ev['Event'] || ev.type || ev.Type || '';
+        if (eventType !== 'Placement Drive') return false; 
+        
+        const dateStr = ev['Date of the Event'] || ev.date || ev.Date;
+        if (!dateStr) return false;
+
+        const driveDate = new Date(dateStr);
+        return driveDate >= today; // Only upcoming or today
+      });
+      setActiveDrives(drives);
+    }
+  }, [data.events]);
+
+  useEffect(() => {
+    const checkDrives = setInterval(() => {
+      if (activeDrives.length === 0 || currentDrivePopup) return;
+
+      const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
+      const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+
+      const driveToShow = activeDrives.find(drive => {
+        // Fallback checks for Drive ID
+        const driveId = drive['Drive ID'] || drive.driveId || drive.id;
+        if (!driveId || respondedDrives[driveId]) return false;
+
+        const snoozeTime = snoozedDrives[driveId];
+        if (snoozeTime) {
+          const hoursPassed = (Date.now() - snoozeTime) / (1000 * 60 * 60);
+          if (hoursPassed < 1) return false; // Still within 1 hour snooze
+        }
+        return true;
+      });
+
+      if (driveToShow) {
+        setCurrentDrivePopup(driveToShow);
+        const title = driveToShow['Title'] || driveToShow.title;
+        const branch = driveToShow['Event Hapening in'] || driveToShow.branch || driveToShow['Branch'];
+        sendPushNotification("New Placement Drive!", `${title} is happening at ${branch}. Tap to view.`);
+      }
+    }, 5000); 
+
+    return () => clearInterval(checkDrives);
+  }, [activeDrives, currentDrivePopup, pushPermission]);
+
+  const handleDriveDismiss = () => {
+    const driveId = currentDrivePopup['Drive ID'] || currentDrivePopup.driveId || currentDrivePopup.id;
+    const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+    snoozedDrives[driveId] = Date.now();
+    localStorage.setItem('talentino_drive_snoozes', JSON.stringify(snoozedDrives));
+    setCurrentDrivePopup(null);
+  };
+
+  const handleDriveResponse = async (status) => {
+    setDriveActionStatus({ type: 'info', message: 'Recording your response...' });
+    
+    const driveId = currentDrivePopup['Drive ID'] || currentDrivePopup.driveId || currentDrivePopup.id;
+    const title = currentDrivePopup['Title'] || currentDrivePopup.title;
+    const branch = currentDrivePopup['Event Hapening in'] || currentDrivePopup.branch || currentDrivePopup['Branch'];
+
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
+        driveId: driveId,
+        title: title,
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        course: user.course,
+        branch: user.branch,
+        resume: user.resume,
+        qualification: user.qualification,
+        status: status,
+        tpoBranch: branch
+      });
+
+      if (res.data.success) {
+        const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
+        respondedDrives[driveId] = status;
+        localStorage.setItem('talentino_drive_responses', JSON.stringify(respondedDrives));
+        
+        if (status === 'Registered') {
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 3000);
+        }
+
+        setCurrentDrivePopup(null);
+        setDriveActionStatus(null);
+      }
+    } catch (err) {
+      setDriveActionStatus({ type: 'error', message: 'Failed to record response. Please try again.' });
+    }
+  };
 
   useEffect(() => {
     if (showNotif) {
@@ -1001,9 +1130,9 @@ function Dashboard() {
     const today = new Date();
     today.setHours(0,0,0,0);
     (data.events || []).forEach((ev, idx) => {
-      const ed = new Date(ev.date);
+      const ed = new Date(ev.date || ev['Date of the Event'] || ev.Date);
       if(!isNaN(ed) && ed >= today) {
-        notifs.push({ id: `ev-${idx}-${ev.title}`, title: `Event: ${ev.title}`, desc: `Scheduled for ${ev.date}.`, tab: 'dashboard' });
+        notifs.push({ id: `ev-${idx}-${ev.title || ev.Title}`, title: `Event: ${ev.title || ev.Title}`, desc: `Scheduled for ${ev.date || ev['Date of the Event'] || ev.Date}.`, tab: 'dashboard' });
       }
     });
 
@@ -1130,7 +1259,7 @@ function Dashboard() {
         if (distance > 150) {
            setAttStatus({ 
              type: 'error', 
-             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 150 meters to mark attendance. (Ensure exact branch coordinates are set in App.jsx)` 
+             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 150 meters to mark attendance.` 
            });
            return;
         }
@@ -1190,7 +1319,7 @@ function Dashboard() {
   const todayDate = new Date();
   todayDate.setHours(0,0,0,0);
   const filteredEvents = (data.events || []).filter(ev => {
-    const d = new Date(ev.date);
+    const d = new Date(ev.date || ev['Date of the Event'] || ev.Date);
     if(isNaN(d)) return true;
     d.setHours(0,0,0,0);
     return d >= todayDate;
@@ -1362,7 +1491,7 @@ function Dashboard() {
                   ) : (
                     filteredEvents.map((ev, index) => {
                        let monthStr = "TBA"; let dayStr = "-";
-                       let d = new Date(ev.date);
+                       let d = new Date(ev.date || ev['Date of the Event'] || ev.Date);
                        if(!isNaN(d)) { dayStr = d.getDate(); monthStr = d.toLocaleString('en-US', { month: 'short' }); }
                        return (
                           <div className="event-row-card" key={index}>
@@ -1371,10 +1500,10 @@ function Dashboard() {
                               <div className="ev-day">{dayStr}</div>
                             </div>
                             <div className="event-body">
-                              <div className="ev-title">{ev.title}</div>
-                              <div className="ev-meta"><i className="ph ph-clock"></i> {ev.time || 'TBA'}</div>
+                              <div className="ev-title">{ev.title || ev.Title}</div>
+                              <div className="ev-meta"><i className="ph ph-clock"></i> {ev.time || ev['Time of the Event'] || 'TBA'}</div>
                             </div>
-                            <div className="ev-badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid #7e22ce' }}>{ev.type}</div>
+                            <div className="ev-badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid #7e22ce' }}>{ev.type || ev.Event}</div>
                           </div>
                        )
                     })
@@ -1906,6 +2035,67 @@ function Dashboard() {
                <button className="btn-action" onClick={handleProfileUpdate}>Save Changes</button>
             </div>
             {epStatus && <div className={`alert alert-${epStatus.type}`} style={{marginTop: '10px'}}>{epStatus.message}</div>}
+          </div>
+        </div>
+      )}
+
+      {/* PLACEMENT DRIVE POPUP MODAL */}
+      {currentDrivePopup && (
+        <div className="report-modal-overlay" style={{ zIndex: 9999 }}>
+          <div className="report-card" style={{ maxWidth: '500px', padding: '0', overflow: 'hidden', position: 'relative' }}>
+            
+            {/* Close Button (Snoozes for 1 hr) */}
+            <div 
+                style={{ position: 'absolute', top: '15px', right: '15px', width: '32px', height: '32px', background: 'rgba(0,0,0,0.6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                onClick={handleDriveDismiss}
+            >
+                <i className="ph ph-x" style={{ color: '#fff', fontSize: '1.2rem' }}></i>
+            </div>
+
+            {/* Poster Image */}
+            <div style={{ width: '100%', height: '280px', background: 'var(--bg-dark)' }}>
+              {(currentDrivePopup['Poster Link'] || currentDrivePopup.posterLink || currentDrivePopup.poster) ? (
+                <img src={getDriveImageUrl(currentDrivePopup['Poster Link'] || currentDrivePopup.posterLink || currentDrivePopup.poster)} alt="Drive Poster" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e1b4b, #311042)', color: '#fff', fontSize: '1.5rem', fontWeight: 800 }}>
+                  Placement Drive
+                </div>
+              )}
+            </div>
+
+            <div style={{ padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
+                 <div>
+                    <div style={{ color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>Drive ID: {currentDrivePopup['Drive ID'] || currentDrivePopup.driveId || currentDrivePopup.id}</div>
+                    <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-main)', lineHeight: 1.2 }}>{currentDrivePopup['Title'] || currentDrivePopup.title}</h2>
+                 </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', border: '1px solid var(--input-border)', marginBottom: '1.5rem' }}>
+                <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Date</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup['Date of the Event'] || currentDrivePopup.date}</span></div>
+                <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Time</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup['Time of the Event'] || currentDrivePopup.time}</span></div>
+                <div style={{ gridColumn: '1 / -1' }}><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Location</strong><span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{currentDrivePopup['Event Hapening in'] || currentDrivePopup.branch || currentDrivePopup['Branch']}</span></div>
+              </div>
+
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>{currentDrivePopup['Description'] || currentDrivePopup.description}</p>
+
+              {driveActionStatus && <div className={`alert alert-${driveActionStatus.type}`} style={{ marginBottom: '15px' }}>{driveActionStatus.message}</div>}
+
+              <div style={{ display: 'flex', gap: '15px' }}>
+                <button className="btn-cancel" style={{ flex: 1, padding: '1rem', border: '1px solid #ef4444', color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)' }} onClick={() => handleDriveResponse('Not Interested')}>
+                  Not Interested
+                </button>
+                <button className="btn-action" style={{ flex: 2, padding: '1rem', background: '#22c55e' }} onClick={() => {
+                    if (!user.resume || user.resume === "N/A") {
+                        setDriveActionStatus({ type: 'error', message: 'You must upload a resume in your Profile before registering!' });
+                    } else {
+                        handleDriveResponse('Registered');
+                    }
+                }}>
+                  Register Now &rarr;
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
