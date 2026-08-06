@@ -294,7 +294,7 @@ const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEp
 // BRANCH COORDINATES
 // --------------------------------------------------------
 const BRANCH_LOCATIONS = {
-  "Kochi": { lat: 9.9816, lng: 76.2999 }, 
+  "Kochi": { lat: 9.9956, lng: 76.2925 }, 
   "Calicut": { lat: 11.2588, lng: 75.7804 },
   "Trivandrum": { lat: 8.5241, lng: 76.9366 },
   "Attingal": { lat: 8.6943, lng: 76.8184 },
