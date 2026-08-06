@@ -1131,13 +1131,27 @@ function Dashboard() {
     );
   };
 
-  const captureGPS = () => {
-
+  const submitAttendance = async () => {
     setAttStatus({ type: 'info', message: 'Verifying location and submitting...' });
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, { email: user.email, name: user.name, branch: user.branch, course: user.course, rating, location: locStatus, userLat: gpsCoords.lat, userLng: gpsCoords.lng, feedback });
-      if(res.data.success) { setAttStatus({ type: 'success', message: 'Attendance marked successfully!' }); fetchDashboard(user); }
-    } catch(err) { setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error' }); }
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, { 
+        email: user.email, 
+        name: user.name, 
+        branch: user.branch, 
+        course: user.course, 
+        rating, 
+        location: locStatus, 
+        userLat: gpsCoords?.lat, 
+        userLng: gpsCoords?.lng, 
+        feedback 
+      });
+      if(res.data.success) { 
+        setAttStatus({ type: 'success', message: 'Attendance marked successfully!' }); 
+        fetchDashboard(user); 
+      }
+    } catch(err) { 
+      setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error' }); 
+    }
   };
 
   const isPastDate = (dateStr) => {
