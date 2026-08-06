@@ -294,7 +294,7 @@ const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEp
 // BRANCH COORDINATES
 // --------------------------------------------------------
 const BRANCH_LOCATIONS = {
-  "Kochi": { lat: 9.9956, lng: 76.2925 }, 
+  "Kochi": { lat: 9.9956, lng: 76.2999 }, 
   "Calicut": { lat: 11.2588, lng: 75.7804 },
   "Trivandrum": { lat: 8.5241, lng: 76.9366 },
   "Attingal": { lat: 8.6943, lng: 76.8184 },
@@ -328,23 +328,6 @@ const BRANCH_LOCATIONS = {
   "Dubai (UAE)": { lat: 25.2048, lng: 55.2708 },
   "Riyadh (Saudi Arabia)": { lat: 24.7136, lng: 46.6753 }
 };
-// 3. Validate Geofence Dynamically
-let isWithinGeofence = false;
-const studentBranchKey = Object.keys(BRANCH_LOCATIONS).find(
-    b => b.toLowerCase() === (branch || "").trim().toLowerCase()
-);
-const branchCoords = studentBranchKey ? BRANCH_LOCATIONS[studentBranchKey] : { lat: 12.9716, lng: 77.5946 };
-
-if (userLat && userLng) {
-    const distance = calculateDistanceInMeters(
-        parseFloat(userLat), 
-        parseFloat(userLng), 
-        branchCoords.lat, 
-        branchCoords.lng
-    );
-    // Standardize allowed distance threshold (e.g. 500m)
-    if (distance <= 500) isWithinGeofence = true;
-}
 
 // ==========================================
 // 2. LOGIN / LANDING PAGE COMPONENT
@@ -1132,26 +1115,33 @@ function Dashboard() {
   };
 
   const submitAttendance = async () => {
+    if (gpsCoords && user.branch) {
+      const branchCoords = BRANCH_LOCATIONS[user.branch];
+      if (branchCoords) {
+        const R = 6371e3; 
+        const dLat = (branchCoords.lat - gpsCoords.lat) * Math.PI / 180;
+        const dLon = (branchCoords.lng - gpsCoords.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(gpsCoords.lat * Math.PI / 180) * Math.cos(branchCoords.lat * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+
+        if (distance > 150) {
+           setAttStatus({ 
+             type: 'error', 
+             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 150 meters to mark attendance. (Ensure exact branch coordinates are set in App.jsx)` 
+           });
+           return;
+        }
+      }
+    }
+
     setAttStatus({ type: 'info', message: 'Verifying location and submitting...' });
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, { 
-        email: user.email, 
-        name: user.name, 
-        branch: user.branch, 
-        course: user.course, 
-        rating, 
-        location: locStatus, 
-        userLat: gpsCoords?.lat, 
-        userLng: gpsCoords?.lng, 
-        feedback 
-      });
-      if(res.data.success) { 
-        setAttStatus({ type: 'success', message: 'Attendance marked successfully!' }); 
-        fetchDashboard(user); 
-      }
-    } catch(err) { 
-      setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error' }); 
-    }
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, { email: user.email, name: user.name, branch: user.branch, course: user.course, rating, location: locStatus, userLat: gpsCoords.lat, userLng: gpsCoords.lng, feedback });
+      if(res.data.success) { setAttStatus({ type: 'success', message: 'Attendance marked successfully!' }); fetchDashboard(user); }
+    } catch(err) { setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error' }); }
   };
 
   const isPastDate = (dateStr) => {
@@ -1645,7 +1635,7 @@ function Dashboard() {
                   <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1.8rem', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
                     <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
                       <i className="ph ph-calendar-check" style={{ color: data.isScheduledToday ? '#3b82f6' : '#ef4444', fontSize: '1.2rem' }}></i>
-                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:30 AM - 05:00 PM)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
+                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:30 AM - 07:00 PM)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
                     </div>
                     
                     <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
