@@ -1127,10 +1127,10 @@ function Dashboard() {
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         const distance = R * c;
 
-        if (distance > 150) {
+        if (distance > 500) {
            setAttStatus({ 
              type: 'error', 
-             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 150 meters to mark attendance. (Ensure exact branch coordinates are set in App.jsx)` 
+             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 500 meters to mark attendance. (Ensure exact branch coordinates are set in App.jsx)` 
            });
            return;
         }
