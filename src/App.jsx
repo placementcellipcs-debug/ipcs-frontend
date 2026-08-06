@@ -1131,28 +1131,7 @@ function Dashboard() {
     );
   };
 
-  const submitAttendance = async () => {
-    if (gpsCoords && user.branch) {
-      const branchCoords = BRANCH_LOCATIONS[user.branch];
-      if (branchCoords) {
-        const R = 6371e3; 
-        const dLat = (branchCoords.lat - gpsCoords.lat) * Math.PI / 180;
-        const dLon = (branchCoords.lng - gpsCoords.lng) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(gpsCoords.lat * Math.PI / 180) * Math.cos(branchCoords.lat * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c;
-
-        if (distance > 500) {
-           setAttStatus({ 
-             type: 'error', 
-             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 500 meters to mark attendance.` 
-           });
-           return;
-        }
-      }
-    }
+  const captureGPS = () => {
 
     setAttStatus({ type: 'info', message: 'Verifying location and submitting...' });
     try {
