@@ -522,7 +522,7 @@ function Login() {
 
               {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
 
-              <div className="switch-mode">Don&apos;t have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
+              <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
             </div>
           )}
         </div>
@@ -847,7 +847,7 @@ function Signup() {
                 <li>1 year commitment to the company getting recruited is mandatory.</li>
               </ul>
               <h4>DECLARATION</h4>
-              <p>I hereby declare that I have read & understood the terms & conditions of IPCS Placement Cell. I adhere to follow the rules & incase of any failure to do so; I understand that I won&apos;t be eligible for Placement Support.</p>
+              <p>I hereby declare that I have read & understood the terms & conditions of IPCS Placement Cell. I adhere to follow the rules & incase of any failure to do so; I understand that I won’t be eligible for Placement Support.</p>
             </div>
             {!tncScrolled ? (
               <div style={{ textAlign: 'center', color: '#f59e0b', fontSize: '0.88rem', fontWeight: 700, marginTop: '15px' }}>↓ Please scroll to the end of the rules to Accept ↓</div>
@@ -908,7 +908,31 @@ function Dashboard() {
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
 
-  const [localDriveResponses, setLocalDriveResponses] = useState(() => JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}'));
+  // --- NEW PLACEMENT DRIVE STATES ---
+  const [activeDrives, setActiveDrives] = useState([]);
+  const [currentDrivePopup, setCurrentDrivePopup] = useState(null);
+  const [driveActionStatus, setDriveActionStatus] = useState(null);
+  
+  // --- PUSH NOTIFICATION STATE ---
+  const [pushPermission, setPushPermission] = useState('default');
+
+  // Request Push Notification Permission on load
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().then(permission => {
+        setPushPermission(permission);
+      });
+    } else if ('Notification' in window) {
+      setPushPermission(Notification.permission);
+    }
+  }, []);
+
+  // Utility to send Push Notifications
+  const sendPushNotification = (title, body, icon = GLOBAL_LOGO_URL) => {
+    if ('Notification' in window && pushPermission === 'granted') {
+      new Notification(title, { body, icon });
+    }
+  };
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -955,6 +979,7 @@ function Dashboard() {
     } catch (error) { console.error("Data error", error); }
   }, []);
 
+  // --- 1. LAG FIX: CHANGE INTERVAL TO 5 MINUTES ---
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('talentino_student_user') || '{}');
     if (!storedUser.email) { navigate('/'); return; }
@@ -962,17 +987,76 @@ function Dashboard() {
     fetchDashboard(storedUser);
     
     // Changed from 15000 (15s) to 300000 (5 mins) to stop server crashing/lag
-    const interval = setInterval(() => { fetchDashboard(storedUser); }, 300000);
+    const interval = setInterval(() => { fetchDashboard(storedUser); }, 300000);[cite: 3]
     return () => clearInterval(interval);
   }, [navigate, fetchDashboard]);
 
+  // --- 2. POPUP FIX: BETTER DATA FILTERING ---
+  useEffect(() => {
+    if (data.events && data.events.length > 0) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-  const handleDriveResponse = async (status, targetDrive) => {
-    if (!targetDrive) return;
+      const drives = data.events.filter(ev => {
+        // Look for 'Event' or 'type' just in case backend changes the key
+        const eventType = ev['Event'] || ev.type || ev.Type || '';
+        if (eventType !== 'Placement Drive') return false; 
+        
+        const dateStr = ev['Date of the Event'] || ev.date || ev.Date;
+        if (!dateStr) return false;
 
-    const driveId = targetDrive['Drive ID'] || targetDrive.driveId || targetDrive.id;
-    const title = targetDrive['Title'] || targetDrive.title;
-    const branch = targetDrive['Event Hapening in'] || targetDrive.branch || targetDrive['Branch'];
+        const driveDate = new Date(dateStr);
+        return driveDate >= today; // Only upcoming or today
+      });
+      setActiveDrives(drives);
+    }
+  }, [data.events]);
+
+  useEffect(() => {
+    const checkDrives = setInterval(() => {
+      if (activeDrives.length === 0 || currentDrivePopup) return;
+
+      const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
+      const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+
+      const driveToShow = activeDrives.find(drive => {
+        // Fallback checks for Drive ID
+        const driveId = drive['Drive ID'] || drive.driveId || drive.id;
+        if (!driveId || respondedDrives[driveId]) return false;
+
+        const snoozeTime = snoozedDrives[driveId];
+        if (snoozeTime) {
+          const hoursPassed = (Date.now() - snoozeTime) / (1000 * 60 * 60);
+          if (hoursPassed < 1) return false; // Still within 1 hour snooze
+        }
+        return true;
+      });
+
+      if (driveToShow) {
+        setCurrentDrivePopup(driveToShow);
+        const title = driveToShow['Title'] || driveToShow.title;
+        const branch = driveToShow['Event Hapening in'] || driveToShow.branch || driveToShow['Branch'];
+        sendPushNotification("New Placement Drive!", `${title} is happening at ${branch}. Tap to view.`);
+      }
+    }, 5000); 
+
+    return () => clearInterval(checkDrives);
+  }, [activeDrives, currentDrivePopup, pushPermission]);
+
+  const handleDriveDismiss = () => {
+    const driveId = currentDrivePopup['Drive ID'] || currentDrivePopup.driveId || currentDrivePopup.id;
+    const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+    snoozedDrives[driveId] = Date.now();
+    localStorage.setItem('talentino_drive_snoozes', JSON.stringify(snoozedDrives));
+    setCurrentDrivePopup(null);
+  };
+
+  const handleDriveResponse = async (status) => {
+    setDriveActionStatus({ type: 'info', message: 'Recording your response...' });
+    
+    const driveId = currentDrivePopup['Drive ID'] || currentDrivePopup.driveId || currentDrivePopup.id;
+    const title = currentDrivePopup['Title'] || currentDrivePopup.title;
+    const branch = currentDrivePopup['Event Hapening in'] || currentDrivePopup.branch || currentDrivePopup['Branch'];
 
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
@@ -993,18 +1077,19 @@ function Dashboard() {
         const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
         respondedDrives[driveId] = status;
         localStorage.setItem('talentino_drive_responses', JSON.stringify(respondedDrives));
-        setLocalDriveResponses(respondedDrives);
         
         if (status === 'Registered') {
             setShowConfetti(true);
             setTimeout(() => setShowConfetti(false), 3000);
         }
+
+        setCurrentDrivePopup(null);
+        setDriveActionStatus(null);
       }
     } catch (err) {
-      alert("Failed to record response. Please try again.");
+      setDriveActionStatus({ type: 'error', message: 'Failed to record response. Please try again.' });
     }
   };
-
 
   useEffect(() => {
     if (showNotif) {
@@ -1286,15 +1371,6 @@ function Dashboard() {
 
   return (
     <div className="app-layout">
-      {showConfetti && (
-        <div className="celebration-overlay" style={{zIndex: 99999}}>
-          <div className="celebration-content">
-            <span className="party-emoji">🎉</span>
-            <h2 style={{ color: 'white', marginBottom: '10px' }}>Application Successful!</h2>
-            <p style={{ color: '#a5b4fc', margin: 0 }}>Your response has been recorded.</p>
-          </div>
-        </div>
-      )}
       <div className="top-header">
         <div className="header-left">
           {activeTab !== 'dashboard' ? (
@@ -1417,56 +1493,17 @@ function Dashboard() {
                        let monthStr = "TBA"; let dayStr = "-";
                        let d = new Date(ev.date || ev['Date of the Event'] || ev.Date);
                        if(!isNaN(d)) { dayStr = d.getDate(); monthStr = d.toLocaleString('en-US', { month: 'short' }); }
-                       
-                       const isPlacementDrive = (ev.type || ev.Event) === 'Placement Drive';
-                       const driveId = ev['Drive ID'] || ev.driveId || ev.id;
-                       const userResponse = localDriveResponses[driveId];
-
                        return (
-                          <div className="event-row-card" key={index} style={{ alignItems: 'flex-start' }}>
-                            <div className="event-date-box" style={{ paddingTop: '5px' }}>
+                          <div className="event-row-card" key={index}>
+                            <div className="event-date-box">
                               <div className="ev-month">{monthStr}</div>
                               <div className="ev-day">{dayStr}</div>
                             </div>
                             <div className="event-body">
                               <div className="ev-title">{ev.title || ev.Title}</div>
                               <div className="ev-meta"><i className="ph ph-clock"></i> {ev.time || ev['Time of the Event'] || 'TBA'}</div>
-                              
-                              {/* NEW BUTTONS FOR PLACEMENT DRIVE */}
-                              {isPlacementDrive && driveId && (
-                                <div style={{ marginTop: '10px' }}>
-                                  {!userResponse ? (
-                                    <div style={{ display: 'flex', gap: '10px' }}>
-                                      <button 
-                                        className="btn-cancel" 
-                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid #ef4444' }}
-                                        onClick={() => handleDriveResponse('Not Interested', ev)}
-                                      >
-                                        Not Interested
-                                      </button>
-                                      <button 
-                                        className="btn-action" 
-                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', background: '#22c55e' }}
-                                        onClick={() => {
-                                          if (!user.resume || user.resume === "N/A" || !user.resume.includes('http')) {
-                                            alert("Please upload your Resume document in your Profile section before registering.");
-                                          } else {
-                                            handleDriveResponse('Registered', ev);
-                                          }
-                                        }}
-                                      >
-                                        Register Now
-                                      </button>
-                                    </div>
-                                  ) : (
-                                     <div style={{ fontSize: '0.8rem', fontWeight: 700, color: userResponse === 'Registered' ? '#4ade80' : '#ef4444', marginTop: '5px' }}>
-                                       {userResponse === 'Registered' ? '✓ Registered' : '✕ Not Interested'}
-                                     </div>
-                                  )}
-                                </div>
-                              )}
                             </div>
-                            <div className="ev-badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid #7e22ce', height: 'fit-content' }}>{ev.type || ev.Event}</div>
+                            <div className="ev-badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid #7e22ce' }}>{ev.type || ev.Event}</div>
                           </div>
                        )
                     })
@@ -1691,63 +1728,244 @@ function Dashboard() {
             </div>
           )}
 
-          {/* PLACEMENT DRIVE POPUP MODAL */}
-          {currentDrivePopup && (
-            <div className="report-modal-overlay" style={{ zIndex: 9999 }}>
-              <div className="report-card" style={{ maxWidth: '500px', padding: '0', overflow: 'hidden', position: 'relative' }}>
-                
-                {/* Close Button (Snoozes for 1 hr) */}
-                <div 
-                    style={{ position: 'absolute', top: '15px', right: '15px', width: '32px', height: '32px', background: 'rgba(0,0,0,0.6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
-                    onClick={handleDriveDismiss}
-                >
-                    <i className="ph ph-x" style={{ color: '#fff', fontSize: '1.2rem' }}></i>
+          {activeTab === 'talentino' && (
+            <div className="animate-fade-in">
+              <div style={{ marginBottom: '2rem' }}>
+                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Talentino Attendance</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Mark your attendance and track your session participation (Calculated post-joining date)</p>
+              </div>
+              
+              <div className="talentino-summary-grid">
+                <div className="talentino-stat-card">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-check-circle" style={{ color: '#10b981' }}></i> Present Check-ins</div>
+                  <div className="t-stat-num">{data.stats?.attended || 0}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}><span>Progress</span><span>{data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%</span></div>
+                  <div className="progress-bar" style={{ marginTop: '6px' }}><div className="progress-fill" style={{ width: `${data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%` }}></div></div>
                 </div>
+                <div className="talentino-stat-card">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-calendar-blank" style={{ color: '#3b82f6' }}></i> Total Conducted</div>
+                  <div className="t-stat-num">{data.stats?.totalConducted || 0}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sessions in your branch since joining</div>
+                </div>
+                <div className="talentino-stat-card">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-clock" style={{ color: '#f59e0b' }}></i> On Leave</div>
+                  <div className="t-stat-num">{data.stats?.onLeave || 0}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Approved leaves</div>
+                </div>
+              </div>
 
-                {/* Poster Image */}
-                <div style={{ width: '100%', height: '280px', background: 'var(--bg-dark)' }}>
-                  {(currentDrivePopup['Poster Link'] || currentDrivePopup.posterLink || currentDrivePopup.poster) ? (
-                    <img src={getDriveImageUrl(currentDrivePopup['Poster Link'] || currentDrivePopup.posterLink || currentDrivePopup.poster)} alt="Drive Poster" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e1b4b, #311042)', color: '#fff', fontSize: '1.5rem', fontWeight: 800 }}>
-                      Placement Drive
+              <h3 style={{ margin: '0 0 1.2rem 0', fontSize: '1.2rem', color: 'var(--text-main)' }}>Mark Today's Attendance</h3>
+              
+              {data.hasMarkedToday ? (
+                  <div style={{ background: 'rgba(10, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#10b981', fontWeight: 600 }}>
+                     <i className="ph-fill ph-check-circle" style={{ fontSize: '1.4rem' }}></i> You have already marked your attendance for today.
+                  </div>
+              ) : (
+                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1.8rem', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+                    <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                      <i className="ph ph-calendar-check" style={{ color: data.isScheduledToday ? '#3b82f6' : '#ef4444', fontSize: '1.2rem' }}></i>
+                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:30 AM - 07:00 PM)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
                     </div>
-                  )}
-                </div>
+                    
+                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
+                      <label>Location Verification</label>
+                      <div onClick={captureGPS} style={{ background: gpsCoords ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-dark)', color: gpsCoords ? '#10b981' : 'var(--text-main)', border: `1px solid ${gpsCoords ? '#10b981' : 'var(--card-border)'}`, padding: '1rem', borderRadius: '12px', textAlign: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
+                        <i className="ph ph-map-pin" style={{ marginRight: '8px' }}></i> {locStatus}
+                      </div>
+                    </div>
+                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
+                      <label>Rate this session</label>
+                      <div className="star-rating">
+                        {[1,2,3,4,5].map(s => (
+                          <span key={s} className={`star ${rating >= s ? 'selected' : ''}`} onClick={() => setRating(s)}>★</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
+                      <label>Feedback (optional)</label>
+                      <textarea rows="3" value={feedback} onChange={e => setFeedback(e.target.value)} placeholder="Share your thoughts about today's session..."></textarea>
+                    </div>
 
-                <div style={{ padding: '2rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
-                     <div>
-                        <div style={{ color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>Drive ID: {currentDrivePopup['Drive ID'] || currentDrivePopup.driveId || currentDrivePopup.id}</div>
-                        <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-main)', lineHeight: 1.2 }}>{currentDrivePopup['Title'] || currentDrivePopup.title}</h2>
-                     </div>
+                    <button className="btn-action" style={{ width: '100%', opacity: (data.isScheduledToday && gpsCoords && rating > 0) ? 1 : 0.5 }} disabled={!(data.isScheduledToday && gpsCoords && rating > 0)} onClick={submitAttendance}>Mark Attendance</button>
+                    {attStatus && <div className={`alert alert-${attStatus.type}`} style={{marginTop: '10px'}}>{attStatus.message}</div>}
                   </div>
+              )}
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', border: '1px solid var(--input-border)', marginBottom: '1.5rem' }}>
-                    <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Date</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup['Date of the Event'] || currentDrivePopup.date || currentDrivePopup['Date']}</span></div>
-                    <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Time</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup['Time of the Event'] || currentDrivePopup.time}</span></div>
-                    <div style={{ gridColumn: '1 / -1' }}><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Location</strong><span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{currentDrivePopup['Event Hapening in'] || currentDrivePopup.branch || currentDrivePopup['Branch']}</span></div>
-                  </div>
-
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>{currentDrivePopup['Description'] || currentDrivePopup.description}</p>
-
-                  {driveActionStatus && <div className={`alert alert-${driveActionStatus.type}`} style={{ marginBottom: '15px' }}>{driveActionStatus.message}</div>}
-
-                  <div style={{ display: 'flex', gap: '15px' }}>
-                    <button className="btn-cancel" style={{ flex: 1, padding: '1rem', border: '1px solid #ef4444', color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)' }} onClick={() => handleDriveResponse('Not Interested', currentDrivePopup)}>
-                      Not Interested
-                    </button>
-                    <button className="btn-action" style={{ flex: 2, padding: '1rem', background: '#22c55e' }} onClick={() => {
-                        if (!user.resume || user.resume === "N/A" || !user.resume.includes('http')) {
-                            setDriveActionStatus({ type: 'error', message: 'You must upload a resume in your Profile before registering!' });
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '2rem 0 1rem 0', color: 'var(--text-main)', fontWeight: 800, fontSize: '1.1rem' }}>
+                <i className="ph ph-trend-up"></i> Attendance History
+              </div>
+              
+              <div id="attendanceHistoryContainer">
+                 {(data.attendanceHistory || []).length === 0 ? (
+                   <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)' }}>No attendance records yet.</div>
+                 ) : (
+                   (data.attendanceHistory || []).map((hist, idx) => {
+                      let parsedDate = hist.dateStr || "Unknown";
+                      let parsedTime = "";
+                      try {
+                        const d = new Date(hist.timestamp);
+                        if(!isNaN(d)) {
+                           parsedDate = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                           parsedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                         } else {
-                            handleDriveResponse('Registered', currentDrivePopup);
+                           parsedDate = hist.timestamp.split(' ')[0] || hist.timestamp;
+                           parsedTime = hist.timestamp.split(' ')[1] || "";
                         }
-                    }}>
-                      Register Now &rarr;
-                    </button>
-                  </div>
+                      } catch(e) {}
+                      let statusText = hist.rating >= 4 ? 'Good' : (hist.rating === 3 ? 'Average' : 'Poor');
+
+                      return (
+                        <div key={idx} style={{ background: 'var(--bg-dark)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                              <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}><i className="ph-fill ph-check-circle"></i></div>
+                              <div>
+                                 <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '1.05rem', marginBottom: '2px' }}>{parsedDate}</strong>
+                                 <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{parsedTime} · {statusText}</span>
+                              </div>
+                           </div>
+                           <div style={{ color: '#f59e0b', fontSize: '1.2rem', letterSpacing: '2px' }}>
+                              {'★'.repeat(hist.rating)}{'☆'.repeat(5 - hist.rating)}
+                           </div>
+                        </div>
+                      )
+                   })
+                 )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'vacancies' && (
+            <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
+              <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
+                <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '2px', color: '#ffffff', margin: '0 0 8px 0', textTransform: 'uppercase' }}>JOB VACANCIES</h1>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>NewsLetter ID Not Valid After Expiry Date</p>
+              </div>
+              
+              {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'yes') ? (
+                 <div className="alert alert-error" style={{ margin: '2rem auto', maxWidth: '600px', padding: '2rem' }}>
+                     <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '2rem', display: 'block', marginBottom: '10px' }}></i> 
+                     Your access to view Job Vacancies is currently restricted. Please contact your Placement Officer.
+                 </div>
+              ) : processedVacancies.length === 0 ? (
+                 <div className="alert alert-info" style={{ margin: '2rem auto', maxWidth: '600px' }}><i className="ph-fill ph-info"></i> No active vacancies found after your joining date. Check back later!</div>
+              ) : (
+                 Object.entries(
+                   processedVacancies.reduce((acc, vac) => {
+                     const loc = (vac.state || 'OTHER STATES').toUpperCase().trim();
+                     if(!acc[loc]) acc[loc] = [];
+                     acc[loc].push(vac);
+                     return acc;
+                 }, {})).map(([locationName, vacs], index) => (
+                     <div key={index} className="location-table-card">
+                         <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.2rem' }}>{locationName}</h2>
+                         <table className="vac-table">
+                             <thead>
+                                 <tr>
+                                     <th>NewsLetter ID</th>
+                                     <th>Position</th>
+                                     <th>Opening At</th>
+                                     <th>Mode of Work</th>
+                                     <th>Last Date</th>
+                                     <th style={{ textAlign: 'center' }}>Action</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                                 {vacs.map((vac, vIdx) => {
+                                     const isApplied = (data.appliedJobs || []).some(j => j.jobId === vac.newsletterId);
+                                     const isExpired = isPastDate(vac.lastDate);
+                                     return (
+                                         <tr key={vIdx} style={{ cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.4 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
+                                             <td style={{ color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
+                                             <td style={{ color: 'var(--text-main)', fontWeight: 700 }}>{vac.position}</td>
+                                             <td style={{ color: 'var(--accent-cyan)' }}>{vac.location}</td>
+                                             <td style={{ color: 'var(--text-muted)' }}>{vac.modeOfWork}</td>
+                                             <td style={{ color: isExpired ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{vac.lastDate} {isExpired && '(Expired)'}</td>
+                                             <td style={{ textAlign: 'center' }}>
+                                                 {isApplied ? (
+                                                     <button className="btn-action" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid #22c55e', cursor: 'default' }} disabled><i className="ph-fill ph-check-circle" style={{marginRight: '6px'}}></i> Applied</button>
+                                                 ) : isExpired ? (
+                                                     <button className="btn-action" style={{ background: 'var(--input-border)', color: 'var(--text-muted)', padding: '0.45rem 1rem', fontSize: '0.8rem', cursor: 'not-allowed' }} disabled><i className="ph-fill ph-prohibit" style={{marginRight: '6px'}}></i> Expired</button>
+                                                 ) : (
+                                                     <button className="btn-action" style={{ background: 'var(--accent-blue)', padding: '0.45rem 1rem', fontSize: '0.8rem' }} onClick={(e) => { e.stopPropagation(); setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}>Details</button>
+                                                 )}
+                                             </td>
+                                         </tr>
+                                     )
+                                 })}
+                             </tbody>
+                         </table>
+                     </div>
+                 ))
+              )}
+            </div>
+          )}
+
+          {activeTab === 'status' && (
+            <div className="animate-fade-in">
+              <div style={{ marginBottom: '2rem' }}>
+                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Application Status</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Track the current status of all your applied job openings</p>
+              </div>
+
+              <div className="app-stats-grid">
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Jobs Applied</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{appStats.applied}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Attended</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{appStats.attended}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Offers Got</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>{appStats.offers}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Not Attended</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{appStats.notAttended}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Rejected</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#94a3b8' }}>{appStats.rejected}</div>
+                 </div>
+              </div>
+
+              <div style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <i className="ph-fill ph-chart-line-up" style={{ fontSize: '2rem', color: 'var(--accent-purple)' }}></i>
+                <div>
+                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Journey Analysis</div>
+                   <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.95rem' }}>{journeyText}</div>
                 </div>
+              </div>
+
+              <div className="location-table-card">
+                <table className="vac-table">
+                  <thead><tr><th>NewsLetter ID</th><th>Company & Position</th><th>Applied Date & Time</th><th>Current Status</th><th>Remarks</th></tr></thead>
+                  <tbody>
+                    {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="5" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
+                      (data.appliedJobs || []).map((job, idx) => {
+                        const statusVal = job.status || job.Status || 'Applied';
+                        const style = getStatusStyle(statusVal);
+                        const jobIdVal = job.jobId || job['Job ID'] || job.id;
+                        const companyVal = job.company || job.companyName || job['Company Name'] || 'Company N/A';
+                        const positionVal = job.position || job.Position || 'Position N/A';
+                        const dateVal = job.date || job.TimeStamp || job.Timestamp || job.time || 'N/A';
+                        const remarksVal = job.remarks || job.Remarks || '-';
+
+                        return(
+                        <tr key={idx}>
+                          <td style={{color:'var(--accent-purple)', fontWeight:700}}>{jobIdVal}</td>
+                          <td>
+                             <div style={{fontWeight:600}}>{companyVal}</div>
+                             <div style={{fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px'}}>{positionVal}</div>
+                          </td>
+                          <td style={{color:'var(--text-muted)', fontSize:'0.8rem'}}>{dateVal}</td>
+                          <td><span className="status-badge" style={{ background: style.bg, color: style.color, border: style.border }}>{statusVal}</span></td>
+                          <td style={{color:'var(--text-muted)', fontSize:'0.85rem'}}>{remarksVal}</td>
+                        </tr>
+                      )})}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
@@ -1817,6 +2035,67 @@ function Dashboard() {
                <button className="btn-action" onClick={handleProfileUpdate}>Save Changes</button>
             </div>
             {epStatus && <div className={`alert alert-${epStatus.type}`} style={{marginTop: '10px'}}>{epStatus.message}</div>}
+          </div>
+        </div>
+      )}
+
+      {/* PLACEMENT DRIVE POPUP MODAL */}
+      {currentDrivePopup && (
+        <div className="report-modal-overlay" style={{ zIndex: 9999 }}>
+          <div className="report-card" style={{ maxWidth: '500px', padding: '0', overflow: 'hidden', position: 'relative' }}>
+            
+            {/* Close Button (Snoozes for 1 hr) */}
+            <div 
+                style={{ position: 'absolute', top: '15px', right: '15px', width: '32px', height: '32px', background: 'rgba(0,0,0,0.6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                onClick={handleDriveDismiss}
+            >
+                <i className="ph ph-x" style={{ color: '#fff', fontSize: '1.2rem' }}></i>
+            </div>
+
+            {/* Poster Image */}
+            <div style={{ width: '100%', height: '280px', background: 'var(--bg-dark)' }}>
+              {(currentDrivePopup['Poster Link'] || currentDrivePopup.posterLink || currentDrivePopup.poster) ? (
+                <img src={getDriveImageUrl(currentDrivePopup['Poster Link'] || currentDrivePopup.posterLink || currentDrivePopup.poster)} alt="Drive Poster" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e1b4b, #311042)', color: '#fff', fontSize: '1.5rem', fontWeight: 800 }}>
+                  Placement Drive
+                </div>
+              )}
+            </div>
+
+            <div style={{ padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
+                 <div>
+                    <div style={{ color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>Drive ID: {currentDrivePopup['Drive ID'] || currentDrivePopup.driveId || currentDrivePopup.id}</div>
+                    <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-main)', lineHeight: 1.2 }}>{currentDrivePopup['Title'] || currentDrivePopup.title}</h2>
+                 </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', border: '1px solid var(--input-border)', marginBottom: '1.5rem' }}>
+                <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Date</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup['Date of the Event'] || currentDrivePopup.date}</span></div>
+                <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Time</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup['Time of the Event'] || currentDrivePopup.time}</span></div>
+                <div style={{ gridColumn: '1 / -1' }}><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Location</strong><span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{currentDrivePopup['Event Hapening in'] || currentDrivePopup.branch || currentDrivePopup['Branch']}</span></div>
+              </div>
+
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>{currentDrivePopup['Description'] || currentDrivePopup.description}</p>
+
+              {driveActionStatus && <div className={`alert alert-${driveActionStatus.type}`} style={{ marginBottom: '15px' }}>{driveActionStatus.message}</div>}
+
+              <div style={{ display: 'flex', gap: '15px' }}>
+                <button className="btn-cancel" style={{ flex: 1, padding: '1rem', border: '1px solid #ef4444', color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)' }} onClick={() => handleDriveResponse('Not Interested')}>
+                  Not Interested
+                </button>
+                <button className="btn-action" style={{ flex: 2, padding: '1rem', background: '#22c55e' }} onClick={() => {
+                    if (!user.resume || user.resume === "N/A") {
+                        setDriveActionStatus({ type: 'error', message: 'You must upload a resume in your Profile before registering!' });
+                    } else {
+                        handleDriveResponse('Registered');
+                    }
+                }}>
+                  Register Now &rarr;
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -1979,7 +2258,7 @@ function NotFound() {
         </div>
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-main)' }}>Oops!</h1>
         <p style={{ fontSize: '1.125rem', color: 'var(--accent-cyan)', marginBottom: '0.25rem', fontWeight: 600 }}>Who spilled the paint?</p>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>The page you are looking for doesn&apos;t exist or has been moved.</p>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>The page you are looking for doesn't exist or has been moved.</p>
         <a href="/" style={{ background: 'var(--accent-blue)', color: '#ffffff', padding: '0.8rem 2rem', borderRadius: '10px', fontWeight: 700, textDecoration: 'none', transition: 'opacity 0.2s', display: 'inline-block' }}>Go Back Home &rarr;</a>
       </div>
     </div>
