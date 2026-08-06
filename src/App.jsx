@@ -2045,6 +2045,7 @@ function Dashboard() {
       )}
     </div>
   );
+}
 
 function NotFound() {
   return (
