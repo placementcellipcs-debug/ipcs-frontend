@@ -328,6 +328,23 @@ const BRANCH_LOCATIONS = {
   "Dubai (UAE)": { lat: 25.2048, lng: 55.2708 },
   "Riyadh (Saudi Arabia)": { lat: 24.7136, lng: 46.6753 }
 };
+// 3. Validate Geofence Dynamically
+let isWithinGeofence = false;
+const studentBranchKey = Object.keys(BRANCH_LOCATIONS).find(
+    b => b.toLowerCase() === (branch || "").trim().toLowerCase()
+);
+const branchCoords = studentBranchKey ? BRANCH_LOCATIONS[studentBranchKey] : { lat: 12.9716, lng: 77.5946 };
+
+if (userLat && userLng) {
+    const distance = calculateDistanceInMeters(
+        parseFloat(userLat), 
+        parseFloat(userLng), 
+        branchCoords.lat, 
+        branchCoords.lng
+    );
+    // Standardize allowed distance threshold (e.g. 500m)
+    if (distance <= 500) isWithinGeofence = true;
+}
 
 // ==========================================
 // 2. LOGIN / LANDING PAGE COMPONENT
@@ -1130,7 +1147,7 @@ function Dashboard() {
         if (distance > 500) {
            setAttStatus({ 
              type: 'error', 
-             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 500 meters to mark attendance. (Ensure exact branch coordinates are set in App.jsx)` 
+             message: `You are ${Math.round(distance)} meters away from the ${user.branch} branch. You must be within 500 meters to mark attendance.` 
            });
            return;
         }
