@@ -1065,12 +1065,50 @@ function Dashboard() {
         return;
     }
     
-    setDocStatus({ type: 'info', msg: `Uploading ${docType}...` });
+    setDocStatus({ type: 'info', msg: `Processing and uploading ${docType}...` });
+    
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = async () => {
+    reader.onload = async (event) => {
+        let finalBase64 = event.target.result;
+
+        // Auto-compress photo before uploading to bypass Google Drive size limits
+        if (docType === 'Photo') {
+            const img = new Image();
+            img.src = finalBase64;
+            await new Promise((resolve) => {
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 400;
+                    const MAX_HEIGHT = 400;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    // Compress to a highly optimized JPEG
+                    finalBase64 = canvas.toDataURL('image/jpeg', 0.8); 
+                    resolve();
+                };
+            });
+        }
+
         try {
-            const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/document`, { email: user.email, rollNo: user.rollNo, base64: reader.result, docType });
+            const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/document`, { 
+                email: user.email, 
+                rollNo: user.rollNo, 
+                base64: finalBase64, 
+                docType 
+            });
+            
             if (res.data.success) {
                 setDocStatus({ type: 'success', msg: `${docType} uploaded successfully!` });
                 
@@ -1083,10 +1121,15 @@ function Dashboard() {
                 localStorage.setItem('talentino_student_user', JSON.stringify(updatedUser));
                 setTimeout(() => setDocStatus({ type: '', msg: '' }), 3000);
             }
-        } catch(err) { setDocStatus({ type: 'error', msg: 'Upload failed securely' }); }
+        } catch(err) { 
+            setDocStatus({ 
+                type: 'error', 
+                // Show the exact backend error now instead of a generic message
+                msg: err.response?.data?.message || 'Upload failed due to connection timeout.' 
+            }); 
+        }
     };
   };
-
   const handlePasswordUpdate = async () => {
     if(!pwdData.current || !pwdData.newPwd || !pwdData.confirm) { setPwdStatus({ type: 'error', message: 'All fields are required' }); return; }
     if(pwdData.newPwd !== pwdData.confirm) { setPwdStatus({ type: 'error', message: 'Passwords mismatch' }); return; }
