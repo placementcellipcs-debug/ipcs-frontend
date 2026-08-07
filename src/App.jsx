@@ -1399,21 +1399,29 @@ function Dashboard() {
               
               <div className="profile-grid">
                 <div className="profile-left-col">
-                  {/* --- UPDATED PROFILE AVATAR WRAPPER --- */}
+                  {/* --- UPDATED WRAPPER --- */}
                   <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1rem auto' }}>
+                    
                     <div className="profile-large-avatar" style={{ margin: 0, width: '100%', height: '100%' }}>
                        {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} alt="Profile" /> : null}
                        <span style={{ display: (!user?.photo || user.photo === "N/A") ? 'flex' : 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>{user?.name?.charAt(0).toUpperCase()}</span>
                     </div>
-                    {/* Camera Button moved OUTSIDE the overflow mask */}
+
+                    {/* CAMERA BUTTON IS NOW OUTSIDE THE HIDDEN AVATAR MASK */}
                     <div 
                        onClick={() => document.getElementById('photoUploadInput').click()} 
                        style={{ position: 'absolute', bottom: '0px', right: '0px', background: 'var(--accent-blue)', color: '#fff', width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid var(--card-bg)', zIndex: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}
                      >
                        <i className="ph-fill ph-camera"></i>
-                     </div>
-                     <input type="file" id="photoUploadInput" accept="image/*" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Photo')} />
+                    </div>
+                    <input type="file" id="photoUploadInput" accept="image/*" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Photo')} />
+                    
                   </div>
+                  {/* --- END UPDATED WRAPPER --- */}
+                  
+                  <h2 style={{ margin: '10px 0 5px 0', fontSize: '1.4rem', position: 'relative', zIndex: 2 }}>{user.name}</h2>
+                  {/* --- END UPDATED WRAPPER --- */}
+                  
                   <h2 style={{ margin: '10px 0 5px 0', fontSize: '1.4rem', position: 'relative', zIndex: 2 }}>{user.name}</h2>
                   <div style={{ color: 'var(--text-muted)', marginBottom: '15px', position: 'relative', zIndex: 2 }}>{user.course}</div>
                   <div style={{ display: 'inline-block', position: 'relative', zIndex: 2, background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid #22c55e' }}>{user.studyStatus || 'Active'}</div>
