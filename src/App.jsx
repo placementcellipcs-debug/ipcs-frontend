@@ -1055,7 +1055,15 @@ function Dashboard() {
   const handleDocumentUpload = async (e, docType) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.type !== "application/pdf") { setDocStatus({ type: 'error', msg: 'Only PDF allowed' }); return; }
+    
+    if (docType !== 'Photo' && file.type !== "application/pdf") { 
+        setDocStatus({ type: 'error', msg: 'Only PDF allowed for documents' }); 
+        return; 
+    }
+    if (docType === 'Photo' && !file.type.startsWith("image/")) {
+        setDocStatus({ type: 'error', msg: 'Only image files allowed for profile photo' });
+        return;
+    }
     
     setDocStatus({ type: 'info', msg: `Uploading ${docType}...` });
     const reader = new FileReader();
@@ -1065,7 +1073,12 @@ function Dashboard() {
             const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/document`, { email: user.email, rollNo: user.rollNo, base64: reader.result, docType });
             if (res.data.success) {
                 setDocStatus({ type: 'success', msg: `${docType} uploaded successfully!` });
-                const updatedUser = { ...user, [docType === 'Resume' ? 'resume' : 'certificate']: res.data.url };
+                
+                let key = 'certificate';
+                if (docType === 'Resume') key = 'resume';
+                else if (docType === 'Photo') key = 'photo';
+
+                const updatedUser = { ...user, [key]: res.data.url };
                 setUser(updatedUser);
                 localStorage.setItem('talentino_student_user', JSON.stringify(updatedUser));
                 setTimeout(() => setDocStatus({ type: '', msg: '' }), 3000);
@@ -1386,9 +1399,20 @@ function Dashboard() {
               
               <div className="profile-grid">
                 <div className="profile-left-col">
-                  <div className="profile-large-avatar">
-                     {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} alt="Profile" /> : null}
-                     <span style={{ display: (!user?.photo || user.photo === "N/A") ? 'flex' : 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>{user?.name?.charAt(0).toUpperCase()}</span>
+                  {/* --- UPDATED PROFILE AVATAR WRAPPER --- */}
+                  <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1rem auto' }}>
+                    <div className="profile-large-avatar" style={{ margin: 0, width: '100%', height: '100%' }}>
+                       {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} alt="Profile" /> : null}
+                       <span style={{ display: (!user?.photo || user.photo === "N/A") ? 'flex' : 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>{user?.name?.charAt(0).toUpperCase()}</span>
+                    </div>
+                    {/* Camera Button moved OUTSIDE the overflow mask */}
+                    <div 
+                       onClick={() => document.getElementById('photoUploadInput').click()} 
+                       style={{ position: 'absolute', bottom: '0px', right: '0px', background: 'var(--accent-blue)', color: '#fff', width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid var(--card-bg)', zIndex: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}
+                     >
+                       <i className="ph-fill ph-camera"></i>
+                     </div>
+                     <input type="file" id="photoUploadInput" accept="image/*" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Photo')} />
                   </div>
                   <h2 style={{ margin: '10px 0 5px 0', fontSize: '1.4rem', position: 'relative', zIndex: 2 }}>{user.name}</h2>
                   <div style={{ color: 'var(--text-muted)', marginBottom: '15px', position: 'relative', zIndex: 2 }}>{user.course}</div>
@@ -1880,8 +1904,6 @@ function Dashboard() {
             <div className="grid-2col">
                <div className="form-group"><label>Age</label><input type="number" value={epData.age} onChange={(e) => setEpData({...epData, age: e.target.value})} /></div>
                <div className="form-group"><label>Gender</label><select value={epData.gender} onChange={(e) => setEpData({...epData, gender: e.target.value})}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-               <div className="form-group"><label>Parent Name</label><input type="text" value={epData.parentName} onChange={(e) => setEpData({...epData, parentName: e.target.value})} /></div>
-               <div className="form-group"><label>Parent Contact</label><input type="tel" value={epData.parentContact} onChange={(e) => setEpData({...epData, parentContact: e.target.value})} /></div>
                <div className="form-group"><label>Studying Status</label><select value={epData.studyStatus} onChange={(e) => setEpData({...epData, studyStatus: e.target.value})}><option value="Currently Studying">Currently Studying</option><option value="Completed Course">Completed Course</option></select></div>
                <div className="form-group"><label>Course Completed Date</label><input type="date" value={epData.completedDate} onChange={(e) => setEpData({...epData, completedDate: e.target.value})} /></div>
                <div className="form-group"><label>Stream</label><input type="text" value={epData.stream} onChange={(e) => setEpData({...epData, stream: e.target.value})} /></div>
