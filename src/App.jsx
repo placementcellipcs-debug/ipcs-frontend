@@ -1193,10 +1193,12 @@ function Dashboard() {
   };
 
   const handleEventRSVP = async (status) => {
-    if (status === 'Registered' && (!user.resume || user.resume === 'N/A' || !user.resume.startsWith('http'))) {
+    // Flexible check: allows registration as long as resume exists and isn't 'N/A' or empty
+    if (status === 'Registered' && (!user.resume || user.resume === 'N/A' || user.resume.trim() === '')) {
         setRsvpStatus({ type: 'error', message: 'You must upload your Resume in your Profile before registering for an event.' });
         return;
     }
+    
     setRsvpStatus({ type: 'info', message: 'Recording response...' });
     try {
         const currentDriveId = eventModal.id || eventModal.title;
@@ -1209,7 +1211,7 @@ function Dashboard() {
             course: user.course, 
             branch: user.branch,
             qualification: user.qualification, 
-            resume: user.resume, 
+            resume: user.resume || "N/A", 
             status: status,
             tpoBranch: user.branch
         });
@@ -1225,7 +1227,7 @@ function Dashboard() {
             setTimeout(() => { setEventModal(null); setRsvpStatus(null); }, 2000);
         }
     } catch(e) { 
-        setRsvpStatus({ type: 'error', message: 'You have already recorded your response for this event.' }); 
+        setRsvpStatus({ type: 'error', message: 'Failed to record response.' }); 
     }
   };
 
