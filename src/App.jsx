@@ -300,7 +300,7 @@ const GlobalStyle = () => {
   );
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = 'https://api-placement.ipcsglobal.info';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
@@ -838,6 +838,24 @@ function Signup() {
   );
 }
 
+// --------------------------------------------------------
+// DATE VALIDATOR FOR DRIVES & EVENTS
+// --------------------------------------------------------
+const isEventExpired = (dateStr) => {
+  if (!dateStr || dateStr === "TBA") return false;
+  
+  // Clean string e.g. "07 August , 2026" -> "07 August 2026"
+  const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+  const eventDate = new Date(cleanStr);
+  
+  if (isNaN(eventDate.getTime())) return false; // Fallback if unparseable
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Start of today (00:00:00)
+  
+  return eventDate < today;
+};
+
 // ==========================================
 // 4. MAIN DASHBOARD ECOSYSTEM
 // ==========================================
@@ -845,7 +863,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState({});
-  const [data, setData] = useState({ stats: {}, events: [], appliedJobs: [], vacancies: [], attendanceHistory: [], tpoInfo: {} });
+  const [data, setData] = useState({ stats: {}, events: [], appliedJobs: [], vacancies: [], attendanceHistory: [], tpoInfo: {}, driveRSVPs: [] });
   const [theme, setTheme] = useState('dark');
   
   const [activeTab, setActiveTab] = useState(() => {
@@ -1181,8 +1199,9 @@ function Dashboard() {
     }
     setRsvpStatus({ type: 'info', message: 'Recording response...' });
     try {
+        const currentDriveId = eventModal.id || eventModal.title;
         const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
-            driveId: eventModal.id || eventModal.title, 
+            driveId: currentDriveId, 
             title: eventModal.title, 
             name: user.name, 
             phone: user.phone,
@@ -1196,10 +1215,17 @@ function Dashboard() {
         });
         if(res.data.success) {
             setRsvpStatus({ type: 'success', message: `Status updated to: ${status}` });
+            
+            // Instantly update UI state to lock the buttons
+            setData(prev => ({
+                ...prev,
+                driveRSVPs: [...(prev.driveRSVPs || []), { driveId: currentDriveId, status: status }]
+            }));
+
             setTimeout(() => { setEventModal(null); setRsvpStatus(null); }, 2000);
         }
     } catch(e) { 
-        setRsvpStatus({ type: 'error', message: 'Failed to record response.' }); 
+        setRsvpStatus({ type: 'error', message: 'You have already recorded your response for this event.' }); 
     }
   };
 
@@ -1398,7 +1424,7 @@ function Dashboard() {
                     <div style={{ fontSize: '0.82rem', color: '#a5b4fc' }}>Explore active job openings for your course</div>
                   </div>
                 </div>
-                <button className="btn-action" style={{ background: '#6366f1', padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>View Openings &rr;</button>
+                <button className="btn-action" style={{ background: '#6366f1', padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>View Openings</button>
               </div>
 
               <div className="stats-row">
@@ -2072,6 +2098,11 @@ function Dashboard() {
                       <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-clock" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Time:</strong> {eventModal.time || 'TBA'}</div>
                       <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-map-pin" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Location:</strong> {eventModal.location || 'TBA'}</div>
                       <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-tag" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Type:</strong> <span style={{color:'var(--accent-cyan)'}}>{eventModal.type}</span></div>
+                      
+                      {/* SHOW THE DRIVE ID IF IT EXISTS */}
+                      {eventModal.id && (
+                          <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-fingerprint" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Drive ID:</strong> <span style={{color:'var(--accent-purple)', fontWeight: 700}}>{eventModal.id}</span></div>
+                      )}
                   </div>
                   
                   {eventModal.description && (
@@ -2080,10 +2111,57 @@ function Dashboard() {
                       </div>
                   )}
 
-                  <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
-                      <button className="btn-action" style={{ flex: 1, background: '#10b981', padding: '1rem' }} onClick={() => handleEventRSVP('Registered')}><i className="ph-bold ph-check-circle"></i> Register</button>
-                      <button className="btn-action" style={{ flex: 1, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '1rem' }} onClick={() => handleEventRSVP('Not Interested')}><i className="ph-bold ph-x-circle"></i> Not Interested</button>
-                  </div>
+                  {/* STRICT DATE AND RSVP VERIFICATION LOGIC */}
+                  {(() => {
+                      // 1. Check if event is in the past
+                      let isPast = false;
+                      if (eventModal.date && eventModal.date.toLowerCase() !== 'tba') {
+                          const cleanDateStr = eventModal.date.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+                          const eventDate = new Date(cleanDateStr);
+                          if (!isNaN(eventDate.getTime())) {
+                              eventDate.setHours(0,0,0,0);
+                              const today = new Date();
+                              today.setHours(0,0,0,0);
+                              isPast = eventDate < today;
+                          }
+                      }
+                      
+                      // 2. Check if user already RSVP'd
+                      const userRSVP = data.driveRSVPs?.find(r => 
+                          (eventModal.id && r.driveId === eventModal.id) || 
+                          (r.driveId === eventModal.title)
+                      );
+                      
+                      // Scenario A: User Already Registered / Marked Not Interested
+                      if (userRSVP) {
+                          const statusColor = userRSVP.status.toLowerCase() === 'registered' ? '#10b981' : '#ef4444';
+                          const statusIcon = userRSVP.status.toLowerCase() === 'registered' ? 'ph-check-circle' : 'ph-x-circle';
+                          return (
+                              <div style={{ padding: '14px', background: `${statusColor}22`, color: statusColor, textAlign: 'center', borderRadius: '10px', fontWeight: 600, border: `1px solid ${statusColor}55`, marginTop: '1rem' }}>
+                                  <i className={`ph-fill ${statusIcon}`} style={{ marginRight: '8px', fontSize: '1.1rem', verticalAlign: 'middle' }}></i> 
+                                  Response Recorded: {userRSVP.status}
+                              </div>
+                          );
+                      }
+
+                      // Scenario B: Event is in the Past
+                      if (isPast) {
+                          return (
+                              <div style={{ padding: '14px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', textAlign: 'center', borderRadius: '10px', fontWeight: 600, border: '1px solid rgba(239, 68, 68, 0.2)', marginTop: '1rem' }}>
+                                  <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '1.1rem', verticalAlign: 'middle' }}></i> 
+                                  This event has concluded. Registrations are closed.
+                              </div>
+                          );
+                      }
+
+                      // Scenario C: Active Event (Show Buttons)
+                      return (
+                          <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
+                              <button className="btn-action" style={{ flex: 1, background: '#10b981', padding: '1rem' }} onClick={() => handleEventRSVP('Registered')}><i className="ph-bold ph-check-circle"></i> Register</button>
+                              <button className="btn-action" style={{ flex: 1, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '1rem' }} onClick={() => handleEventRSVP('Not Interested')}><i className="ph-bold ph-x-circle"></i> Not Interested</button>
+                          </div>
+                      );
+                  })()}
                   
                   {rsvpStatus && <div className={`alert alert-${rsvpStatus.type}`} style={{marginTop: '15px'}}>{rsvpStatus.message}</div>}
                </div>
