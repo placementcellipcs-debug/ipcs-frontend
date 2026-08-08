@@ -108,6 +108,7 @@ const GlobalStyle = () => {
       .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
       .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.1rem; }
       .form-footer-bar { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid var(--card-border); }
+      @keyframes spin { 100% { transform: rotate(360deg); } }
 
       @keyframes fadeInReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -902,6 +903,7 @@ function Dashboard() {
   const [epData, setEpData] = useState({});
   const [epStatus, setEpStatus] = useState(null);
   const [docStatus, setDocStatus] = useState({ type: '', msg: '' });
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [settingsTab, setSettingsTab] = useState('security');
   const [pwdData, setPwdData] = useState({ current: '', newPwd: '', confirm: '' });
   const [pwdStatus, setPwdStatus] = useState(null);
@@ -1057,22 +1059,28 @@ function Dashboard() {
     if (!file) return;
     
     if (docType !== 'Photo' && file.type !== "application/pdf") { 
-        setDocStatus({ type: 'error', msg: 'Only PDF allowed for documents' }); 
+        setDocStatus({ type: 'error', msg: 'Only PDF allowed for documents' });
+        e.target.value = null; 
         return; 
     }
     if (docType === 'Photo' && !file.type.startsWith("image/")) {
-        setDocStatus({ type: 'error', msg: 'Only image files allowed for profile photo' });
+        alert("Only image files are allowed for profile photos.");
+        e.target.value = null;
         return;
     }
     
-    setDocStatus({ type: 'info', msg: `Processing and uploading ${docType}...` });
+    // Trigger the correct loading indicator
+    if (docType === 'Photo') {
+        setPhotoUploading(true);
+    } else {
+        setDocStatus({ type: 'info', msg: `Processing and uploading ${docType}...` });
+    }
     
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = async (event) => {
         let finalBase64 = event.target.result;
 
-        // Auto-compress photo before uploading to bypass Google Drive size limits
         if (docType === 'Photo') {
             const img = new Image();
             img.src = finalBase64;
@@ -1094,7 +1102,6 @@ function Dashboard() {
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    // Compress to a highly optimized JPEG
                     finalBase64 = canvas.toDataURL('image/jpeg', 0.8); 
                     resolve();
                 };
@@ -1110,23 +1117,32 @@ function Dashboard() {
             });
             
             if (res.data.success) {
-                setDocStatus({ type: 'success', msg: `${docType} uploaded successfully!` });
-                
                 let key = 'certificate';
                 if (docType === 'Resume') key = 'resume';
                 else if (docType === 'Photo') key = 'photo';
 
+                // Instantly update the UI with the new photo
                 const updatedUser = { ...user, [key]: res.data.url };
                 setUser(updatedUser);
                 localStorage.setItem('talentino_student_user', JSON.stringify(updatedUser));
-                setTimeout(() => setDocStatus({ type: '', msg: '' }), 3000);
+
+                // Clear the loading states
+                if (docType === 'Photo') {
+                    setPhotoUploading(false);
+                } else {
+                    setDocStatus({ type: 'success', msg: `${docType} uploaded successfully!` });
+                    setTimeout(() => setDocStatus({ type: '', msg: '' }), 3000);
+                }
             }
         } catch(err) { 
-            setDocStatus({ 
-                type: 'error', 
-                // Show the exact backend error now instead of a generic message
-                msg: err.response?.data?.message || 'Upload failed due to connection timeout.' 
-            }); 
+            if (docType === 'Photo') {
+                setPhotoUploading(false);
+                alert("Profile photo upload failed. Please try again.");
+            } else {
+                setDocStatus({ type: 'error', msg: err.response?.data?.message || 'Upload failed.' }); 
+            }
+        } finally {
+            e.target.value = null; // Clean up the input
         }
     };
   };
@@ -1446,8 +1462,14 @@ function Dashboard() {
                   <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1rem auto' }}>
                     
                     <div className="profile-large-avatar" style={{ margin: 0, width: '100%', height: '100%' }}>
-                       {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} alt="Profile" /> : null}
-                       <span style={{ display: (!user?.photo || user.photo === "N/A") ? 'flex' : 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>{user?.name?.charAt(0).toUpperCase()}</span>
+                       {photoUploading ? (
+                           <i className="ph ph-spinner" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></i>
+                       ) : (
+                           <>
+                             {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} alt="Profile" /> : null}
+                             <span style={{ display: (!user?.photo || user.photo === "N/A") ? 'flex' : 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>{user?.name?.charAt(0).toUpperCase()}</span>
+                           </>
+                       )}
                     </div>
 
                     {/* CAMERA BUTTON IS NOW OUTSIDE THE HIDDEN AVATAR MASK */}
