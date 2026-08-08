@@ -757,9 +757,23 @@ function Signup() {
           </div>
 
           <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '20px' }}>
-            <input type="checkbox" style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} checked={tncAccepted} onChange={(e) => setTncAccepted(e.target.checked)} />
-            <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: 1.4 }}>
+            <input 
+              type="checkbox" 
+              style={{ 
+                width: '22px', 
+                height: '22px', 
+                flexShrink: 0, 
+                marginTop: '3px', 
+                cursor: tncScrolled ? 'pointer' : 'not-allowed',
+                opacity: tncScrolled ? 1 : 0.5 
+              }} 
+              checked={tncAccepted} 
+              disabled={!tncScrolled}
+              onChange={(e) => setTncAccepted(e.target.checked)} 
+            />
+            <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: 1.4, opacity: tncScrolled ? 1 : 0.7 }}>
               I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span>
+              {!tncScrolled && <span style={{display: 'block', fontSize: '0.75rem', color: '#f59e0b', marginTop: '2px'}}>(Please open and read the terms to enable this checkbox)</span>}
             </label>
           </div>
 
@@ -828,7 +842,18 @@ function Signup() {
               <div style={{ textAlign: 'center', color: '#f59e0b', fontSize: '0.88rem', fontWeight: 700, marginTop: '15px' }}>↓ Please scroll to the end of the rules to Accept ↓</div>
             ) : (
               <div style={{ display: 'flex', marginTop: '20px' }}>
-                <button type="button" className="btn-action" style={{ width: '100%', background: '#22c55e' }} onClick={() => { setTncAccepted(true); setShowTncModal(false); }}>Accept</button>
+                <button 
+                  type="button" 
+                  className="btn-action" 
+                  style={{ width: '100%', background: '#22c55e' }} 
+                  onClick={() => { 
+                    setTncScrolled(true); 
+                    setTncAccepted(true); 
+                    setShowTncModal(false); 
+                  }}
+                >
+                  Accept & Enable Checkbox
+                </button>
               </div>
             )}
           </div>
