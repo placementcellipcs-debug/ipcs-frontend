@@ -1052,17 +1052,37 @@ function Dashboard() {
   };
 
   const openEditProfileModal = () => {
-    setEpData({
-        age: user.age || '', gender: user.gender || 'Male',
-        parentName: user.parentName || '', parentContact: user.parentContact || '',
-        studyStatus: user.studyStatus || 'Currently Studying',
-        completedDate: user.completedDate && user.completedDate !== 'N/A' ? user.completedDate : '',
-        stream: user.stream || '', homeTown: user.homeTown || '',
-        fresherStatus: user.fresherStatus || 'Fresher', qualification: user.qualification || '',
-        linkedin: user.linkedin || '', instagram: user.instagram || '', placementReq: user.placementReq || ''
-    });
-    setEditProfileModal(true);
-  };
+  setEpData({
+      age: user.age || '', 
+      gender: user.gender || 'Male',
+      parentName: user.parentName || '', 
+      parentContact: user.parentContact || '',
+      studyStatus: user.studyStatus || 'Currently Studying',
+      completedDate: user.completedDate && user.completedDate !== 'N/A' && !user.completedDate.includes('google') ? user.completedDate : '',
+      stream: user.stream || '', 
+      homeTown: user.homeTown || '',
+      fresherStatus: user.fresherStatus || 'Fresher', 
+      qualification: user.qualification || '',
+      linkedin: user.linkedin || '', 
+      instagram: user.instagram || '', 
+      placementReq: user.placementReq || ''
+  });
+  setEditProfileModal(true);
+};
+
+const handleProfileUpdate = async () => {
+  setEpStatus({ type: 'info', message: 'Saving changes...' });
+  try {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/update`, { email: user.email, ...epData });
+      if(res.data.success) {
+          setEpStatus({ type: 'success', message: 'Profile updated!' });
+          const updatedUser = { ...user, ...res.data.user };
+          setUser(updatedUser);
+          localStorage.setItem('talentino_student_user', JSON.stringify(updatedUser));
+          setTimeout(() => { setEditProfileModal(false); setEpStatus(null); }, 1500);
+      }
+  } catch(err) { setEpStatus({ type: 'error', message: 'Server Error updating profile' }); }
+};
 
   const handleProfileUpdate = async () => {
     setEpStatus({ type: 'info', message: 'Saving changes...' });
@@ -2232,36 +2252,38 @@ function Dashboard() {
       </div>
       
       {editProfileModal && (
-        <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
-          <div className="report-card" style={{ maxWidth: '700px' }}>
-            <div className="modal-header-border">
-              <h3 style={{ margin: 0, color: 'var(--text-main)' }}><i className="ph ph-pencil-simple" style={{ color: 'var(--accent-cyan)' }}></i> Edit Profile Details</h3>
-              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setEditProfileModal(false)}></i>
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', background: 'var(--hover-bg)', padding: '10px', borderRadius: '8px' }}><strong>Note:</strong> Core ID details (Name, Roll No, Branch, Email, Course) are strictly uneditable by students. Contact admin for corrections.</div>
-            <div className="grid-2col">
-               <div className="form-group"><label>Age</label><input type="number" value={epData.age} onChange={(e) => setEpData({...epData, age: e.target.value})} /></div>
-               <div className="form-group"><label>Gender</label><select value={epData.gender} onChange={(e) => setEpData({...epData, gender: e.target.value})}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-               <div className="form-group"><label>Studying Status</label><select value={epData.studyStatus} onChange={(e) => setEpData({...epData, studyStatus: e.target.value})}><option value="Currently Studying">Currently Studying</option><option value="Completed Course">Completed Course</option></select></div>
-               <div className="form-group"><label>Course Completed Date</label><input type="date" value={epData.completedDate} onChange={(e) => setEpData({...epData, completedDate: e.target.value})} /></div>
-               <div className="form-group"><label>Stream</label><input type="text" value={epData.stream} onChange={(e) => setEpData({...epData, stream: e.target.value})} /></div>
-               <div className="form-group"><label>Home Town</label><input type="text" value={epData.homeTown} onChange={(e) => setEpData({...epData, homeTown: e.target.value})} /></div>
-               <div className="form-group"><label>Fresher Status</label><select value={epData.fresherStatus} onChange={(e) => setEpData({...epData, fresherStatus: e.target.value})}><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option></select></div>
-               <div className="form-group"><label>Qualification</label><input type="text" value={epData.qualification} onChange={(e) => setEpData({...epData, qualification: e.target.value})} /></div>
-            </div>
-            <div className="grid-2col" style={{ marginTop: '1rem' }}>
-               <div className="form-group"><label>LinkedIn</label><input type="text" value={epData.linkedin} onChange={(e) => setEpData({...epData, linkedin: e.target.value})} /></div>
-               <div className="form-group"><label>Instagram Handle</label><input type="text" value={epData.instagram} onChange={(e) => setEpData({...epData, instagram: e.target.value})} /></div>
-            </div>
-            <div className="form-group"><label>Placement Requirements</label><textarea rows="2" value={epData.placementReq} onChange={(e) => setEpData({...epData, placementReq: e.target.value})}></textarea></div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '15px' }}>
-               <button className="btn-cancel" onClick={() => setEditProfileModal(false)}>Cancel</button>
-               <button className="btn-action" onClick={handleProfileUpdate}>Save Changes</button>
-            </div>
-            {epStatus && <div className={`alert alert-${epStatus.type}`} style={{marginTop: '10px'}}>{epStatus.message}</div>}
-          </div>
-        </div>
-      )}
+  <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
+    <div className="report-card" style={{ maxWidth: '700px' }}>
+      <div className="modal-header-border">
+        <h3 style={{ margin: 0, color: 'var(--text-main)' }}><i className="ph ph-pencil-simple" style={{ color: 'var(--accent-cyan)' }}></i> Edit Profile Details</h3>
+        <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setEditProfileModal(false)}></i>
+      </div>
+      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', background: 'var(--hover-bg)', padding: '10px', borderRadius: '8px' }}><strong>Note:</strong> Core ID details (Name, Roll No, Branch, Email, Course) are strictly uneditable by students. Contact admin for corrections.</div>
+      <div className="grid-2col">
+         <div className="form-group"><label>Age</label><input type="number" value={epData.age} onChange={(e) => setEpData({...epData, age: e.target.value})} /></div>
+         <div className="form-group"><label>Gender</label><select value={epData.gender} onChange={(e) => setEpData({...epData, gender: e.target.value})}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+         <div className="form-group"><label>Parent / Guardian Name</label><input type="text" value={epData.parentName} onChange={(e) => setEpData({...epData, parentName: e.target.value})} /></div>
+         <div className="form-group"><label>Parent Contact No.</label><input type="tel" value={epData.parentContact} onChange={(e) => setEpData({...epData, parentContact: e.target.value})} /></div>
+         <div className="form-group"><label>Studying Status</label><select value={epData.studyStatus} onChange={(e) => setEpData({...epData, studyStatus: e.target.value})}><option value="Currently Studying">Currently Studying</option><option value="Completed Course">Completed Course</option></select></div>
+         <div className="form-group"><label>Course Completed Date</label><input type="date" value={epData.completedDate} onChange={(e) => setEpData({...epData, completedDate: e.target.value})} /></div>
+         <div className="form-group"><label>Stream</label><input type="text" value={epData.stream} onChange={(e) => setEpData({...epData, stream: e.target.value})} /></div>
+         <div className="form-group"><label>Home Town</label><input type="text" value={epData.homeTown} onChange={(e) => setEpData({...epData, homeTown: e.target.value})} /></div>
+         <div className="form-group"><label>Fresher Status</label><select value={epData.fresherStatus} onChange={(e) => setEpData({...epData, fresherStatus: e.target.value})}><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option></select></div>
+         <div className="form-group"><label>Qualification</label><input type="text" value={epData.qualification} onChange={(e) => setEpData({...epData, qualification: e.target.value})} /></div>
+      </div>
+      <div className="grid-2col" style={{ marginTop: '1rem' }}>
+         <div className="form-group"><label>LinkedIn</label><input type="text" value={epData.linkedin} onChange={(e) => setEpData({...epData, linkedin: e.target.value})} /></div>
+         <div className="form-group"><label>Instagram Handle</label><input type="text" value={epData.instagram} onChange={(e) => setEpData({...epData, instagram: e.target.value})} /></div>
+      </div>
+      <div className="form-group"><label>Placement Requirements</label><textarea rows="2" value={epData.placementReq} onChange={(e) => setEpData({...epData, placementReq: e.target.value})}></textarea></div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '15px' }}>
+         <button className="btn-cancel" onClick={() => setEditProfileModal(false)}>Cancel</button>
+         <button className="btn-action" onClick={handleProfileUpdate}>Save Changes</button>
+      </div>
+      {epStatus && <div className={`alert alert-${epStatus.type}`} style={{marginTop: '10px'}}>{epStatus.message}</div>}
+    </div>
+  </div>
+)}
 
       {jobModal && (
         <div className="report-modal-overlay">
