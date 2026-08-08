@@ -1084,20 +1084,6 @@ const handleProfileUpdate = async () => {
   } catch(err) { setEpStatus({ type: 'error', message: 'Server Error updating profile' }); }
 };
 
-  const handleProfileUpdate = async () => {
-    setEpStatus({ type: 'info', message: 'Saving changes...' });
-    try {
-        const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/update`, { email: user.email, ...epData });
-        if(res.data.success) {
-            setEpStatus({ type: 'success', message: 'Profile updated!' });
-            const updatedUser = { ...user, ...res.data.user };
-            setUser(updatedUser);
-            localStorage.setItem('talentino_student_user', JSON.stringify(updatedUser));
-            setTimeout(() => { setEditProfileModal(false); setEpStatus(null); }, 1500);
-        }
-    } catch(err) { setEpStatus({ type: 'error', message: 'Server Error updating profile' }); }
-  };
-
   const handleDocumentUpload = async (e, docType) => {
     const file = e.target.files[0];
     if (!file) return;
