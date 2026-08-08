@@ -1983,7 +1983,7 @@ function Dashboard() {
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>NewsLetter ID Not Valid After Expiry Date</p>
               </div>
               
-              {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'yes') ? (
+              {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'Yes') ? (
                  <div className="alert alert-error" style={{ margin: '2rem auto', maxWidth: '600px', padding: '2rem' }}>
                      <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '2rem', display: 'block', marginBottom: '10px' }}></i> 
                      Your access to view Job Vacancies is currently restricted. Please contact your Placement Officer.
