@@ -50,30 +50,24 @@ const GlobalStyle = () => {
       /* --- LANDING PAGE (LOGIN) STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: #080c14; display: flex; flex-direction: column; position: relative; overflow: hidden; }
       .landing-wrapper::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(14, 165, 233, 0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
-      
       .landing-nav { position: relative; z-index: 10; display: flex; justify-content: flex-start; align-items: center; padding: 2rem 4rem; }
       .landing-grid { position: relative; z-index: 10; display: grid; grid-template-columns: 1fr 480px; gap: 4rem; padding: 2rem 4rem; flex: 1; align-items: center; max-width: 1400px; margin: 0 auto; width: 100%; }
-      
       .hero-badge { display: inline-flex; align-items: center; gap: 12px; background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2); border-radius: 30px; padding: 8px 18px; margin-bottom: 2rem; }
       .hero-badge i { color: #38bdf8; font-size: 1.2rem; }
       .hero-badge-text { display: flex; flex-direction: column; }
       .hero-badge-title { font-size: 0.85rem; font-weight: 800; color: #38bdf8; letter-spacing: 1px; line-height: 1.2; }
       .hero-badge-subtitle { font-size: 0.55rem; font-weight: 700; color: #38bdf8; opacity: 0.8; letter-spacing: 0.5px; text-transform: uppercase; }
-      
       .hero-title { font-size: 4.2rem; font-weight: 800; line-height: 1.1; margin: 0 0 1.5rem 0; color: #ffffff; letter-spacing: -1.5px; }
       .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; max-width: 500px; margin-bottom: 2.5rem; }
-      
       .btn-glow { background: linear-gradient(90deg, #0ea5e9, #38bdf8); color: #ffffff; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4); transition: transform 0.2s, box-shadow 0.2s; }
       .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.6); }
 
       .ticker-container { margin-top: 3.5rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; display: flex; align-items: center; gap: 15px; }
       .ticker-icon { width: 36px; height: 36px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.2rem; flex-shrink: 0; }
-      
       @keyframes tickerFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       .ticker-animate { animation: tickerFadeUp 0.5s ease forwards; }
 
       .right-panel-wrapper { width: 100%; max-width: 440px; margin: 0 auto; position: relative; }
-      
       .hiring-dashboard-card { background: #111827; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 2.2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
       .hiring-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem; }
       .hiring-stat-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 18px; margin-bottom: 1rem; }
@@ -91,13 +85,11 @@ const GlobalStyle = () => {
       .alert-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; }
       .alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
 
-      /* --- VIDEO LOADER STYLES --- */
       .video-loader-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-in-out; }
       .video-loader-overlay.fade-out { opacity: 0; pointer-events: none; }
       .video-loader-overlay video { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s ease; }
       .video-loader-overlay video.ready { opacity: 1; }
 
-      /* --- PROFILE REGISTRATION --- */
       .profile-reg-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem 2.2rem; width: 100%; max-width: 880px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); max-height: 92vh; overflow-y: auto; }
       .reg-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--card-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
       .section-title { font-size: 0.78rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 1.8rem 0 1.1rem 0; padding-bottom: 6px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; gap: 8px; color: var(--text-main); }
@@ -167,6 +159,24 @@ const GlobalStyle = () => {
       .stat-icon-wrapper { width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
       .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px; line-height: 1.1; }
       .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+
+      /* --- CALENDAR UI --- */
+      .calendar-layout { display: flex; gap: 20px; align-items: stretch; }
+      .cal-sidebar { width: 260px; display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
+      .cal-main-area { flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
+      .cal-top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+      .cal-view-toggles { display: flex; background: var(--bg-dark); border-radius: 8px; padding: 4px; border: 1px solid var(--card-border); }
+      .cal-toggle-btn { padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); transition: 0.2s; }
+      .cal-toggle-btn.active { background: var(--card-border); color: var(--text-main); }
+      .cal-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; }
+      .cal-grid-body { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--card-border); border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; flex: 1; }
+      .cal-day-cell { background: var(--bg-dark); min-height: 100px; padding: 8px; transition: background 0.2s; }
+      .cal-day-cell:hover { background: var(--hover-bg); }
+      .cal-day-number { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+      .cal-day-cell.today .cal-day-number { color: #fff; background: var(--accent-blue); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+      .cal-event-pill { font-size: 0.75rem; font-weight: 600; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+      .pill-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+      .mini-cal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 15px; }
 
       /* --- EVENTS --- */
       .upcoming-wrapper { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -265,6 +275,9 @@ const GlobalStyle = () => {
         .stats-row { grid-template-columns: 1fr; }
         .talentino-summary-grid { grid-template-columns: 1fr; }
         .app-stats-grid { grid-template-columns: repeat(3, 1fr); }
+        .calendar-layout { flex-direction: column; }
+        .cal-sidebar { width: 100%; }
+        .cal-grid-body { overflow-x: auto; }
       }
       @media (max-width: 768px) {
         .landing-nav { flex-direction: column; gap: 1rem; padding: 1.5rem; }
@@ -290,45 +303,6 @@ const GlobalStyle = () => {
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
-
-// --------------------------------------------------------
-// BRANCH COORDINATES
-// --------------------------------------------------------
-const BRANCH_LOCATIONS = {
-  "Kochi": { lat: 9.9933, lng: 76.2904 }, 
-  "Calicut": { lat: 11.2588, lng: 75.7804 },
-  "Trivandrum": { lat: 8.5241, lng: 76.9366 },
-  "Attingal": { lat: 8.6943, lng: 76.8184 },
-  "Kollam": { lat: 8.8932, lng: 76.6141 },
-  "Kannur": { lat: 11.8745, lng: 75.3704 },
-  "Thrissur": { lat: 10.5276, lng: 76.2144 },
-  "Perinthalmanna": { lat: 10.9760, lng: 76.2254 },
-  "Kottayam": { lat: 9.5916, lng: 76.5222 },
-  "Pathanamthitta": { lat: 9.2648, lng: 76.7870 },
-  "Palakkad": { lat: 10.7867, lng: 76.6548 },
-  "Coimbatore": { lat: 11.0168, lng: 76.9558 },
-  "Chennai": { lat: 13.0827, lng: 80.2707 },
-  "Tambaram": { lat: 12.9249, lng: 80.1000 },
-  "Trichy": { lat: 10.7905, lng: 78.7047 },
-  "Salem": { lat: 11.6643, lng: 78.1460 },
-  "Madurai": { lat: 9.9252, lng: 78.1198 },
-  "Erode": { lat: 11.3410, lng: 77.7172 },
-  "Tirunelveli": { lat: 8.7139, lng: 77.7567 },
-  "Bangalore": { lat: 12.9716, lng: 77.5946 },
-  "Mangalore": { lat: 12.9141, lng: 74.8560 },
-  "Mysore": { lat: 12.2958, lng: 76.6394 },
-  "Mumbai": { lat: 19.0760, lng: 72.8777 },
-  "Pune": { lat: 18.5204, lng: 73.8567 },
-  "Nagpur": { lat: 21.1458, lng: 79.0882 },
-  "Kolkata": { lat: 22.5726, lng: 88.3639 },
-  "Siliguri": { lat: 26.7271, lng: 88.3953 },
-  "Hyderabad (Telangana)": { lat: 17.3850, lng: 78.4867 },
-  "Ranchi (Jharkhand)": { lat: 23.3441, lng: 85.3096 },
-  "Raipur (Chhattisgarh)": { lat: 21.2514, lng: 81.6296 },
-  "Bhopal (Madhya Pradesh)": { lat: 23.2599, lng: 77.4126 },
-  "Dubai (UAE)": { lat: 25.2048, lng: 55.2708 },
-  "Riyadh (Saudi Arabia)": { lat: 24.7136, lng: 46.6753 }
-};
 
 // ==========================================
 // 2. LOGIN / LANDING PAGE COMPONENT
@@ -882,7 +856,13 @@ function Dashboard() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [tpoModal, setTpoModal] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
+  const [eventModal, setEventModal] = useState(null);
+  const [rsvpStatus, setRsvpStatus] = useState(null);
   
+  // Calendar State
+  const [calDate, setCalDate] = useState(new Date());
+  const [calView, setCalView] = useState('Month');
+
   const [showNotif, setShowNotif] = useState(false);
   const [readNotifs, setReadNotifs] = useState(() => JSON.parse(localStorage.getItem('talentino_read_notifs') || '[]'));
 
@@ -991,6 +971,7 @@ function Dashboard() {
       case 'profile': return '› Student Details';
       case 'guide': return '› Guide & Resume Resources';
       case 'settings': return '› Settings';
+      case 'events': return '› Events & Drives';
       default: return '';
     }
   };
@@ -1005,7 +986,7 @@ function Dashboard() {
     (data.events || []).forEach((ev, idx) => {
       const ed = new Date(ev.date);
       if(!isNaN(ed) && ed >= today) {
-        notifs.push({ id: `ev-${idx}-${ev.title}`, title: `Event: ${ev.title}`, desc: `Scheduled for ${ev.date}.`, tab: 'dashboard' });
+        notifs.push({ id: `ev-${idx}-${ev.title}`, title: `Event: ${ev.title}`, desc: `Scheduled for ${ev.date}.`, tab: 'events' });
       }
     });
 
@@ -1069,12 +1050,8 @@ function Dashboard() {
         return;
     }
     
-    // Trigger the correct loading indicator
-    if (docType === 'Photo') {
-        setPhotoUploading(true);
-    } else {
-        setDocStatus({ type: 'info', msg: `Processing and uploading ${docType}...` });
-    }
+    if (docType === 'Photo') setPhotoUploading(true);
+    else setDocStatus({ type: 'info', msg: `Processing and uploading ${docType}...` });
     
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -1110,10 +1087,7 @@ function Dashboard() {
 
         try {
             const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/document`, { 
-                email: user.email, 
-                rollNo: user.rollNo, 
-                base64: finalBase64, 
-                docType 
+                email: user.email, rollNo: user.rollNo, base64: finalBase64, docType 
             });
             
             if (res.data.success) {
@@ -1121,15 +1095,12 @@ function Dashboard() {
                 if (docType === 'Resume') key = 'resume';
                 else if (docType === 'Photo') key = 'photo';
 
-                // Instantly update the UI with the new photo
                 const updatedUser = { ...user, [key]: res.data.url };
                 setUser(updatedUser);
                 localStorage.setItem('talentino_student_user', JSON.stringify(updatedUser));
 
-                // Clear the loading states
-                if (docType === 'Photo') {
-                    setPhotoUploading(false);
-                } else {
+                if (docType === 'Photo') setPhotoUploading(false);
+                else {
                     setDocStatus({ type: 'success', msg: `${docType} uploaded successfully!` });
                     setTimeout(() => setDocStatus({ type: '', msg: '' }), 3000);
                 }
@@ -1137,16 +1108,16 @@ function Dashboard() {
         } catch(err) { 
             if (docType === 'Photo') {
                 setPhotoUploading(false);
-                // Reveal the exact backend error message in the alert
                 alert(`Upload failed: ${err.response?.data?.message || err.message}`);
             } else {
                 setDocStatus({ type: 'error', msg: err.response?.data?.message || 'Upload failed.' }); 
             }
         } finally {
-            e.target.value = null; // Clean up the input
+            e.target.value = null; 
         }
     };
   };
+
   const handlePasswordUpdate = async () => {
     if(!pwdData.current || !pwdData.newPwd || !pwdData.confirm) { setPwdStatus({ type: 'error', message: 'All fields are required' }); return; }
     if(pwdData.newPwd !== pwdData.confirm) { setPwdStatus({ type: 'error', message: 'Passwords mismatch' }); return; }
@@ -1191,15 +1162,8 @@ function Dashboard() {
     setAttStatus({ type: 'info', message: 'Verifying location and submitting...' });
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, { 
-        email: user.email, 
-        name: user.name, 
-        branch: user.branch, 
-        course: user.course, 
-        rating, 
-        location: locStatus, 
-        userLat: gpsCoords?.lat || null, 
-        userLng: gpsCoords?.lng || null, 
-        feedback 
+        email: user.email, name: user.name, branch: user.branch, course: user.course, 
+        rating, location: locStatus, userLat: gpsCoords?.lat || null, userLng: gpsCoords?.lng || null, feedback 
       });
       if(res.data.success) { 
         setAttStatus({ type: 'success', message: 'Attendance marked successfully!' }); 
@@ -1207,6 +1171,35 @@ function Dashboard() {
       }
     } catch(err) { 
       setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error. Failed to submit attendance.' }); 
+    }
+  };
+
+  const handleEventRSVP = async (status) => {
+    if (status === 'Registered' && (!user.resume || user.resume === 'N/A' || !user.resume.startsWith('http'))) {
+        setRsvpStatus({ type: 'error', message: 'You must upload your Resume in your Profile before registering for an event.' });
+        return;
+    }
+    setRsvpStatus({ type: 'info', message: 'Recording response...' });
+    try {
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
+            driveId: eventModal.id || eventModal.title, 
+            title: eventModal.title, 
+            name: user.name, 
+            phone: user.phone,
+            email: user.email, 
+            course: user.course, 
+            branch: user.branch,
+            qualification: user.qualification, 
+            resume: user.resume, 
+            status: status,
+            tpoBranch: user.branch
+        });
+        if(res.data.success) {
+            setRsvpStatus({ type: 'success', message: `Status updated to: ${status}` });
+            setTimeout(() => { setEventModal(null); setRsvpStatus(null); }, 2000);
+        }
+    } catch(e) { 
+        setRsvpStatus({ type: 'error', message: 'Failed to record response.' }); 
     }
   };
 
@@ -1251,10 +1244,21 @@ function Dashboard() {
     } catch(err) { setActionStatus({ type: 'error', message: 'Server Error applying for job' }); }
   };
 
-  const studentJoinDate = parseSafeDate(user.joiningDate);
+  // Calendar Helpers
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+  const calYear = calDate.getFullYear();
+  const calMonth = calDate.getMonth();
+  const blanks = Array.from({ length: getFirstDayOfMonth(calYear, calMonth) }, (_, i) => i);
+  const days = Array.from({ length: getDaysInMonth(calYear, calMonth) }, (_, i) => i + 1);
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const prevMonth = () => setCalDate(new Date(calYear, calMonth - 1, 1));
+  const nextMonth = () => setCalDate(new Date(calYear, calMonth + 1, 1));
 
+  const studentJoinDate = parseSafeDate(user.joiningDate);
   const todayDate = new Date();
   todayDate.setHours(0,0,0,0);
+  
   const filteredEvents = (data.events || []).filter(ev => {
     const d = new Date(ev.date);
     if(isNaN(d)) return true;
@@ -1379,8 +1383,8 @@ function Dashboard() {
                   <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>Quick Actions</h3>
                   <div className="quick-actions-grid">
                     <div className="qa-btn" onClick={() => changeTab('talentino')}><div className="qa-icon" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-user-check"></i></div><div>Talentino</div></div>
-                    <div className="qa-btn" onClick={() => setTpoModal(true)}><div className="qa-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-address-book"></i></div><div>Contact TPO</div></div>
-                    <div className="qa-btn" onClick={() => setHelpModal(true)}><div className="qa-icon" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}><i className="ph-fill ph-headset"></i></div><div>Request Help</div></div>
+                    <div className="qa-btn" onClick={() => changeTab('events')}><div className="qa-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-calendar-blank"></i></div><div>Events & Drives</div></div>
+                    <div className="qa-btn" onClick={() => setTpoModal(true)}><div className="qa-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-address-book"></i></div><div>Contact TPO</div></div>
                     <div className="qa-btn" onClick={() => changeTab('profile')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-user"></i></div><div>Profile</div></div>
                   </div>
                 </div>
@@ -1394,7 +1398,7 @@ function Dashboard() {
                     <div style={{ fontSize: '0.82rem', color: '#a5b4fc' }}>Explore active job openings for your course</div>
                   </div>
                 </div>
-                <button className="btn-action" style={{ background: '#6366f1', padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>View Openings &rarr;</button>
+                <button className="btn-action" style={{ background: '#6366f1', padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>View Openings &rr;</button>
               </div>
 
               <div className="stats-row">
@@ -1431,7 +1435,7 @@ function Dashboard() {
                        let d = new Date(ev.date);
                        if(!isNaN(d)) { dayStr = d.getDate(); monthStr = d.toLocaleString('en-US', { month: 'short' }); }
                        return (
-                          <div className="event-row-card" key={index}>
+                          <div className="event-row-card" key={index} style={{cursor: 'pointer'}} onClick={() => setEventModal(ev)}>
                             <div className="event-date-box">
                               <div className="ev-month">{monthStr}</div>
                               <div className="ev-day">{dayStr}</div>
@@ -1450,6 +1454,138 @@ function Dashboard() {
             </>
           )}
 
+          {activeTab === 'events' && (
+            <div className="animate-fade-in" style={{ height: '100%' }}>
+               <div className="calendar-layout">
+                   <div className="cal-sidebar">
+                       <div className="mini-cal">
+                           <h3 style={{margin: '0 0 15px 0', fontSize:'1.2rem', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                               <span>{monthNames[calMonth]} {calYear}</span>
+                               <div style={{display:'flex', gap:'10px'}}>
+                                 <i className="ph ph-caret-left" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={prevMonth}></i>
+                                 <i className="ph ph-caret-right" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={nextMonth}></i>
+                               </div>
+                           </h3>
+                           <div style={{display:'grid', gridTemplateColumns:'repeat(7, 1fr)', textAlign:'center', fontSize:'0.75rem', color:'var(--text-muted)', marginBottom:'10px'}}>
+                               <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                           </div>
+                           <div style={{display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:'5px', textAlign:'center', fontSize:'0.85rem'}}>
+                               {blanks.map(b => <div key={`mblank-${b}`}></div>)}
+                               {days.map(d => {
+                                   const isToday = new Date().getDate() === d && new Date().getMonth() === calMonth && new Date().getFullYear() === calYear;
+                                   return <div key={`mday-${d}`} style={{padding:'4px', background: isToday ? 'var(--accent-blue)' : 'transparent', color: isToday ? '#fff' : 'inherit', borderRadius:'50%'}}>{d}</div>
+                               })}
+                           </div>
+                       </div>
+                       
+                       <div className="mini-cal">
+                           <h3 style={{margin: '0 0 15px 0', fontSize:'1rem', display:'flex', alignItems:'center', justifyContent:'space-between'}}>Event Categories <i className="ph ph-plus" style={{color:'var(--text-muted)'}}></i></h3>
+                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'12px', fontSize:'0.85rem'}}>
+                               <div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#3b82f6'}}></div> Placement Drives</div>
+                               <i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i>
+                           </div>
+                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'12px', fontSize:'0.85rem'}}>
+                               <div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#10b981'}}></div> Training Sessions</div>
+                               <i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i>
+                           </div>
+                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', fontSize:'0.85rem'}}>
+                               <div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#8b5cf6'}}></div> General Events</div>
+                               <i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i>
+                           </div>
+                       </div>
+
+                       <div className="mini-cal">
+                           <h3 style={{margin: '0 0 15px 0', fontSize:'1rem'}}>Upcoming Events</h3>
+                           {filteredEvents.slice(0, 4).map((ev, i) => (
+                               <div key={i} style={{background:'var(--bg-dark)', padding:'12px', borderRadius:'10px', marginBottom:'10px', borderLeft: '3px solid var(--accent-cyan)', cursor: 'pointer'}} onClick={() => {setEventModal(ev); setRsvpStatus(null);}}>
+                                   <div style={{fontWeight: 700, fontSize:'0.85rem', marginBottom:'4px', color:'var(--text-main)'}}>{ev.title}</div>
+                                   <div style={{fontSize:'0.75rem', color:'var(--text-muted)'}}>{ev.date}</div>
+                               </div>
+                           ))}
+                           {filteredEvents.length === 0 && <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>No upcoming events.</div>}
+                       </div>
+                   </div>
+
+                   <div className="cal-main-area">
+                       <div className="cal-top-controls">
+                           <div className="cal-view-toggles">
+                               <div className={`cal-toggle-btn ${calView==='Day'?'active':''}`} onClick={()=>setCalView('Day')}>Day</div>
+                               <div className={`cal-toggle-btn ${calView==='Week'?'active':''}`} onClick={()=>setCalView('Week')}>Week</div>
+                               <div className={`cal-toggle-btn ${calView==='Month'?'active':''}`} onClick={()=>setCalView('Month')}>Month</div>
+                           </div>
+                           <div style={{display:'flex', alignItems:'center', gap:'15px', fontWeight:800, fontSize:'1.1rem'}}>
+                               <i className="ph ph-caret-left" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={prevMonth}></i>
+                               {monthNames[calMonth]} {calYear}
+                               <i className="ph ph-caret-right" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={nextMonth}></i>
+                           </div>
+                       </div>
+                       
+                       {calView !== 'Month' ? (
+                          <div style={{ padding: '20px', background: 'var(--bg-dark)', borderRadius: '12px', flex: 1, overflowY: 'auto' }}>
+                              <h3 style={{color: 'var(--text-muted)', marginTop: 0, marginBottom: '20px', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase'}}><i className="ph ph-list-dashes"></i> Event List View</h3>
+                              {filteredEvents.length === 0 ? <div style={{color:'var(--text-muted)'}}>No events available.</div> : 
+                                filteredEvents.map((ev, idx) => {
+                                  let typeColor = '#8b5cf6';
+                                  if(ev.type.toLowerCase().includes('drive') || ev.type.toLowerCase().includes('placement')) typeColor = '#3b82f6';
+                                  else if(ev.type.toLowerCase().includes('train')) typeColor = '#10b981';
+
+                                  return (
+                                    <div key={idx} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderLeft: `4px solid ${typeColor}`, padding: '15px 20px', borderRadius: '10px', marginBottom: '12px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => {setEventModal(ev); setRsvpStatus(null);}}>
+                                        <div>
+                                            <div style={{ fontWeight: 800, color: 'var(--text-main)', marginBottom: '6px', fontSize: '1.05rem' }}>{ev.title}</div>
+                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', gap: '15px' }}>
+                                                <span><i className="ph ph-calendar"></i> {ev.date}</span>
+                                                <span><i className="ph ph-clock"></i> {ev.time || 'TBA'}</span>
+                                            </div>
+                                        </div>
+                                        <div style={{ background: `${typeColor}22`, color: typeColor, padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>{ev.type}</div>
+                                    </div>
+                                  )
+                              })}
+                          </div>
+                       ) : (
+                          <>
+                           <div className="cal-grid-header">
+                               <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                           </div>
+                           <div className="cal-grid-body">
+                              {blanks.map(b => <div key={`blank-${b}`} className="cal-day-cell" style={{opacity: 0.3}}></div>)}
+                              {days.map(d => {
+                                  const dayEvents = (data.events || []).filter(ev => {
+                                      if(!ev.date || ev.date === 'TBA') return false;
+                                      const ed = new Date(ev.date);
+                                      if(isNaN(ed)) return false;
+                                      return ed.getDate() === d && ed.getMonth() === calMonth && ed.getFullYear() === calYear;
+                                  });
+                                  
+                                  const isToday = new Date().getDate() === d && new Date().getMonth() === calMonth && new Date().getFullYear() === calYear;
+
+                                  return (
+                                      <div key={`day-${d}`} className={`cal-day-cell ${isToday ? 'today' : ''}`}>
+                                          <div className="cal-day-number">{d}</div>
+                                          {dayEvents.map((ev, i) => {
+                                              let typeColor = '#8b5cf6';
+                                              if(ev.type.toLowerCase().includes('drive') || ev.type.toLowerCase().includes('placement')) typeColor = '#3b82f6';
+                                              else if(ev.type.toLowerCase().includes('train')) typeColor = '#10b981';
+                                              
+                                              return (
+                                                  <div key={i} className="cal-event-pill" style={{background: `${typeColor}22`, border: `1px solid ${typeColor}55`, color: typeColor}} onClick={() => {setEventModal(ev); setRsvpStatus(null);}}>
+                                                      <div className="pill-dot" style={{background: typeColor}}></div>
+                                                      {ev.title}
+                                                  </div>
+                                              )
+                                          })}
+                                      </div>
+                                  )
+                              })}
+                           </div>
+                          </>
+                       )}
+                   </div>
+               </div>
+            </div>
+          )}
+
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -1459,9 +1595,7 @@ function Dashboard() {
               
               <div className="profile-grid">
                 <div className="profile-left-col">
-                  {/* --- UPDATED WRAPPER --- */}
                   <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1rem auto' }}>
-                    
                     <div className="profile-large-avatar" style={{ margin: 0, width: '100%', height: '100%' }}>
                        {photoUploading ? (
                            <i className="ph ph-spinner" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></i>
@@ -1472,8 +1606,6 @@ function Dashboard() {
                            </>
                        )}
                     </div>
-
-                    {/* CAMERA BUTTON IS NOW OUTSIDE THE HIDDEN AVATAR MASK */}
                     <div 
                        onClick={() => document.getElementById('photoUploadInput').click()} 
                        style={{ position: 'absolute', bottom: '0px', right: '0px', background: 'var(--accent-blue)', color: '#fff', width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid var(--card-bg)', zIndex: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}
@@ -1481,12 +1613,7 @@ function Dashboard() {
                        <i className="ph-fill ph-camera"></i>
                     </div>
                     <input type="file" id="photoUploadInput" accept="image/*" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Photo')} />
-                    
                   </div>
-                  {/* --- END UPDATED WRAPPER --- */}
-                  
-                  <h2 style={{ margin: '10px 0 5px 0', fontSize: '1.4rem', position: 'relative', zIndex: 2 }}>{user.name}</h2>
-                  {/* --- END UPDATED WRAPPER --- */}
                   
                   <h2 style={{ margin: '10px 0 5px 0', fontSize: '1.4rem', position: 'relative', zIndex: 2 }}>{user.name}</h2>
                   <div style={{ color: 'var(--text-muted)', marginBottom: '15px', position: 'relative', zIndex: 2 }}>{user.course}</div>
@@ -1932,6 +2059,37 @@ function Dashboard() {
             </div>
           )}
 
+          {/* Event Details & RSVP Modal */}
+          {eventModal && (
+            <div className="report-modal-overlay">
+               <div className="report-card" style={{ maxWidth: '500px' }}>
+                  <div className="modal-header-border">
+                     <h3 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.3rem' }}>{eventModal.title}</h3>
+                     <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }} onClick={() => setEventModal(null)}></i>
+                  </div>
+                  <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-calendar" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Date:</strong> {eventModal.date}</div>
+                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-clock" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Time:</strong> {eventModal.time || 'TBA'}</div>
+                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-map-pin" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Location:</strong> {eventModal.location || 'TBA'}</div>
+                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-tag" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Type:</strong> <span style={{color:'var(--accent-cyan)'}}>{eventModal.type}</span></div>
+                  </div>
+                  
+                  {eventModal.description && (
+                      <div style={{ background: 'var(--hover-bg)', padding: '15px', borderRadius: '10px', marginBottom: '1.5rem', fontSize: '0.9rem', border: '1px solid var(--card-border)', lineHeight: '1.5' }}>
+                          {eventModal.description}
+                      </div>
+                  )}
+
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
+                      <button className="btn-action" style={{ flex: 1, background: '#10b981', padding: '1rem' }} onClick={() => handleEventRSVP('Registered')}><i className="ph-bold ph-check-circle"></i> Register</button>
+                      <button className="btn-action" style={{ flex: 1, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '1rem' }} onClick={() => handleEventRSVP('Not Interested')}><i className="ph-bold ph-x-circle"></i> Not Interested</button>
+                  </div>
+                  
+                  {rsvpStatus && <div className={`alert alert-${rsvpStatus.type}`} style={{marginTop: '15px'}}>{rsvpStatus.message}</div>}
+               </div>
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -1952,6 +2110,7 @@ function Dashboard() {
           <div className="drawer-menu">
             <div className="drawer-item" onClick={() => changeTab('dashboard')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-house"></i> Dashboard</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('talentino')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('events')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-calendar-blank"></i> Events & Drives</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('profile')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('status')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('vacancies')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
