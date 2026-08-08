@@ -1137,7 +1137,8 @@ function Dashboard() {
         } catch(err) { 
             if (docType === 'Photo') {
                 setPhotoUploading(false);
-                alert("Profile photo upload failed. Please try again.");
+                // Reveal the exact backend error message in the alert
+                alert(`Upload failed: ${err.response?.data?.message || err.message}`);
             } else {
                 setDocStatus({ type: 'error', msg: err.response?.data?.message || 'Upload failed.' }); 
             }
