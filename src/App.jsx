@@ -300,7 +300,7 @@ const GlobalStyle = () => {
   );
 };
 
-const API_BASE_URL = 'https://api-placement.ipcsglobal.info';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-placement.ipcsglobal.info';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
