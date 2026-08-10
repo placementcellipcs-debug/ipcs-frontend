@@ -1186,7 +1186,15 @@ const handleProfileUpdate = async () => {
     if(!issueText.trim()) return;
     setIssueStatus({ type: 'info', message: 'Submitting...' });
     try {
-        const res = await axios.post(`${API_BASE_URL}/api/dashboard/support/issue`, { email: user.email, name: user.name, branch: user.branch, course: user.course, issueDetails: issueText });
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/support/issue`, { 
+            email: user.email, 
+            name: user.name, 
+            phone: user.phone,    // <-- ADDED TO MATCH NEW ISSUES TAB
+            rollNo: user.rollNo,  // <-- ADDED TO MATCH NEW ISSUES TAB
+            branch: user.branch, 
+            course: user.course, 
+            issueDetails: issueText 
+        });
         if(res.data.success) {
             setIssueStatus({ type: 'success', message: 'Report submitted successfully.' });
             setTimeout(() => { setHelpModal(false); setIssueText(''); setIssueStatus(null); }, 2500);
@@ -1325,19 +1333,14 @@ const handleProfileUpdate = async () => {
     return d >= todayDate;
   });
 
-  const processedVacancies = (data.vacancies || []).filter(vac => {
-    if (!studentJoinDate) return true;
-    const vacLastDate = parseSafeDate(vac.lastDate);
-    if (!vacLastDate) return true;
-    return vacLastDate >= studentJoinDate;
-  }).sort((a, b) => {
+  const processedVacancies = (data.vacancies || []).sort((a, b) => {
     const aExp = isPastDate(a.lastDate);
     const bExp = isPastDate(b.lastDate);
     if (aExp && !bExp) return 1;
     if (!aExp && bExp) return -1;
     return 0; 
   });
-
+  
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
   (data.appliedJobs || []).forEach(job => {
     const s = (job.status || job.Status || '').toLowerCase();
