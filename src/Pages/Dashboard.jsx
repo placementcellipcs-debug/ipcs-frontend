@@ -6,6 +6,13 @@
   // --- PUSH NOTIFICATION STATE ---
   const [pushPermission, setPushPermission] = useState(Notification.permission);
 
+  // --- STUDY MATERIAL STATES ---
+  const [studyMaterials, setStudyMaterials] = useState([]);
+  const [studyMatStatus, setStudyMatStatus] = useState(null);
+  const [materialModal, setMaterialModal] = useState(null);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
+
   // Request Push Notification Permission on load
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
@@ -176,4 +183,4 @@
             </div>
           </div>
         </div>
-      )}}
+      )}

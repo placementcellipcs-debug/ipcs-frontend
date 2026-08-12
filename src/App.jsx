@@ -962,21 +962,62 @@ function Dashboard() {
   };
   const greeting = getGreeting();
 
-  const fetchDashboard = useCallback(async (storedUser) => {
+  const fetchStudyMaterials = useCallback(async (storedUser) => {
+    setStudyMatStatus({ type: 'info', message: 'Loading study materials...' });
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/data`, { 
-        email: storedUser.email, branch: storedUser.branch, course: storedUser.course, joiningDate: storedUser.joiningDate 
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials`, {
+        email: storedUser.email,
+        course: storedUser.course
       });
-      if(res.data.success) {
-        setData(res.data);
-        if (res.data.userInfo) {
-            const mergedUser = { ...storedUser, ...res.data.userInfo };
-            setUser(mergedUser);
-            localStorage.setItem('talentino_student_user', JSON.stringify(mergedUser));
-        }
+      if (res.data.success) {
+        setStudyMaterials(res.data.materials || []);
+        setStudyMatStatus(null);
       }
-    } catch (error) { console.error("Data error", error); }
+    } catch (err) {
+      setStudyMatStatus({ 
+        type: 'error', 
+        message: err.response?.data?.message || 'Access restricted or server error.' 
+      });
+    }
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'materials') {
+      fetchStudyMaterials(user);
+    }
+  }, [activeTab, user, fetchStudyMaterials]);
+
+  const handleViewMaterial = async (mat) => {
+    setMaterialModal(mat);
+    setIsPdfLoading(true);
+    setPdfBlobUrl(null);
+
+    try {
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials/stream`, {
+            email: user.email,
+            oneDriveLink: mat.oneDriveLink
+        }, { responseType: 'blob' }); // MUST be 'blob' to receive raw file data
+
+        // Create a temporary URL in the browser's memory
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        
+        // #toolbar=0 hides the download/print buttons in Chrome/Edge/Safari
+        setPdfBlobUrl(url + '#toolbar=0&navpanes=0&scrollbar=0');
+        setIsPdfLoading(false);
+    } catch (err) {
+        setIsPdfLoading(false);
+        setMaterialModal({ ...mat, error: 'Failed to load document securely.' });
+    }
+  };
+
+  const closeMaterialModal = () => {
+    if (pdfBlobUrl) {
+        window.URL.revokeObjectURL(pdfBlobUrl); // Clear memory
+    }
+    setMaterialModal(null);
+    setPdfBlobUrl(null);
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('talentino_student_user') || '{}');
@@ -1015,6 +1056,7 @@ function Dashboard() {
       case 'guide': return '› Guide & Resume Resources';
       case 'settings': return '› Settings';
       case 'events': return '› Events & Drives';
+      case 'materials': return '› Study Material';
       default: return '';
     }
   };
@@ -1654,7 +1696,86 @@ const handleProfileUpdate = async () => {
                 <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0 }}>Student Details</h2>
                 <button className="btn-action" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }} onClick={openEditProfileModal}><i className="ph ph-pencil-simple"></i> Edit Profile</button>
               </div>
-              
+            {activeTab === 'materials' && (
+            <div className="animate-fade-in">
+              <div style={{ marginBottom: '2rem' }}>
+                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Study Material</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Secure, in-app presentations and notes tailored for your course.</p>
+              </div>
+
+              {studyMatStatus && studyMatStatus.type === 'error' ? (
+                <div className="alert alert-error" style={{ padding: '2rem', textAlign: 'center', maxWidth: '600px', margin: '2rem auto' }}>
+                  <i className="ph-fill ph-lock-key" style={{ fontSize: '2.5rem', display: 'block', marginBottom: '10px' }}></i>
+                  {studyMatStatus.message}
+                </div>
+              ) : studyMaterials.length === 0 ? (
+                <div className="alert alert-info" style={{ textAlign: 'center', padding: '2rem' }}>No study materials uploaded for your course yet.</div>
+              ) : (
+                <div className="resume-grid">
+                  {studyMaterials.map((mat, idx) => (
+                    <div key={idx} className="resume-card" onClick={() => handleViewMaterial(mat)}>
+                      <div className="resume-icon-box" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899' }}>
+                        <i className={`ph-fill ${mat.fileType.toLowerCase().includes('pdf') ? 'ph-file-pdf' : 'ph-presentation'}`}></i>
+                      </div>
+                      <div style={{ flex: 1, overflow: 'hidden' }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>{mat.topic}</div>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mat.title}</h3>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Format: {mat.fileType}</span>
+                      </div>
+                      <button className="btn-action" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', background: '#ec4899' }}>View</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SECURE MATERIAL VIEWER MODAL */}
+          {materialModal && (
+            <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
+              <div 
+                className="report-card" 
+                style={{ maxWidth: '1000px', width: '95%', height: '88vh', padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}
+                onContextMenu={(e) => e.preventDefault()} // Disables Right-Click entirely
+              >
+                <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic} ({materialModal.course})</div>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>{materialModal.title}</h3>
+                  </div>
+                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
+                </div>
+
+                <div style={{ flex: 1, position: 'relative', background: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  
+                  {isPdfLoading && (
+                    <div style={{ textAlign: 'center', color: 'var(--accent-cyan)' }}>
+                      <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
+                      <div style={{ fontWeight: 600 }}>Encrypting & Loading Document...</div>
+                    </div>
+                  )}
+
+                  {materialModal.error && (
+                    <div className="alert alert-error">{materialModal.error}</div>
+                  )}
+
+                  {pdfBlobUrl && !isPdfLoading && (
+                    <>
+                      {/* Transparent Shield over the top right corner to block hidden popup buttons */}
+                      <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
+                      
+                      <iframe
+                        src={pdfBlobUrl}
+                        title={materialModal.title}
+                        style={{ width: '100%', height: '100%', border: 'none' }}
+                        allowFullScreen={true}
+                      ></iframe>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}  
               <div className="profile-grid">
                 <div className="profile-left-col">
                   <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1rem auto' }}>
@@ -1750,7 +1871,7 @@ const handleProfileUpdate = async () => {
                         <button className="btn-cancel" style={{ padding: '0.5rem 1rem' }} onClick={() => document.getElementById('resumeUploadInput').click()}><i className="ph ph-upload-simple"></i> Upload</button>
                         {user.resume && user.resume !== 'N/A' && user.resume.includes('http') && <a href={user.resume} target="_blank" rel="noreferrer" className="btn-action" style={{ padding: '0.5rem 1rem', textDecoration: 'none' }}><i className="ph ph-download-simple"></i> View</a>}
                       </div>
-                    </div>
+                    </div>  
                     
                     <div className="doc-box">
                       <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -2232,6 +2353,7 @@ const handleProfileUpdate = async () => {
             <div className="drawer-item" onClick={() => { setTpoModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-address-book"></i> Contact TPO</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => { setHelpModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-info"></i> Request Help</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('settings')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-gear"></i> Settings</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('materials')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-books"></i> Study Material</div><span>&rsaquo;</span></div>
           </div>
           <div className="drawer-footer">
             <button className="btn-logout-drawer" onClick={handleLogout}>Log Out</button>
