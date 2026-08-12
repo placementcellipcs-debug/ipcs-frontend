@@ -47,7 +47,7 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* --- LANDING PAGE (LOGIN) STYLES --- */
+      /* --- LANDING PAGE STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: #080c14; display: flex; flex-direction: column; position: relative; overflow: hidden; }
       .landing-wrapper::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(14, 165, 233, 0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
       .landing-nav { position: relative; z-index: 10; display: flex; justify-content: flex-start; align-items: center; padding: 2rem 4rem; }
@@ -933,19 +933,31 @@ function Dashboard() {
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
 
+  // --- PLACEMENT DRIVE STATES ---
+  const [activeDrives, setActiveDrives] = useState([]);
+  const [currentDrivePopup, setCurrentDrivePopup] = useState(null);
+  const [driveActionStatus, setDriveActionStatus] = useState(null);
+  const [pushPermission, setPushPermission] = useState(Notification.permission);
+
+  // --- STUDY MATERIAL STATES ---
+  const [studyMaterials, setStudyMaterials] = useState([]);
+  const [studyMatStatus, setStudyMatStatus] = useState(null);
+  const [materialModal, setMaterialModal] = useState(null);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
+
   useEffect(() => {
-    const handleHashChange = () => {
-        const hash = window.location.hash.replace('#', '') || 'dashboard';
-        setActiveTab(hash);
-    };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().then(permission => {
+        setPushPermission(permission);
+      });
+    }
   }, []);
 
-  const changeTab = (tab) => {
-    window.location.hash = tab;
-    setActiveTab(tab);
-    setDrawerOpen(false);
+  const sendPushNotification = (title, body, icon = GLOBAL_LOGO_URL) => {
+    if (pushPermission === 'granted') {
+      new Notification(title, { body, icon });
+    }
   };
 
   const getDriveImageUrl = (url) => {
@@ -961,6 +973,22 @@ function Dashboard() {
     return { text: "Good Evening", emoji: "🌙" };
   };
   const greeting = getGreeting();
+
+  const fetchDashboard = useCallback(async (storedUser) => {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/data`, { 
+        email: storedUser.email, branch: storedUser.branch, course: storedUser.course, joiningDate: storedUser.joiningDate 
+      });
+      if(res.data.success) {
+        setData(res.data);
+        if (res.data.userInfo) {
+            const mergedUser = { ...storedUser, ...res.data.userInfo };
+            setUser(mergedUser);
+            localStorage.setItem('talentino_student_user', JSON.stringify(mergedUser));
+        }
+      }
+    } catch (error) { console.error("Data error", error); }
+  }, []);
 
   const fetchStudyMaterials = useCallback(async (storedUser) => {
     setStudyMatStatus({ type: 'info', message: 'Loading study materials...' });
@@ -981,12 +1009,6 @@ function Dashboard() {
     }
   }, []);
 
-  useEffect(() => {
-    if (activeTab === 'materials') {
-      fetchStudyMaterials(user);
-    }
-  }, [activeTab, user, fetchStudyMaterials]);
-
   const handleViewMaterial = async (mat) => {
     setMaterialModal(mat);
     setIsPdfLoading(true);
@@ -996,13 +1018,10 @@ function Dashboard() {
         const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials/stream`, {
             email: user.email,
             oneDriveLink: mat.oneDriveLink
-        }, { responseType: 'blob' }); // MUST be 'blob' to receive raw file data
+        }, { responseType: 'blob' });
 
-        // Create a temporary URL in the browser's memory
         const blob = new Blob([res.data], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
-        
-        // #toolbar=0 hides the download/print buttons in Chrome/Edge/Safari
         setPdfBlobUrl(url + '#toolbar=0&navpanes=0&scrollbar=0');
         setIsPdfLoading(false);
     } catch (err) {
@@ -1013,10 +1032,25 @@ function Dashboard() {
 
   const closeMaterialModal = () => {
     if (pdfBlobUrl) {
-        window.URL.revokeObjectURL(pdfBlobUrl); // Clear memory
+        window.URL.revokeObjectURL(pdfBlobUrl); 
     }
     setMaterialModal(null);
     setPdfBlobUrl(null);
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+        const hash = window.location.hash.replace('#', '') || 'dashboard';
+        setActiveTab(hash);
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const changeTab = (tab) => {
+    window.location.hash = tab;
+    setActiveTab(tab);
+    setDrawerOpen(false);
   };
 
   useEffect(() => {
@@ -1029,11 +1063,108 @@ function Dashboard() {
   }, [navigate, fetchDashboard]);
 
   useEffect(() => {
+    if (activeTab === 'materials') {
+      fetchStudyMaterials(user);
+    }
+  }, [activeTab, user, fetchStudyMaterials]);
+
+  useEffect(() => {
     if (showNotif) {
       const timer = setTimeout(() => setShowNotif(false), 5000);
       return () => clearTimeout(timer);
     }
   }, [showNotif]);
+
+  useEffect(() => {
+    if (data.events && data.events.length > 0) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const drives = data.events.filter(ev => {
+        if (ev.type && ev.type !== 'Placement Drive') return false; 
+        if (ev.Event && ev.Event !== 'Placement Drive') return false;
+        
+        const driveDate = new Date(ev.date || ev['Date of the Event']);
+        return driveDate >= today;
+      });
+      setActiveDrives(drives);
+    }
+  }, [data.events]);
+
+  useEffect(() => {
+    const checkDrives = setInterval(() => {
+      if (activeDrives.length === 0 || currentDrivePopup) return;
+
+      const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
+      const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+
+      const driveToShow = activeDrives.find(drive => {
+        const driveId = drive.id || drive['Drive ID'];
+        if (respondedDrives[driveId]) return false; 
+
+        const snoozeTime = snoozedDrives[driveId];
+        if (snoozeTime) {
+          const hoursPassed = (Date.now() - snoozeTime) / (1000 * 60 * 60);
+          if (hoursPassed < 1) return false; 
+        }
+        return true;
+      });
+
+      if (driveToShow) {
+        setCurrentDrivePopup(driveToShow);
+        sendPushNotification(
+          "New Placement Drive!", 
+          `${driveToShow.title || driveToShow.Title} is happening at ${driveToShow.branch || driveToShow.Branch}. Tap to view.`
+        );
+      }
+    }, 5000);
+
+    return () => clearInterval(checkDrives);
+  }, [activeDrives, currentDrivePopup, pushPermission]);
+
+  const handleDriveDismiss = () => {
+    const driveId = currentDrivePopup.id || currentDrivePopup['Drive ID'];
+    const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+    snoozedDrives[driveId] = Date.now();
+    localStorage.setItem('talentino_drive_snoozes', JSON.stringify(snoozedDrives));
+    setCurrentDrivePopup(null);
+  };
+
+  const handleDriveResponsePopup = async (status) => {
+    setDriveActionStatus({ type: 'info', message: 'Recording your response...' });
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
+        driveId: currentDrivePopup.id || currentDrivePopup['Drive ID'],
+        title: currentDrivePopup.title || currentDrivePopup['Title'],
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        course: user.course,
+        branch: user.branch,
+        resume: user.resume,
+        qualification: user.qualification,
+        status: status,
+        tpoBranch: currentDrivePopup.branch || currentDrivePopup['Branch'] 
+      });
+
+      if (res.data.success) {
+        const driveId = currentDrivePopup.id || currentDrivePopup['Drive ID'];
+        const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
+        respondedDrives[driveId] = status;
+        localStorage.setItem('talentino_drive_responses', JSON.stringify(respondedDrives));
+        
+        if (status === 'Registered') {
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 3000);
+        }
+
+        setCurrentDrivePopup(null);
+        setDriveActionStatus(null);
+      }
+    } catch (err) {
+      setDriveActionStatus({ type: 'error', message: 'Failed to record response. Please try again.' });
+    }
+  };
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -1231,8 +1362,8 @@ const handleProfileUpdate = async () => {
         const res = await axios.post(`${API_BASE_URL}/api/dashboard/support/issue`, { 
             email: user.email, 
             name: user.name, 
-            phone: user.phone,    // <-- ADDED TO MATCH NEW ISSUES TAB
-            rollNo: user.rollNo,  // <-- ADDED TO MATCH NEW ISSUES TAB
+            phone: user.phone,    
+            rollNo: user.rollNo,  
             branch: user.branch, 
             course: user.course, 
             issueDetails: issueText 
@@ -1274,7 +1405,6 @@ const handleProfileUpdate = async () => {
   };
 
   const handleEventRSVP = async (status) => {
-    // Flexible check: allows registration as long as resume exists and isn't 'N/A' or empty
     if (status === 'Registered' && (!user.resume || user.resume === 'N/A' || user.resume.trim() === '')) {
         setRsvpStatus({ type: 'error', message: 'You must upload your Resume in your Profile before registering for an event.' });
         return;
@@ -1299,7 +1429,6 @@ const handleProfileUpdate = async () => {
         if(res.data.success) {
             setRsvpStatus({ type: 'success', message: `Status updated to: ${status}` });
             
-            // Instantly update UI state to lock the buttons
             setData(prev => ({
                 ...prev,
                 driveRSVPs: [...(prev.driveRSVPs || []), { driveId: currentDriveId, status: status }]
@@ -1353,7 +1482,6 @@ const handleProfileUpdate = async () => {
     } catch(err) { setActionStatus({ type: 'error', message: 'Server Error applying for job' }); }
   };
 
-  // Calendar Helpers
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
   const calYear = calDate.getFullYear();
@@ -1486,7 +1614,7 @@ const handleProfileUpdate = async () => {
                 <div className="quick-actions-card">
                   <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>Quick Actions</h3>
                   <div className="quick-actions-grid">
-                    <div className="qa-btn" onClick={() => changeTab('talentino')}><div className="qa-icon" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-user-check"></i></div><div>Talentino</div></div>
+                    <div className="qa-btn" onClick={() => changeTab('materials')}><div className="qa-icon" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899' }}><i className="ph-fill ph-books"></i></div><div>Study Material</div></div>
                     <div className="qa-btn" onClick={() => changeTab('events')}><div className="qa-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-calendar-blank"></i></div><div>Events & Drives</div></div>
                     <div className="qa-btn" onClick={() => setTpoModal(true)}><div className="qa-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-address-book"></i></div><div>Contact TPO</div></div>
                     <div className="qa-btn" onClick={() => changeTab('profile')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-user"></i></div><div>Profile</div></div>
@@ -1556,6 +1684,40 @@ const handleProfileUpdate = async () => {
                 </div>
               </div>
             </>
+          )}
+
+          {activeTab === 'materials' && (
+            <div className="animate-fade-in">
+              <div style={{ marginBottom: '2rem' }}>
+                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Study Material</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Secure, in-app presentations and notes tailored for your course.</p>
+              </div>
+
+              {studyMatStatus && studyMatStatus.type === 'error' ? (
+                <div className="alert alert-error" style={{ padding: '2rem', textAlign: 'center', maxWidth: '600px', margin: '2rem auto' }}>
+                  <i className="ph-fill ph-lock-key" style={{ fontSize: '2.5rem', display: 'block', marginBottom: '10px' }}></i>
+                  {studyMatStatus.message}
+                </div>
+              ) : studyMaterials.length === 0 ? (
+                <div className="alert alert-info" style={{ textAlign: 'center', padding: '2rem' }}>No study materials uploaded for your course yet.</div>
+              ) : (
+                <div className="resume-grid">
+                  {studyMaterials.map((mat, idx) => (
+                    <div key={idx} className="resume-card" onClick={() => handleViewMaterial(mat)}>
+                      <div className="resume-icon-box" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899' }}>
+                        <i className={`ph-fill ${mat.fileType.toLowerCase().includes('pdf') ? 'ph-file-pdf' : 'ph-presentation'}`}></i>
+                      </div>
+                      <div style={{ flex: 1, overflow: 'hidden' }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>{mat.topic}</div>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mat.title}</h3>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Format: {mat.fileType}</span>
+                      </div>
+                      <button className="btn-action" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', background: '#ec4899' }}>View</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
 
           {activeTab === 'events' && (
@@ -1630,8 +1792,8 @@ const handleProfileUpdate = async () => {
                               {filteredEvents.length === 0 ? <div style={{color:'var(--text-muted)'}}>No events available.</div> : 
                                 filteredEvents.map((ev, idx) => {
                                   let typeColor = '#8b5cf6';
-                                  if(ev.type.toLowerCase().includes('drive') || ev.type.toLowerCase().includes('placement')) typeColor = '#3b82f6';
-                                  else if(ev.type.toLowerCase().includes('train')) typeColor = '#10b981';
+                                  if(ev.type && (ev.type.toLowerCase().includes('drive') || ev.type.toLowerCase().includes('placement'))) typeColor = '#3b82f6';
+                                  else if(ev.type && ev.type.toLowerCase().includes('train')) typeColor = '#10b981';
 
                                   return (
                                     <div key={idx} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderLeft: `4px solid ${typeColor}`, padding: '15px 20px', borderRadius: '10px', marginBottom: '12px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => {setEventModal(ev); setRsvpStatus(null);}}>
@@ -1669,8 +1831,8 @@ const handleProfileUpdate = async () => {
                                           <div className="cal-day-number">{d}</div>
                                           {dayEvents.map((ev, i) => {
                                               let typeColor = '#8b5cf6';
-                                              if(ev.type.toLowerCase().includes('drive') || ev.type.toLowerCase().includes('placement')) typeColor = '#3b82f6';
-                                              else if(ev.type.toLowerCase().includes('train')) typeColor = '#10b981';
+                                              if(ev.type && (ev.type.toLowerCase().includes('drive') || ev.type.toLowerCase().includes('placement'))) typeColor = '#3b82f6';
+                                              else if(ev.type && ev.type.toLowerCase().includes('train')) typeColor = '#10b981';
                                               
                                               return (
                                                   <div key={i} className="cal-event-pill" style={{background: `${typeColor}22`, border: `1px solid ${typeColor}55`, color: typeColor}} onClick={() => {setEventModal(ev); setRsvpStatus(null);}}>
@@ -1696,87 +1858,7 @@ const handleProfileUpdate = async () => {
                 <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0 }}>Student Details</h2>
                 <button className="btn-action" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }} onClick={openEditProfileModal}><i className="ph ph-pencil-simple"></i> Edit Profile</button>
               </div>
-            {activeTab === 'materials' && (
-            <div className="animate-fade-in">
-              <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Study Material</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Secure, in-app presentations and notes tailored for your course.</p>
-              </div>
-
-              {studyMatStatus && studyMatStatus.type === 'error' ? (
-                <div className="alert alert-error" style={{ padding: '2rem', textAlign: 'center', maxWidth: '600px', margin: '2rem auto' }}>
-                  <i className="ph-fill ph-lock-key" style={{ fontSize: '2.5rem', display: 'block', marginBottom: '10px' }}></i>
-                  {studyMatStatus.message}
-                </div>
-              ) : studyMaterials.length === 0 ? (
-                <div className="alert alert-info" style={{ textAlign: 'center', padding: '2rem' }}>No study materials uploaded for your course yet.</div>
-              ) : (
-                <div className="resume-grid">
-                  {studyMaterials.map((mat, idx) => (
-                    <div key={idx} className="resume-card" onClick={() => handleViewMaterial(mat)}>
-                      <div className="resume-icon-box" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899' }}>
-                        <i className={`ph-fill ${mat.fileType.toLowerCase().includes('pdf') ? 'ph-file-pdf' : 'ph-presentation'}`}></i>
-                      </div>
-                      <div style={{ flex: 1, overflow: 'hidden' }}>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>{mat.topic}</div>
-                        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mat.title}</h3>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Format: {mat.fileType}</span>
-                      </div>
-                      <button className="btn-action" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', background: '#ec4899' }}>View</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* SECURE MATERIAL VIEWER MODAL */}
-          {materialModal && (
-            <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
-              <div 
-                className="report-card" 
-                style={{ maxWidth: '1000px', width: '95%', height: '88vh', padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}
-                onContextMenu={(e) => e.preventDefault()} // Disables Right-Click entirely
-              >
-                <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic} ({materialModal.course})</div>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>{materialModal.title}</h3>
-                  </div>
-                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
-                </div>
-
-                <div style={{ flex: 1, position: 'relative', background: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  
-                  {isPdfLoading && (
-                    <div style={{ textAlign: 'center', color: 'var(--accent-cyan)' }}>
-                      <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
-                      <div style={{ fontWeight: 600 }}>Encrypting & Loading Document...</div>
-                    </div>
-                  )}
-
-                  {materialModal.error && (
-                    <div className="alert alert-error">{materialModal.error}</div>
-                  )}
-
-                  {pdfBlobUrl && !isPdfLoading && (
-                    <>
-                      {/* Transparent Shield over the top right corner to block hidden popup buttons */}
-                      <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
-                      
-                      <iframe
-                        src={pdfBlobUrl}
-                        title={materialModal.title}
-                        style={{ width: '100%', height: '100%', border: 'none' }}
-                        allowFullScreen={true}
-                      ></iframe>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}  
-              <div className="profile-grid">
+               <div className="profile-grid">
                 <div className="profile-left-col">
                   <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1rem auto' }}>
                     <div className="profile-large-avatar" style={{ margin: 0, width: '100%', height: '100%' }}>
@@ -2000,542 +2082,112 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-          {activeTab === 'talentino' && (
-            <div className="animate-fade-in">
-              <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Talentino Attendance</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Mark your attendance and track your session participation (Calculated post-joining date)</p>
-              </div>
-              
-              <div className="talentino-summary-grid">
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-check-circle" style={{ color: '#10b981' }}></i> Present Check-ins</div>
-                  <div className="t-stat-num">{data.stats?.attended || 0}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}><span>Progress</span><span>{data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%</span></div>
-                  <div className="progress-bar" style={{ marginTop: '6px' }}><div className="progress-fill" style={{ width: `${data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%` }}></div></div>
-                </div>
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-calendar-blank" style={{ color: '#3b82f6' }}></i> Total Conducted</div>
-                  <div className="t-stat-num">{data.stats?.totalConducted || 0}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sessions in your branch since joining</div>
-                </div>
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-clock" style={{ color: '#f59e0b' }}></i> On Leave</div>
-                  <div className="t-stat-num">{data.stats?.onLeave || 0}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Approved leaves</div>
-                </div>
-              </div>
-
-              <h3 style={{ margin: '0 0 1.2rem 0', fontSize: '1.2rem', color: 'var(--text-main)' }}>Mark Today's Attendance</h3>
-              
-              {data.hasMarkedToday ? (
-                  <div style={{ background: 'rgba(10, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#10b981', fontWeight: 600 }}>
-                     <i className="ph-fill ph-check-circle" style={{ fontSize: '1.4rem' }}></i> You have already marked your attendance for today.
+          {/* SECURE MATERIAL VIEWER MODAL */}
+          {materialModal && (
+            <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
+              <div 
+                className="report-card" 
+                style={{ maxWidth: '1000px', width: '95%', height: '88vh', padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}
+                onContextMenu={(e) => e.preventDefault()}
+              >
+                <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic} ({materialModal.course})</div>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>{materialModal.title}</h3>
                   </div>
-              ) : (
-                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1.8rem', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-                    <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                      <i className="ph ph-calendar-check" style={{ color: data.isScheduledToday ? '#3b82f6' : '#ef4444', fontSize: '1.2rem' }}></i>
-                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:30 AM - 07:00 PM)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
-                    </div>
-                    
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Location Verification</label>
-                      <div onClick={captureGPS} style={{ background: gpsCoords ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-dark)', color: gpsCoords ? '#10b981' : 'var(--text-main)', border: `1px solid ${gpsCoords ? '#10b981' : 'var(--card-border)'}`, padding: '1rem', borderRadius: '12px', textAlign: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
-                        <i className="ph ph-map-pin" style={{ marginRight: '8px' }}></i> {locStatus}
-                      </div>
-                    </div>
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Rate this session</label>
-                      <div className="star-rating">
-                        {[1,2,3,4,5].map(s => (
-                          <span key={s} className={`star ${rating >= s ? 'selected' : ''}`} onClick={() => setRating(s)}>★</span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Feedback (optional)</label>
-                      <textarea rows="3" value={feedback} onChange={e => setFeedback(e.target.value)} placeholder="Share your thoughts about today's session..."></textarea>
-                    </div>
-
-                    <button className="btn-action" style={{ width: '100%', opacity: (data.isScheduledToday && gpsCoords && rating > 0) ? 1 : 0.5 }} disabled={!(data.isScheduledToday && gpsCoords && rating > 0)} onClick={submitAttendance}>Mark Attendance</button>
-                    {attStatus && <div className={`alert alert-${attStatus.type}`} style={{marginTop: '10px'}}>{attStatus.message}</div>}
-                  </div>
-              )}
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '2rem 0 1rem 0', color: 'var(--text-main)', fontWeight: 800, fontSize: '1.1rem' }}>
-                <i className="ph ph-trend-up"></i> Attendance History
-              </div>
-              
-              <div id="attendanceHistoryContainer">
-                 {(data.attendanceHistory || []).length === 0 ? (
-                   <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)' }}>No attendance records yet.</div>
-                 ) : (
-                   (data.attendanceHistory || []).map((hist, idx) => {
-                      let parsedDate = hist.dateStr || "Unknown";
-                      let parsedTime = "";
-                      try {
-                        const d = new Date(hist.timestamp);
-                        if(!isNaN(d)) {
-                           parsedDate = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                           parsedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                        } else {
-                           parsedDate = hist.timestamp.split(' ')[0] || hist.timestamp;
-                           parsedTime = hist.timestamp.split(' ')[1] || "";
-                        }
-                      } catch(e) {}
-                      let statusText = hist.rating >= 4 ? 'Good' : (hist.rating === 3 ? 'Average' : 'Poor');
-
-                      return (
-                        <div key={idx} style={{ background: 'var(--bg-dark)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                              <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}><i className="ph-fill ph-check-circle"></i></div>
-                              <div>
-                                 <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '1.05rem', marginBottom: '2px' }}>{parsedDate}</strong>
-                                 <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{parsedTime} · {statusText}</span>
-                              </div>
-                           </div>
-                           <div style={{ color: '#f59e0b', fontSize: '1.2rem', letterSpacing: '2px' }}>
-                              {'★'.repeat(hist.rating)}{'☆'.repeat(5 - hist.rating)}
-                           </div>
-                        </div>
-                      )
-                   })
-                 )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'vacancies' && (
-            <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
-              <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
-                <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '2px', color: '#ffffff', margin: '0 0 8px 0', textTransform: 'uppercase' }}>JOB VACANCIES</h1>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>NewsLetter ID Not Valid After Expiry Date</p>
-              </div>
-              
-              {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'yes') ? (
-                 <div className="alert alert-error" style={{ margin: '2rem auto', maxWidth: '600px', padding: '2rem' }}>
-                     <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '2rem', display: 'block', marginBottom: '10px' }}></i> 
-                     Your access to view Job Vacancies is currently restricted. Please contact your Placement Officer.
-                 </div>
-              ) : processedVacancies.length === 0 ? (
-                 <div className="alert alert-info" style={{ margin: '2rem auto', maxWidth: '600px' }}><i className="ph-fill ph-info"></i> No active vacancies found after your joining date. Check back later!</div>
-              ) : (
-                 Object.entries(
-                   processedVacancies.reduce((acc, vac) => {
-                     const loc = (vac.state || 'OTHER STATES').toUpperCase().trim();
-                     if(!acc[loc]) acc[loc] = [];
-                     acc[loc].push(vac);
-                     return acc;
-                 }, {})).map(([locationName, vacs], index) => (
-                     <div key={index} className="location-table-card">
-                         <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.2rem' }}>{locationName}</h2>
-                         <table className="vac-table">
-                             <thead>
-                                 <tr>
-                                     <th>NewsLetter ID</th>
-                                     <th>Position</th>
-                                     <th>Opening At</th>
-                                     <th>Mode of Work</th>
-                                     <th>Last Date</th>
-                                     <th style={{ textAlign: 'center' }}>Action</th>
-                                 </tr>
-                             </thead>
-                             <tbody>
-                                 {vacs.map((vac, vIdx) => {
-                                     const isApplied = (data.appliedJobs || []).some(j => j.jobId === vac.newsletterId);
-                                     const isExpired = isPastDate(vac.lastDate);
-                                     return (
-                                         <tr key={vIdx} style={{ cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.4 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
-                                             <td style={{ color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
-                                             <td style={{ color: 'var(--text-main)', fontWeight: 700 }}>{vac.position}</td>
-                                             <td style={{ color: 'var(--accent-cyan)' }}>{vac.location}</td>
-                                             <td style={{ color: 'var(--text-muted)' }}>{vac.modeOfWork}</td>
-                                             <td style={{ color: isExpired ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{vac.lastDate} {isExpired && '(Expired)'}</td>
-                                             <td style={{ textAlign: 'center' }}>
-                                                 {isApplied ? (
-                                                     <button className="btn-action" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid #22c55e', cursor: 'default' }} disabled><i className="ph-fill ph-check-circle" style={{marginRight: '6px'}}></i> Applied</button>
-                                                 ) : isExpired ? (
-                                                     <button className="btn-action" style={{ background: 'var(--input-border)', color: 'var(--text-muted)', padding: '0.45rem 1rem', fontSize: '0.8rem', cursor: 'not-allowed' }} disabled><i className="ph-fill ph-prohibit" style={{marginRight: '6px'}}></i> Expired</button>
-                                                 ) : (
-                                                     <button className="btn-action" style={{ background: 'var(--accent-blue)', padding: '0.45rem 1rem', fontSize: '0.8rem' }} onClick={(e) => { e.stopPropagation(); setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}>Details</button>
-                                                 )}
-                                             </td>
-                                         </tr>
-                                     )
-                                 })}
-                             </tbody>
-                         </table>
-                     </div>
-                 ))
-              )}
-            </div>
-          )}
-
-          {activeTab === 'status' && (
-            <div className="animate-fade-in">
-              <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Application Status</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Track the current status of all your applied job openings</p>
-              </div>
-
-              <div className="app-stats-grid">
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Jobs Applied</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{appStats.applied}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Attended</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{appStats.attended}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Offers Got</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>{appStats.offers}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Not Attended</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{appStats.notAttended}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Rejected</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#94a3b8' }}>{appStats.rejected}</div>
-                 </div>
-              </div>
-
-              <div style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <i className="ph-fill ph-chart-line-up" style={{ fontSize: '2rem', color: 'var(--accent-purple)' }}></i>
-                <div>
-                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Journey Analysis</div>
-                   <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.95rem' }}>{journeyText}</div>
+                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
                 </div>
-              </div>
 
-              <div className="location-table-card">
-                <table className="vac-table">
-                  <thead><tr><th>NewsLetter ID</th><th>Company & Position</th><th>Applied Date & Time</th><th>Current Status</th><th>Remarks</th></tr></thead>
-                  <tbody>
-                    {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="5" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
-                      (data.appliedJobs || []).map((job, idx) => {
-                        const statusVal = job.status || job.Status || 'Applied';
-                        const style = getStatusStyle(statusVal);
-                        const jobIdVal = job.jobId || job['Job ID'] || job.id;
-                        const companyVal = job.company || job.companyName || job['Company Name'] || 'Company N/A';
-                        const positionVal = job.position || job.Position || 'Position N/A';
-                        const dateVal = job.date || job.TimeStamp || job.Timestamp || job.time || 'N/A';
-                        const remarksVal = job.remarks || job.Remarks || '-';
-
-                        return(
-                        <tr key={idx}>
-                          <td style={{color:'var(--accent-purple)', fontWeight:700}}>{jobIdVal}</td>
-                          <td>
-                             <div style={{fontWeight:600}}>{companyVal}</div>
-                             <div style={{fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px'}}>{positionVal}</div>
-                          </td>
-                          <td style={{color:'var(--text-muted)', fontSize:'0.8rem'}}>{dateVal}</td>
-                          <td><span className="status-badge" style={{ background: style.bg, color: style.color, border: style.border }}>{statusVal}</span></td>
-                          <td style={{color:'var(--text-muted)', fontSize:'0.85rem'}}>{remarksVal}</td>
-                        </tr>
-                      )})}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Event Details & RSVP Modal */}
-          {eventModal && (
-            <div className="report-modal-overlay">
-               <div className="report-card" style={{ maxWidth: '500px' }}>
-                  <div className="modal-header-border">
-                     <h3 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.3rem' }}>{eventModal.title}</h3>
-                     <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }} onClick={() => setEventModal(null)}></i>
-                  </div>
-                  <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-calendar" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Date:</strong> {eventModal.date}</div>
-                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-clock" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Time:</strong> {eventModal.time || 'TBA'}</div>
-                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-map-pin" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Location:</strong> {eventModal.location || 'TBA'}</div>
-                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-tag" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Type:</strong> <span style={{color:'var(--accent-cyan)'}}>{eventModal.type}</span></div>
-                      
-                      {/* SHOW THE DRIVE ID IF IT EXISTS */}
-                      {eventModal.id && (
-                          <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-fingerprint" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Drive ID:</strong> <span style={{color:'var(--accent-purple)', fontWeight: 700}}>{eventModal.id}</span></div>
-                      )}
-                  </div>
+                <div style={{ flex: 1, position: 'relative', background: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   
-                  {eventModal.description && (
-                      <div style={{ background: 'var(--hover-bg)', padding: '15px', borderRadius: '10px', marginBottom: '1.5rem', fontSize: '0.9rem', border: '1px solid var(--card-border)', lineHeight: '1.5' }}>
-                          {eventModal.description}
-                      </div>
+                  {isPdfLoading && (
+                    <div style={{ textAlign: 'center', color: 'var(--accent-cyan)' }}>
+                      <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
+                      <div style={{ fontWeight: 600 }}>Encrypting & Loading Document...</div>
+                    </div>
                   )}
 
-                  {/* STRICT DATE AND RSVP VERIFICATION LOGIC */}
-                  {(() => {
-                      // 1. Check if event is in the past
-                      let isPast = false;
-                      if (eventModal.date && eventModal.date.toLowerCase() !== 'tba') {
-                          const cleanDateStr = eventModal.date.replace(/,/g, '').replace(/\s+/g, ' ').trim();
-                          const eventDate = new Date(cleanDateStr);
-                          if (!isNaN(eventDate.getTime())) {
-                              eventDate.setHours(0,0,0,0);
-                              const today = new Date();
-                              today.setHours(0,0,0,0);
-                              isPast = eventDate < today;
-                          }
-                      }
-                      
-                      // 2. Check if user already RSVP'd
-                      const userRSVP = data.driveRSVPs?.find(r => 
-                          (eventModal.id && r.driveId === eventModal.id) || 
-                          (r.driveId === eventModal.title)
-                      );
-                      
-                      // Scenario A: User Already Registered / Marked Not Interested
-                      if (userRSVP) {
-                          const statusColor = userRSVP.status.toLowerCase() === 'registered' ? '#10b981' : '#ef4444';
-                          const statusIcon = userRSVP.status.toLowerCase() === 'registered' ? 'ph-check-circle' : 'ph-x-circle';
-                          return (
-                              <div style={{ padding: '14px', background: `${statusColor}22`, color: statusColor, textAlign: 'center', borderRadius: '10px', fontWeight: 600, border: `1px solid ${statusColor}55`, marginTop: '1rem' }}>
-                                  <i className={`ph-fill ${statusIcon}`} style={{ marginRight: '8px', fontSize: '1.1rem', verticalAlign: 'middle' }}></i> 
-                                  Response Recorded: {userRSVP.status}
-                              </div>
-                          );
-                      }
+                  {materialModal.error && (
+                    <div className="alert alert-error">{materialModal.error}</div>
+                  )}
 
-                      // Scenario B: Event is in the Past
-                      if (isPast) {
-                          return (
-                              <div style={{ padding: '14px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', textAlign: 'center', borderRadius: '10px', fontWeight: 600, border: '1px solid rgba(239, 68, 68, 0.2)', marginTop: '1rem' }}>
-                                  <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '1.1rem', verticalAlign: 'middle' }}></i> 
-                                  This event has concluded. Registrations are closed.
-                              </div>
-                          );
-                      }
-
-                      // Scenario C: Active Event (Show Buttons)
-                      return (
-                          <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
-                              <button className="btn-action" style={{ flex: 1, background: '#10b981', padding: '1rem' }} onClick={() => handleEventRSVP('Registered')}><i className="ph-bold ph-check-circle"></i> Register</button>
-                              <button className="btn-action" style={{ flex: 1, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '1rem' }} onClick={() => handleEventRSVP('Not Interested')}><i className="ph-bold ph-x-circle"></i> Not Interested</button>
-                          </div>
-                      );
-                  })()}
-                  
-                  {rsvpStatus && <div className={`alert alert-${rsvpStatus.type}`} style={{marginTop: '15px'}}>{rsvpStatus.message}</div>}
-               </div>
-            </div>
-          )}
-
-        </div>
-      </div>
-
-      <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
-        <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
-          <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
-            <div className="drawer-close-btn" onClick={() => setDrawerOpen(false)}><i className="ph ph-x"></i></div>
-            <div className="drawer-profile-row">
-              <div className="drawer-avatar">
-                 {user?.photo && user.photo.includes('http') ? <img src={getDriveImageUrl(user.photo)} alt="Profile" /> : user?.name?.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <strong style={{ display:'block', fontSize:'1.1rem', fontWeight:700, color: '#fff' }}>{user?.name}</strong>
-                <span style={{ fontSize:'0.8rem', color: '#38bdf8', fontWeight: 600 }}>{user?.rollNo}</span>
-              </div>
-            </div>
-          </div>
-          <div className="drawer-menu">
-            <div className="drawer-item" onClick={() => changeTab('dashboard')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-house"></i> Dashboard</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('talentino')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('events')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-calendar-blank"></i> Events & Drives</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('profile')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('status')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('vacancies')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('guide')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-book-open"></i> Guide</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setTpoModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-address-book"></i> Contact TPO</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setHelpModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-info"></i> Request Help</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('settings')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-gear"></i> Settings</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('materials')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-books"></i> Study Material</div><span>&rsaquo;</span></div>
-          </div>
-          <div className="drawer-footer">
-            <button className="btn-logout-drawer" onClick={handleLogout}>Log Out</button>
-            <div style={{ fontSize:'0.72rem', color:'var(--text-muted)' }}>Copyright &copy; 2026 Talentino IPCS Global</div>
-          </div>
-        </div>
-      </div>
-      
-      {editProfileModal && (
-  <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
-    <div className="report-card" style={{ maxWidth: '700px' }}>
-      <div className="modal-header-border">
-        <h3 style={{ margin: 0, color: 'var(--text-main)' }}><i className="ph ph-pencil-simple" style={{ color: 'var(--accent-cyan)' }}></i> Edit Profile Details</h3>
-        <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setEditProfileModal(false)}></i>
-      </div>
-      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', background: 'var(--hover-bg)', padding: '10px', borderRadius: '8px' }}><strong>Note:</strong> Core ID details (Name, Roll No, Branch, Email, Course) are strictly uneditable by students. Contact admin for corrections.</div>
-      <div className="grid-2col">
-         <div className="form-group"><label>Age</label><input type="number" value={epData.age} onChange={(e) => setEpData({...epData, age: e.target.value})} /></div>
-         <div className="form-group"><label>Gender</label><select value={epData.gender} onChange={(e) => setEpData({...epData, gender: e.target.value})}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-         <div className="form-group"><label>Parent / Guardian Name</label><input type="text" value={epData.parentName} onChange={(e) => setEpData({...epData, parentName: e.target.value})} /></div>
-         <div className="form-group"><label>Parent Contact No.</label><input type="tel" value={epData.parentContact} onChange={(e) => setEpData({...epData, parentContact: e.target.value})} /></div>
-         <div className="form-group"><label>Studying Status</label><select value={epData.studyStatus} onChange={(e) => setEpData({...epData, studyStatus: e.target.value})}><option value="Currently Studying">Currently Studying</option><option value="Completed Course">Completed Course</option></select></div>
-         <div className="form-group"><label>Course Completed Date</label><input type="date" value={epData.completedDate} onChange={(e) => setEpData({...epData, completedDate: e.target.value})} /></div>
-         <div className="form-group"><label>Stream</label><input type="text" value={epData.stream} onChange={(e) => setEpData({...epData, stream: e.target.value})} /></div>
-         <div className="form-group"><label>Home Town</label><input type="text" value={epData.homeTown} onChange={(e) => setEpData({...epData, homeTown: e.target.value})} /></div>
-         <div className="form-group"><label>Fresher Status</label><select value={epData.fresherStatus} onChange={(e) => setEpData({...epData, fresherStatus: e.target.value})}><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option></select></div>
-         <div className="form-group"><label>Qualification</label><input type="text" value={epData.qualification} onChange={(e) => setEpData({...epData, qualification: e.target.value})} /></div>
-      </div>
-      <div className="grid-2col" style={{ marginTop: '1rem' }}>
-         <div className="form-group"><label>LinkedIn</label><input type="text" value={epData.linkedin} onChange={(e) => setEpData({...epData, linkedin: e.target.value})} /></div>
-         <div className="form-group"><label>Instagram Handle</label><input type="text" value={epData.instagram} onChange={(e) => setEpData({...epData, instagram: e.target.value})} /></div>
-      </div>
-      <div className="form-group"><label>Placement Requirements</label><textarea rows="2" value={epData.placementReq} onChange={(e) => setEpData({...epData, placementReq: e.target.value})}></textarea></div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '15px' }}>
-         <button className="btn-cancel" onClick={() => setEditProfileModal(false)}>Cancel</button>
-         <button className="btn-action" onClick={handleProfileUpdate}>Save Changes</button>
-      </div>
-      {epStatus && <div className={`alert alert-${epStatus.type}`} style={{marginTop: '10px'}}>{epStatus.message}</div>}
-    </div>
-  </div>
-)}
-
-      {jobModal && (
-        <div className="report-modal-overlay">
-          <div className="report-card" style={{ maxWidth: '600px', width: '90%', padding: '0', overflow: 'hidden', position: 'relative' }}>
-            
-            {showConfetti && (
-              <div className="celebration-overlay">
-                <div className="celebration-content">
-                  <span className="party-emoji">🎉</span>
-                  <h2 style={{ color: 'white', marginBottom: '10px' }}>Application Successful!</h2>
-                  <p style={{ color: '#a5b4fc', margin: 0 }}>You can track this in Application Status.</p>
-                </div>
-              </div>
-            )}
-
-            <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--card-border)', background: 'var(--bg-dark)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.4rem' }}>
-                  {jobModal.position} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>({jobModal.newsletterId})</span>
-                </h3>
-                <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={() => { setJobModal(null); setShowConsent(false); setQ1(false); setQ2(false); setShowConfetti(false); }}></i>
-              </div>
-              <strong style={{ color: 'var(--accent-cyan)', fontSize: '1.15rem' }}>{jobModal.company}</strong>
-            </div>
-            
-            <div style={{ padding: '2rem', maxHeight: '75vh', overflowY: 'auto' }}>
-              <div style={{ background: 'var(--input-bg)', padding: '18px 24px', borderRadius: '12px', marginBottom: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.9rem' }}>
-                <div><strong style={{ color: 'var(--text-muted)' }}>Location:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.location}</span></div>
-                <div><strong style={{ color: 'var(--text-muted)' }}>Mode of Work:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.modeOfWork}</span></div>
-                <div><strong style={{ color: 'var(--text-muted)' }}>No. of Openings:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.openings}</span></div>
-                <div><strong style={{ color: 'var(--text-muted)' }}>Experience:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.experience}</span></div>
-                <div><strong style={{ color: 'var(--text-muted)' }}>Salary:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.salary}</span></div>
-                <div><strong style={{ color: 'var(--text-muted)' }}>Interview Date:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.interviewDate}</span></div>
-              </div>
-              
-              <div style={{ marginBottom: '1.5rem' }}>
-                <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '6px', fontSize: '1rem' }}>Qualification Required:</strong>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{jobModal.qualification}</div>
-              </div>
-
-              {jobModal.description && (
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px', fontSize: '1rem' }}>Job Description:</strong>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', whiteSpace: 'pre-line', background: 'var(--hover-bg)', padding: '16px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
-                    {jobModal.description}
-                  </div>
-                </div>
-              )}
-
-              {showConsent ? (
-                <div style={{ background: 'var(--bg-dark)', padding: '20px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
-                  {actionStatus && actionStatus.type === 'error' && actionStatus.message.includes('Resume') ? (
-                    <div className="alert alert-error" style={{ margin: 0, padding: '1.5rem', textAlign: 'left', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                      {actionStatus.message}
-                    </div>
-                  ) : (
+                  {pdfBlobUrl && !isPdfLoading && (
                     <>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-                        <input type="checkbox" checked={q1} onChange={e => setQ1(e.target.checked)} style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} />
-                        <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 400, lineHeight: 1.4 }}>
-                          1. As I am applying for this job, I agree that I will attend the interview whenever the company calls me without fail.
-                        </p>
-                      </div>
+                      <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
                       
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '20px' }}>
-                        <input type="checkbox" checked={q2} onChange={e => setQ2(e.target.checked)} style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} />
-                        <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 400, lineHeight: 1.4 }}>
-                          2. I agree as per Placement rule if I fail to attend this company interview, I will be removed from placement support.
-                        </p>
-                      </div>
-                      
-                      {actionStatus && <div className={`alert alert-${actionStatus.type}`} style={{ marginBottom: '15px' }}>{actionStatus.message}</div>}
-                      
-                      <button 
-                        className="btn-action" 
-                        style={{ width: '100%', background: (q1 && q2) ? '#22c55e' : 'var(--input-border)', color: (q1 && q2) ? '#fff' : 'var(--text-muted)', padding: '1rem', fontSize: '1rem', cursor: (q1 && q2) ? 'pointer' : 'not-allowed', transition: 'background 0.3s' }} 
-                        onClick={handleApply}
-                      >
-                        Confirm Application
-                      </button>
+                      <iframe
+                        src={pdfBlobUrl}
+                        title={materialModal.title}
+                        style={{ width: '100%', height: '100%', border: 'none' }}
+                        allowFullScreen={true}
+                      ></iframe>
                     </>
                   )}
                 </div>
-              ) : (
-                <div style={{ display: 'flex', gap: '15px', marginTop: '2rem' }}>
-                  <button className="btn-action" style={{ flex: 1, background: '#22c55e', padding: '1rem', fontSize: '1rem' }} onClick={openApplyConfirm}>Apply &rarr;</button>
-                  <button className="btn-cancel" style={{ flex: 1, padding: '1rem', fontSize: '1rem' }} onClick={() => { setJobModal(null); setShowConsent(false); setQ1(false); setQ2(false); }}>Close</button>
-                </div>
-              )}
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}  
 
-      {tpoModal && (
-        <div className="report-modal-overlay">
-          <div className="report-card" style={{ maxWidth: '420px', padding: 0, overflow: 'hidden' }}>
-            <div style={{ background: `url(${COVER_BANNER_URL}) center/cover`, position: 'relative', padding: '2.5rem 1.5rem 3.5rem 1.5rem', textAlign: 'center' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(11,15,23,0.85)' }}></div>
-              <i className="ph ph-x" style={{ position: 'absolute', top: '15px', right: '15px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem', zIndex: 10 }} onClick={() => setTpoModal(false)}></i>
-              
-              <div style={{ position: 'relative', zIndex: 2 }}>
-                <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
-                  {tpoPhoto && tpoPhoto !== "N/A" ? <img src={getDriveImageUrl(tpoPhoto)} style={{width: '100%', height: '100%', objectFit: 'cover'}} alt="TPO" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} /> : null}
-                  <i className="ph ph-user-tie" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', display: (!tpoPhoto || tpoPhoto === "N/A") ? 'block' : 'none' }}></i>
+          {/* PLACEMENT DRIVE MODAL */}
+          {currentDrivePopup && (
+            <div className="report-modal-overlay" style={{ zIndex: 9999 }}>
+              <div className="report-card" style={{ maxWidth: '500px', padding: '0', overflow: 'hidden', position: 'relative' }}>
+                <div 
+                    style={{ position: 'absolute', top: '15px', right: '15px', width: '32px', height: '32px', background: 'rgba(0,0,0,0.6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                    onClick={handleDriveDismiss}
+                >
+                    <i className="ph ph-x" style={{ color: '#fff', fontSize: '1.2rem' }}></i>
                 </div>
-                <h2 style={{ margin: '0 0 5px 0', color: '#fff' }}>{tpoName}</h2>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Sitting Branch: <strong style={{ color: 'var(--accent-cyan)' }}>{tpoSitting}</strong></div>
-              </div>
-            </div>
-            
-            <div style={{ padding: '0 2rem 2rem 2rem', marginTop: '-20px', position: 'relative', zIndex: 3 }}>
-              <div style={{ background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', marginBottom: '20px', textAlign: 'left', fontSize: '0.9rem', border: '1px solid var(--card-border)' }}>
-                <div style={{ marginBottom: '10px' }}><strong>Email:</strong> <span style={{ color: 'var(--accent-cyan)' }}>{tpoEmail}</span></div>
-                <div style={{ marginBottom: '10px' }}><strong>Phone:</strong> <span>{tpoPhone}</span></div>
-                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--card-border)' }}><strong>Assigned Regions:</strong> <span style={{ color: 'var(--text-muted)' }}>{tpoAssigned}</span></div>
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                <a href={`tel:${tpoPhone}`} className="btn-action" style={{ flex: 1, background: '#2563eb', textDecoration: 'none' }}><i className="ph-fill ph-phone"></i> Call</a>
-                <a href={`https://wa.me/${tpoPhone.toString().replace(/\D/g,'')}`} className="btn-action" style={{ flex: 1, background: '#22c55e', textDecoration: 'none' }}><i className="ph-fill ph-whatsapp-logo"></i> WhatsApp</a>
-                <a href={`mailto:${tpoEmail}?cc=placementcell.ipcs@gmail.com&subject=Student Inquiry: ${user?.name} (${user?.rollNo})`} className="btn-action" style={{ flex: 1, background: '#ef4444', textDecoration: 'none' }}><i className="ph-fill ph-envelope"></i> Mail</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {helpModal && (
-        <div className="report-modal-overlay">
-          <div className="report-card">
-            <div className="modal-header-border">
-              <h3 style={{ margin: 0, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="ph ph-headset" style={{ color: 'var(--accent-cyan)' }}></i> Request Help / Inquiry</h3>
-              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }} onClick={() => { setHelpModal(false); setIssueText(''); setIssueStatus(null); }}></i>
+                <div style={{ width: '100%', height: '280px', background: 'var(--bg-dark)' }}>
+                  {currentDrivePopup['Poster Link'] ? (
+                    <img src={getDriveImageUrl(currentDrivePopup['Poster Link'])} alt="Drive Poster" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e1b4b, #311042)', color: '#fff', fontSize: '1.5rem', fontWeight: 800 }}>
+                      Placement Drive
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ padding: '2rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
+                     <div>
+                        <div style={{ color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>Drive ID: {currentDrivePopup.id || currentDrivePopup['Drive ID']}</div>
+                        <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-main)', lineHeight: 1.2 }}>{currentDrivePopup.title || currentDrivePopup['Title']}</h2>
+                     </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', border: '1px solid var(--input-border)', marginBottom: '1.5rem' }}>
+                    <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Date</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup.date || currentDrivePopup['Date of the Event']}</span></div>
+                    <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Time</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup.time || currentDrivePopup['Time of the Event']}</span></div>
+                    <div style={{ gridColumn: '1 / -1' }}><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Location</strong><span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{currentDrivePopup.location || currentDrivePopup['Event Hapening in']}</span></div>
+                  </div>
+
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>{currentDrivePopup.description || currentDrivePopup['Description']}</p>
+
+                  {driveActionStatus && <div className={`alert alert-${driveActionStatus.type}`} style={{ marginBottom: '15px' }}>{driveActionStatus.message}</div>}
+
+                  <div style={{ display: 'flex', gap: '15px' }}>
+                    <button className="btn-cancel" style={{ flex: 1, padding: '1rem', border: '1px solid #ef4444', color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)' }} onClick={() => handleDriveResponsePopup('Not Interested')}>
+                      Not Interested
+                    </button>
+                    <button className="btn-action" style={{ flex: 2, padding: '1rem', background: '#22c55e' }} onClick={() => {
+                        if (!user.resume || user.resume === "N/A") {
+                            setDriveActionStatus({ type: 'error', message: 'You must upload a resume in your Profile before registering!' });
+                        } else {
+                            handleDriveResponsePopup('Registered');
+                        }
+                    }}>
+                      Register Now &rarr;
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 0, marginBottom: '15px' }}>Your issue will be forwarded directly to your TPO and the Master Placement Cell.</p>
-            <div className="form-group"><label>Describe Your Issue or Inquiry *</label><textarea rows="5" value={issueText} onChange={(e) => setIssueText(e.target.value)} placeholder="Explain the problem or inquiry in detail..."></textarea></div>
-            <button className="btn-action" style={{ width: '100%' }} onClick={handleIssueSubmit}>Submit Report &rarr;</button>
-            {issueStatus && <div className={`alert alert-${issueStatus.type}`} style={{marginTop: '10px'}}>{issueStatus.message}</div>}
-          </div>
+          )}
+
         </div>
-      )}
+      </div>
     </div>
   );
 }
