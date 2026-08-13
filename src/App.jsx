@@ -119,6 +119,40 @@ const GlobalStyle = () => {
       .party-emoji { font-size: 4rem; display: block; margin-bottom: 10px; animation: pulse 1s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1) rotate(5deg); } 100% { transform: scale(1); } }
 
+      /* --- MATERIAL VIEWER RESPONSIVE STYLES --- */
+      .material-viewer-card {
+        max-width: 1000px;
+        width: 95%;
+        height: 88vh;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        animation: fadeInReveal 0.3s ease;
+      }
+      .material-iframe-container {
+        flex: 1;
+        position: relative;
+        background: #1e293b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-overflow-scrolling: touch;
+      }
+      @media (max-width: 768px) {
+        .material-viewer-card {
+          width: 100%;
+          height: 100vh;
+          max-height: 100vh;
+          border-radius: 0;
+          border: none;
+        }
+      }
+
       /* --- DASHBOARD STYLES --- */
       .app-layout { display: flex; flex-direction: column; width: 100vw; min-height: 100vh; }
       .main-body { flex: 1; display: flex; flex-direction: column; width: 100%; }
@@ -933,10 +967,12 @@ function Dashboard() {
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
 
-  // --- PLACEMENT DRIVE STATES ---
+  // --- NEW PLACEMENT DRIVE STATES ---
   const [activeDrives, setActiveDrives] = useState([]);
   const [currentDrivePopup, setCurrentDrivePopup] = useState(null);
   const [driveActionStatus, setDriveActionStatus] = useState(null);
+  
+  // --- PUSH NOTIFICATION STATE ---
   const [pushPermission, setPushPermission] = useState(Notification.permission);
 
   // --- STUDY MATERIAL STATES ---
@@ -946,6 +982,7 @@ function Dashboard() {
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
 
+  // Request Push Notification Permission on load
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission().then(permission => {
@@ -954,6 +991,7 @@ function Dashboard() {
     }
   }, []);
 
+  // Utility to send Push Notifications
   const sendPushNotification = (title, body, icon = GLOBAL_LOGO_URL) => {
     if (pushPermission === 'granted') {
       new Notification(title, { body, icon });
@@ -1034,9 +1072,6 @@ function Dashboard() {
   };
 
   const closeMaterialModal = () => {
-    if (pdfBlobUrl) {
-        window.URL.revokeObjectURL(pdfBlobUrl); 
-    }
     setMaterialModal(null);
     setPdfBlobUrl(null);
   };
@@ -1078,37 +1113,43 @@ function Dashboard() {
     }
   }, [showNotif]);
 
+  // Fetch active drives & Handle 1-hour Snooze
   useEffect(() => {
+    // 1. Filter drives from the fetched data
     if (data.events && data.events.length > 0) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       const drives = data.events.filter(ev => {
-        if (ev.type && ev.type !== 'Placement Drive') return false; 
-        if (ev.Event && ev.Event !== 'Placement Drive') return false;
+        if (ev.type && ev.type !== 'Placement Drive' && ev.Event !== 'Placement Drive') return false; 
+        const driveDateStr = ev.date || ev['Date of the Event'];
+        if (!driveDateStr) return false;
         
-        const driveDate = new Date(ev.date || ev['Date of the Event']);
-        return driveDate >= today;
+        const driveDate = new Date(driveDateStr);
+        return driveDate >= today; // Only upcoming or today
       });
       setActiveDrives(drives);
     }
   }, [data.events]);
 
   useEffect(() => {
+    // 2. Interval to check for popups every 5 seconds
     const checkDrives = setInterval(() => {
       if (activeDrives.length === 0 || currentDrivePopup) return;
 
       const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
       const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
 
+      // Find the first drive the user hasn't responded to, and isn't currently snoozed
       const driveToShow = activeDrives.find(drive => {
         const driveId = drive.id || drive['Drive ID'];
-        if (respondedDrives[driveId]) return false; 
+        if (!driveId) return false;
+        if (respondedDrives[driveId]) return false; // Already registered or not interested
 
         const snoozeTime = snoozedDrives[driveId];
         if (snoozeTime) {
           const hoursPassed = (Date.now() - snoozeTime) / (1000 * 60 * 60);
-          if (hoursPassed < 1) return false; 
+          if (hoursPassed < 1) return false; // Still within 1 hour snooze
         }
         return true;
       });
@@ -1120,20 +1161,24 @@ function Dashboard() {
           `${driveToShow.title || driveToShow.Title} is happening at ${driveToShow.branch || driveToShow.Branch}. Tap to view.`
         );
       }
-    }, 5000);
+    }, 5000); 
 
     return () => clearInterval(checkDrives);
   }, [activeDrives, currentDrivePopup, pushPermission]);
 
   const handleDriveDismiss = () => {
+    // Snooze for 1 hour
     const driveId = currentDrivePopup.id || currentDrivePopup['Drive ID'];
-    const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
-    snoozedDrives[driveId] = Date.now();
-    localStorage.setItem('talentino_drive_snoozes', JSON.stringify(snoozedDrives));
+    if(driveId) {
+       const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+       snoozedDrives[driveId] = Date.now();
+       localStorage.setItem('talentino_drive_snoozes', JSON.stringify(snoozedDrives));
+    }
     setCurrentDrivePopup(null);
   };
 
   const handleDriveResponsePopup = async (status) => {
+    // status = 'Registered' or 'Not Interested'
     setDriveActionStatus({ type: 'info', message: 'Recording your response...' });
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
@@ -1146,15 +1191,18 @@ function Dashboard() {
         branch: user.branch,
         resume: user.resume,
         qualification: user.qualification,
-        status: status,
-        tpoBranch: currentDrivePopup.branch || currentDrivePopup['Branch'] 
+        status: status, // 'Registered' or 'Not Interested'
+        tpoBranch: currentDrivePopup.branch || currentDrivePopup['Branch'] // To CC the right TPO
       });
 
       if (res.data.success) {
+        // Save to local storage so it never shows again
         const driveId = currentDrivePopup.id || currentDrivePopup['Drive ID'];
-        const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
-        respondedDrives[driveId] = status;
-        localStorage.setItem('talentino_drive_responses', JSON.stringify(respondedDrives));
+        if(driveId) {
+            const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
+            respondedDrives[driveId] = status;
+            localStorage.setItem('talentino_drive_responses', JSON.stringify(respondedDrives));
+        }
         
         if (status === 'Registered') {
             setShowConfetti(true);
@@ -1984,6 +2032,48 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
+          {/* SECURE MATERIAL VIEWER MODAL */}
+          {materialModal && (
+            <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
+              <div className="material-viewer-card" onContextMenu={(e) => e.preventDefault()}>
+                
+                <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic} ({materialModal.course})</div>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>{materialModal.title}</h3>
+                  </div>
+                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
+                </div>
+
+                <div className="material-iframe-container">
+                  {isPdfLoading && (
+                    <div style={{ textAlign: 'center', color: 'var(--accent-cyan)' }}>
+                      <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
+                      <div style={{ fontWeight: 600 }}>Encrypting & Loading Document...</div>
+                    </div>
+                  )}
+
+                  {materialModal.error && (
+                    <div className="alert alert-error">{materialModal.error}</div>
+                  )}
+
+                  {pdfBlobUrl && !isPdfLoading && (
+                    <>
+                      <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
+                      
+                      <iframe
+                        src={pdfBlobUrl}
+                        title={materialModal.title}
+                        style={{ width: '100%', height: '100%', border: 'none' }}
+                        allowFullScreen={true}
+                      ></iframe>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}  
+
           {/* Settings Tab */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
@@ -2337,52 +2427,6 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-          {/* SECURE MATERIAL VIEWER MODAL */}
-          {materialModal && (
-            <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
-              <div 
-                className="report-card" 
-                style={{ maxWidth: '1000px', width: '95%', height: '88vh', padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}
-                onContextMenu={(e) => e.preventDefault()}
-              >
-                <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic} ({materialModal.course})</div>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>{materialModal.title}</h3>
-                  </div>
-                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
-                </div>
-
-                <div style={{ flex: 1, position: 'relative', background: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  
-                  {isPdfLoading && (
-                    <div style={{ textAlign: 'center', color: 'var(--accent-cyan)' }}>
-                      <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
-                      <div style={{ fontWeight: 600 }}>Encrypting & Loading Document...</div>
-                    </div>
-                  )}
-
-                  {materialModal.error && (
-                    <div className="alert alert-error">{materialModal.error}</div>
-                  )}
-
-                  {pdfBlobUrl && !isPdfLoading && (
-                    <>
-                      <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
-                      
-                      <iframe
-                        src={pdfBlobUrl}
-                        title={materialModal.title}
-                        style={{ width: '100%', height: '100%', border: 'none' }}
-                        allowFullScreen={true}
-                      ></iframe>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}  
-
           {/* PLACEMENT JOB MODAL */}
           {jobModal && (
             <div className="report-modal-overlay">
@@ -2557,6 +2601,7 @@ const handleProfileUpdate = async () => {
           {currentDrivePopup && (
             <div className="report-modal-overlay" style={{ zIndex: 9999 }}>
               <div className="report-card" style={{ maxWidth: '500px', padding: '0', overflow: 'hidden', position: 'relative' }}>
+                
                 <div 
                     style={{ position: 'absolute', top: '15px', right: '15px', width: '32px', height: '32px', background: 'rgba(0,0,0,0.6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
                     onClick={handleDriveDismiss}
