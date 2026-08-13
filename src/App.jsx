@@ -144,12 +144,15 @@ const GlobalStyle = () => {
         -webkit-overflow-scrolling: touch;
       }
       @media (max-width: 768px) {
+        .report-modal-overlay.material-modal-overlay {
+          padding: 0 !important; /* Removes the 20px gap on mobile */
+        }
         .material-viewer-card {
-          width: 100%;
-          height: 100vh;
-          max-height: 100vh;
-          border-radius: 0;
-          border: none;
+          width: 100vw !important;
+          height: 100dvh !important; /* Uses dynamic viewport to fix iOS Safari gaps */
+          max-height: 100dvh !important;
+          border-radius: 0 !important;
+          border: none !important;
         }
       }
 
@@ -1018,7 +1021,15 @@ function Dashboard() {
         email: storedUser.email, branch: storedUser.branch, course: storedUser.course, joiningDate: storedUser.joiningDate 
       });
       if(res.data.success) {
-        setData(res.data);
+        setData(prev => ({
+            ...res.data,
+            // SMART MERGE: If Google Sheets glitches and returns empty arrays, keep the previous data on screen!
+            vacancies: (res.data.vacancies && res.data.vacancies.length > 0) ? res.data.vacancies : (prev.vacancies || []),
+            events: (res.data.events && res.data.events.length > 0) ? res.data.events : (prev.events || []),
+            appliedJobs: (res.data.appliedJobs && res.data.appliedJobs.length > 0) ? res.data.appliedJobs : (prev.appliedJobs || []),
+            attendanceHistory: (res.data.attendanceHistory && res.data.attendanceHistory.length > 0) ? res.data.attendanceHistory : (prev.attendanceHistory || []),
+        }));
+        
         if (res.data.userInfo) {
             const mergedUser = { ...storedUser, ...res.data.userInfo };
             setUser(mergedUser);
@@ -1028,8 +1039,10 @@ function Dashboard() {
     } catch (error) { console.error("Data error", error); }
   }, []);
 
-  const fetchStudyMaterials = useCallback(async (storedUser) => {
-    setStudyMatStatus({ type: 'info', message: 'Loading study materials...' });
+  const fetchStudyMaterials = useCallback(async (storedUser, currentLength) => {
+    // Only show loading screen if we have no materials yet
+    if (currentLength === 0) setStudyMatStatus({ type: 'info', message: 'Loading study materials...' });
+    
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials`, {
         email: storedUser.email,
@@ -1040,10 +1053,13 @@ function Dashboard() {
         setStudyMatStatus(null);
       }
     } catch (err) {
-      setStudyMatStatus({ 
-        type: 'error', 
-        message: err.response?.data?.message || 'Access restricted or server error.' 
-      });
+      // Only show the red error box if the screen is currently completely empty
+      if (currentLength === 0) {
+        setStudyMatStatus({ 
+          type: 'error', 
+          message: err.response?.data?.message || 'Access restricted or server error.' 
+        });
+      }
     }
   }, []);
 
@@ -1096,15 +1112,15 @@ function Dashboard() {
     if (!storedUser.email) { navigate('/'); return; }
     setUser(storedUser);
     fetchDashboard(storedUser);
-    const interval = setInterval(() => { fetchDashboard(storedUser); }, 30000);
+    const interval = setInterval(() => { fetchDashboard(storedUser); }, 300000); 
     return () => clearInterval(interval);
   }, [navigate, fetchDashboard]);
 
   useEffect(() => {
     if (activeTab === 'materials') {
-      fetchStudyMaterials(user);
+      fetchStudyMaterials(user, studyMaterials.length);
     }
-  }, [activeTab, user, fetchStudyMaterials]);
+  }, [activeTab, user.email, user.course]);
 
   useEffect(() => {
     if (showNotif) {
@@ -2034,7 +2050,7 @@ const handleProfileUpdate = async () => {
 
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
-            <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
+            <div className="report-modal-overlay material-modal-overlay" style={{ zIndex: 99999 }}>
               <div className="material-viewer-card" onContextMenu={(e) => e.preventDefault()}>
                 
                 <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
