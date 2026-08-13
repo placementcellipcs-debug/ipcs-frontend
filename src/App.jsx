@@ -1018,12 +1018,15 @@ function Dashboard() {
         const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials/stream`, {
             email: user.email,
             oneDriveLink: mat.oneDriveLink
-        }, { responseType: 'blob' });
+        });
 
-        const blob = new Blob([res.data], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        setPdfBlobUrl(url + '#toolbar=0&navpanes=0&scrollbar=0');
-        setIsPdfLoading(false);
+        if (res.data.success && res.data.embedUrl) {
+            // Set the iframe source directly to the secure embed link
+            setPdfBlobUrl(res.data.embedUrl);
+            setIsPdfLoading(false);
+        } else {
+            throw new Error(res.data.message || "Failed to load link");
+        }
     } catch (err) {
         setIsPdfLoading(false);
         setMaterialModal({ ...mat, error: 'Failed to load document securely.' });
