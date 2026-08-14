@@ -2308,7 +2308,7 @@ function Dashboard() {
                              <tbody>
                                  {vacs.map((vac, vIdx) => {
                                      const isApplied = (data.appliedJobs || []).some(j => j.jobId === vac.newsletterId);
-                                     const isExpired = isPastDate(vac.lastDate);
+                                     const isExpired = isEventExpired(vac.lastDate);
                                      return (
                                          <tr key={vIdx} style={{ cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.4 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
                                              <td style={{ color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
