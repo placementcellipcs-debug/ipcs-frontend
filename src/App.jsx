@@ -1,4 +1,3 @@
-/* STREAMING_CHUNK: Imports and LocalStorage Helpers */
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -23,7 +22,6 @@ const setSafeLocalStorage = (key, value) => {
   }
 };
 
-/* STREAMING_CHUNK: Global CSS Styles */
 const GlobalStyle = () => {
   useEffect(() => {
     if (!document.getElementById('phosphor-icons')) {
@@ -67,7 +65,7 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* --- LANDING PAGE (LOGIN) STYLES --- */
+      /* --- LANDING PAGE STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: #080c14; display: flex; flex-direction: column; position: relative; overflow: hidden; }
       .landing-wrapper::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(14, 165, 233, 0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
       .landing-nav { position: relative; z-index: 10; display: flex; justify-content: flex-start; align-items: center; padding: 2rem 4rem; }
@@ -81,7 +79,6 @@ const GlobalStyle = () => {
       .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; max-width: 500px; margin-bottom: 2.5rem; }
       .btn-glow { background: linear-gradient(90deg, #0ea5e9, #38bdf8); color: #ffffff; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4); transition: transform 0.2s, box-shadow 0.2s; }
       .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.6); }
-
       .ticker-container { margin-top: 3.5rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; display: flex; align-items: center; gap: 15px; }
       .ticker-icon { width: 36px; height: 36px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.2rem; flex-shrink: 0; }
       @keyframes tickerFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -141,31 +138,6 @@ const GlobalStyle = () => {
       .party-emoji { font-size: 4rem; display: block; margin-bottom: 10px; animation: pulse 1s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1) rotate(5deg); } 100% { transform: scale(1); } }
 
-      /* --- MATERIAL VIEWER RESPONSIVE STYLES --- */
-      .material-viewer-card {
-        max-width: 1000px;
-        width: 95%;
-        height: 88vh;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        position: relative;
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: 20px;
-        animation: fadeInReveal 0.3s ease;
-      }
-      .material-iframe-container {
-        flex: 1;
-        position: relative;
-        background: #1e293b;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        -webkit-overflow-scrolling: touch;
-      }
-      
       /* --- DASHBOARD STYLES --- */
       .app-layout { display: flex; flex-direction: column; width: 100vw; min-height: 100vh; }
       .main-body { flex: 1; display: flex; flex-direction: column; width: 100%; }
@@ -555,12 +527,10 @@ const GlobalStyle = () => {
   );
 };
 
-/* STREAMING_CHUNK: Constants and URLs */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-placement.ipcsglobal.info';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
-/* STREAMING_CHUNK: Login Component */
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -646,7 +616,6 @@ function Login() {
       <div className="landing-nav">
         <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
       </div>
-      
       <div className="landing-grid">
         <div className="hero-section">
           <div className="hero-badge">
@@ -656,21 +625,11 @@ function Login() {
               <span className="hero-badge-subtitle">Connecting Talent with Opportunity</span>
             </div>
           </div>
-          
           <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: '#38bdf8' }}>Careers with IPCS</span></h1>
           <p className="hero-desc">IPCS Global connects future-ready talent in Industrial Automation, Embedded Systems, IoT, and Digital Tech with leading blue-chip global firms. Experience zero-barrier career transitions.</p>
-
-          <button 
-            className="btn-glow" 
-            onClick={() => setShowAuthForm(true)}
-          >
-            Login / Signup <i className="ph-bold ph-caret-right"></i>
-          </button>
-
+          <button className="btn-glow" onClick={() => setShowAuthForm(true)}>Login / Signup <i className="ph-bold ph-caret-right"></i></button>
           <div className="ticker-container">
-            <div className="ticker-icon">
-              <i className="ph-fill ph-lightning"></i>
-            </div>
+            <div className="ticker-icon"><i className="ph-fill ph-lightning"></i></div>
             <div>
               <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '2px' }}>Live Hiring Updates</div>
               <div key={tickerIndex} className="ticker-animate" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
@@ -697,11 +656,8 @@ function Login() {
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Realtime Campus Intake</span>
                   </div>
                 </div>
-                <div style={{ border: '1px solid rgba(34, 197, 94, 0.3)', color: '#4ade80', padding: '6px 14px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px' }}>
-                  ACTIVE STAGE
-                </div>
+                <div style={{ border: '1px solid rgba(34, 197, 94, 0.3)', color: '#4ade80', padding: '6px 14px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px' }}>ACTIVE STAGE</div>
               </div>
-
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className="hiring-stat-box">
                   <div style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-users"></i></div>
@@ -710,7 +666,6 @@ function Login() {
                     <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>1.5 M +</div>
                   </div>
                 </div>
-                
                 <div className="hiring-stat-box">
                   <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-buildings"></i></div>
                   <div>
@@ -718,7 +673,6 @@ function Login() {
                     <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>25 K +</div>
                   </div>
                 </div>
-                
                 <div className="hiring-stat-box">
                   <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-medal"></i></div>
                   <div>
@@ -730,27 +684,20 @@ function Login() {
             </div>
           ) : (
             <div className="auth-card animate-fade-in">
-              <div className="brand-logo-container">
-                <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" />
-              </div>
+              <div className="brand-logo-container"><img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" /></div>
               <h2 style={{ textAlign: 'center', margin: '0 0 6px 0', color: '#ffffff' }}>Welcome back</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
-
               <form onSubmit={handleLogin}>
                 <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
                 <div className="form-group"><label>Password</label>
                   <div className="pwd-wrapper">
                     <input type={showPassword ? "text" : "password"} placeholder="Enter password" style={{ paddingRight: '40px' }} value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}>
-                      <i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i>
-                    </span>
+                    <span className="pwd-toggle" onClick={() => setShowPassword(!showPassword)}><i className={`ph ${showPassword ? 'ph-eye-slash' : 'ph-eye'}`}></i></span>
                   </div>
                 </div>
                 <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem', padding: '1rem', borderRadius: '10px' }}>Sign in &rarr;</button>
               </form>
-
               {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
-
               <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
             </div>
           )}
@@ -760,7 +707,6 @@ function Login() {
   );
 }
 
-/* STREAMING_CHUNK: Signup Component */
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -952,9 +898,7 @@ function Signup() {
                 {courseList.map((group, idx) => (
                   <optgroup key={idx} label={group.category}>
                     {group.courses.map((courseItem, cIdx) => (
-                      <option key={cIdx} value={courseItem}>
-                        {courseItem}
-                      </option>
+                      <option key={cIdx} value={courseItem}>{courseItem}</option>
                     ))}
                   </optgroup>
                 ))}
@@ -1032,17 +976,8 @@ function Signup() {
           <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '20px' }}>
             <input 
               type="checkbox" 
-              style={{ 
-                width: '22px', 
-                height: '22px', 
-                flexShrink: 0, 
-                marginTop: '3px', 
-                cursor: tncScrolled ? 'pointer' : 'not-allowed',
-                opacity: tncScrolled ? 1 : 0.5 
-              }} 
-              checked={tncAccepted} 
-              disabled={!tncScrolled}
-              onChange={(e) => setTncAccepted(e.target.checked)} 
+              style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: tncScrolled ? 'pointer' : 'not-allowed', opacity: tncScrolled ? 1 : 0.5 }} 
+              checked={tncAccepted} disabled={!tncScrolled} onChange={(e) => setTncAccepted(e.target.checked)} 
             />
             <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: 1.4, opacity: tncScrolled ? 1 : 0.7 }}>
               I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span>
@@ -1115,16 +1050,7 @@ function Signup() {
               <div style={{ textAlign: 'center', color: '#f59e0b', fontSize: '0.88rem', fontWeight: 700, marginTop: '15px' }}>↓ Please scroll to the end of the rules to Accept ↓</div>
             ) : (
               <div style={{ display: 'flex', marginTop: '20px' }}>
-                <button 
-                  type="button" 
-                  className="btn-action" 
-                  style={{ width: '100%', background: '#22c55e' }} 
-                  onClick={() => { 
-                    setTncScrolled(true); 
-                    setTncAccepted(true); 
-                    setShowTncModal(false); 
-                  }}
-                >
+                <button type="button" className="btn-action" style={{ width: '100%', background: '#22c55e' }} onClick={() => { setTncScrolled(true); setTncAccepted(true); setShowTncModal(false); }}>
                   Accept & Enable Checkbox
                 </button>
               </div>
@@ -1136,7 +1062,6 @@ function Signup() {
   );
 }
 
-/* STREAMING_CHUNK: Dashboard Component Logic */
 const isEventExpired = (dateStr) => {
   if (!dateStr || dateStr === "TBA") return false;
   const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
@@ -1165,7 +1090,6 @@ function Dashboard() {
   const [eventModal, setEventModal] = useState(null);
   const [rsvpStatus, setRsvpStatus] = useState(null);
   
-  // Calendar State
   const [calDate, setCalDate] = useState(new Date());
   const [calView, setCalView] = useState('Month');
 
@@ -1196,21 +1120,17 @@ function Dashboard() {
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
 
-  // --- PLACEMENT DRIVE STATES ---
   const [activeDrives, setActiveDrives] = useState([]);
   const [currentDrivePopup, setCurrentDrivePopup] = useState(null);
   const [driveActionStatus, setDriveActionStatus] = useState(null);
   
-  // --- PUSH NOTIFICATION STATE ---
   const [pushPermission, setPushPermission] = useState(() => {
     return (typeof window !== 'undefined' && 'Notification' in window) ? Notification.permission : 'denied';
   });
 
-  // --- GAMIFIED APTITUDE TEST STATES ---
-  const [aptitudeView, setAptitudeView] = useState('lobby'); // lobby | transition | live | result
+  const [aptitudeView, setAptitudeView] = useState('lobby'); 
   const [levelData, setLevelData] = useState({ 1: [], 2: [], 3: [] });
   const [timeLimits, setTimeLimits] = useState({ 1: 10, 2: 15, 3: 20 });
-  
   const [currentLevel, setCurrentLevel] = useState(1);
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
@@ -1218,18 +1138,15 @@ function Dashboard() {
   const [globalTimeSpent, setGlobalTimeSpent] = useState(0);
   const [cumulativeScore, setCumulativeScore] = useState(0);
   const [totalQuestionsAsked, setTotalQuestionsAsked] = useState(0);
-
   const [leaderboard, setLeaderboard] = useState([]);
   const [testHistoryList, setTestHistoryList] = useState([]);
 
-  // --- STUDY MATERIAL STATES ---
   const [studyMaterials, setStudyMaterials] = useState([]);
   const [studyMatStatus, setStudyMatStatus] = useState(null);
   const [materialModal, setMaterialModal] = useState(null);
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
 
-  // Request Push Notification Permission on load safely
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
@@ -1240,7 +1157,6 @@ function Dashboard() {
     } catch (e) {}
   }, []);
 
-  // Safe Push Notification Dispatcher
   const sendPushNotification = (title, body, icon = GLOBAL_LOGO_URL) => {
     try {
       if (typeof window !== 'undefined' && 'Notification' in window && pushPermission === 'granted') {
@@ -1290,22 +1206,15 @@ function Dashboard() {
 
   const fetchStudyMaterials = useCallback(async (storedUser, currentLength) => {
     if (currentLength === 0) setStudyMatStatus({ type: 'info', message: 'Loading study materials...' });
-    
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials`, {
-        email: storedUser.email,
-        course: storedUser.course
-      });
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials`, { email: storedUser.email, course: storedUser.course });
       if (res.data.success) {
         setStudyMaterials(res.data.materials || []);
         setStudyMatStatus(null);
       }
     } catch (err) {
       if (currentLength === 0) {
-        setStudyMatStatus({ 
-          type: 'error', 
-          message: err.response?.data?.message || 'Access restricted or server error.' 
-        });
+        setStudyMatStatus({ type: 'error', message: err.response?.data?.message || 'Access restricted or server error.' });
       }
     }
   }, []);
@@ -1314,13 +1223,8 @@ function Dashboard() {
     setMaterialModal(mat);
     setIsPdfLoading(true);
     setPdfBlobUrl(null);
-
     try {
-        const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials/stream`, {
-            email: user.email,
-            oneDriveLink: mat.oneDriveLink
-        });
-
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/study-materials/stream`, { email: user.email, oneDriveLink: mat.oneDriveLink });
         if (res.data.success && res.data.embedUrl) {
             setPdfBlobUrl(res.data.embedUrl);
             setIsPdfLoading(false);
@@ -1338,32 +1242,27 @@ function Dashboard() {
     setPdfBlobUrl(null);
   };
 
-  // APTITUDE: Fetch Leaderboard & History
   useEffect(() => {
     if (activeTab === 'aptitude' && aptitudeView === 'lobby' && user?.email) {
       axios.get(`${API_BASE_URL}/api/dashboard/aptitude/leaderboard`)
         .then(res => { if (res.data.success) setLeaderboard(res.data.leaderboard); })
         .catch(() => {});
-      
       axios.post(`${API_BASE_URL}/api/dashboard/aptitude/history`, { email: user.email })
         .then(res => { if (res.data.success) setTestHistoryList(res.data.history); })
         .catch(() => {});
     }
   }, [activeTab, aptitudeView, user?.email]);
 
-  // APTITUDE: Start the Game
   const handleStartAptitude = async () => {
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/start`);
       if (res.data.success) {
         setLevelData(res.data.levels);
         setTimeLimits(res.data.timeLimits);
-        
         setCurrentLevel(1);
         setCumulativeScore(0);
         setTotalQuestionsAsked(0);
         setGlobalTimeSpent(0);
-        
         triggerLevelTransition(1, res.data.timeLimits[1]);
       } else {
         alert("Failed to load questions.");
@@ -1373,76 +1272,53 @@ function Dashboard() {
     }
   };
 
-  // APTITUDE: Level Transition Animation Handler
   const triggerLevelTransition = (levelNum, timeMins) => {
     setUserAnswers({});
     setCurrentQIndex(0);
     setTestTimeLeft(timeMins * 60);
     setAptitudeView('transition');
-    
-    setTimeout(() => {
-        setAptitudeView('live');
-    }, 3000);
+    setTimeout(() => { setAptitudeView('live'); }, 3000);
   };
 
-  // APTITUDE: Live Timer Effect
   useEffect(() => {
     let timer;
     if (aptitudeView === 'live' && testTimeLeft > 0) {
-      timer = setInterval(() => {
-          setTestTimeLeft(prev => prev - 1);
-          setGlobalTimeSpent(prev => prev + 1);
-      }, 1000);
+      timer = setInterval(() => { setTestTimeLeft(prev => prev - 1); setGlobalTimeSpent(prev => prev + 1); }, 1000);
     } else if (aptitudeView === 'live' && testTimeLeft === 0) {
-      handleLevelComplete(); // Time up for this level
+      handleLevelComplete(); 
     }
     return () => clearInterval(timer);
   }, [aptitudeView, testTimeLeft]);
 
-  // APTITUDE: Select Answer
   const handleOptionSelect = (qId, optionKey) => {
     setUserAnswers({ ...userAnswers, [qId]: optionKey });
-    
     if (currentQIndex < levelData[currentLevel].length - 1) {
         setTimeout(() => setCurrentQIndex(prev => prev + 1), 300);
     }
   };
 
-  // APTITUDE: Evaluate Level
   const handleLevelComplete = () => {
     const currentQuestions = levelData[currentLevel] || [];
     if (currentQuestions.length === 0) return;
-
     const answeredCount = Object.keys(userAnswers).length;
     setTotalQuestionsAsked(prev => prev + currentQuestions.length);
-    
-    // Simulate passing if they answered at least 60% of the questions
     const passThreshold = Math.ceil(currentQuestions.length * 0.6);
-    
     if (answeredCount >= passThreshold && currentLevel < 3) {
-        // PASSED: Go to Next Level
         const nextLevel = currentLevel + 1;
         setCurrentLevel(nextLevel);
         triggerLevelTransition(nextLevel, timeLimits[nextLevel]);
     } else {
-        // FAILED OR FINISHED LEVEL 3
         submitFinalScore(currentLevel);
     }
   };
 
-  // APTITUDE: Submit Final Score to Backend
   const submitFinalScore = async (finalLevel) => {
     try {
       setAptitudeView('result');
       await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, {
-        email: user.email,
-        name: user.name,
-        rollNo: user.rollNo,
-        branch: user.branch,
-        totalScore: Object.keys(userAnswers).length * currentLevel * 2, // Simulated Gamified Score
-        totalQuestions: totalQuestionsAsked,
-        finalLevel: finalLevel,
-        totalTimeSeconds: globalTimeSpent
+        email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch,
+        totalScore: Object.keys(userAnswers).length * currentLevel * 2, 
+        totalQuestions: totalQuestionsAsked, finalLevel: finalLevel, totalTimeSeconds: globalTimeSpent
       });
     } catch (e) {
       console.log("Submit error", e);
@@ -1450,10 +1326,7 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    const handleHashChange = () => {
-        const hash = window.location.hash.replace('#', '') || 'dashboard';
-        setActiveTab(hash);
-    };
+    const handleHashChange = () => { setActiveTab(window.location.hash.replace('#', '') || 'dashboard'); };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
@@ -1469,8 +1342,7 @@ function Dashboard() {
     if (!storedUser.email) { navigate('/'); return; }
     setUser(storedUser);
     fetchDashboard(storedUser);
-    
-    const interval = setInterval(() => { fetchDashboard(storedUser); }, 300000); // 5 minute refresh
+    const interval = setInterval(() => { fetchDashboard(storedUser); }, 300000); 
     return () => clearInterval(interval);
   }, [navigate, fetchDashboard]);
 
@@ -1487,17 +1359,14 @@ function Dashboard() {
     }
   }, [showNotif]);
 
-  // Fetch active drives & Handle 1-hour Snooze
   useEffect(() => {
     if (data.events && data.events.length > 0) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
       const drives = data.events.filter(ev => {
         if (ev.type && ev.type !== 'Placement Drive' && ev.Event !== 'Placement Drive') return false; 
         const driveDateStr = ev.date || ev['Date of the Event'];
         if (!driveDateStr) return false;
-        
         const driveDate = new Date(driveDateStr);
         return driveDate >= today;
       });
@@ -1508,15 +1377,12 @@ function Dashboard() {
   useEffect(() => {
     const checkDrives = setInterval(() => {
       if (activeDrives.length === 0 || currentDrivePopup) return;
-
       const respondedDrives = getSafeLocalStorage('talentino_drive_responses', {});
       const snoozedDrives = getSafeLocalStorage('talentino_drive_snoozes', {});
-
       const driveToShow = activeDrives.find(drive => {
         const driveId = drive.id || drive['Drive ID'];
         if (!driveId) return false;
         if (respondedDrives[driveId]) return false;
-
         const snoozeTime = snoozedDrives[driveId];
         if (snoozeTime) {
           const hoursPassed = (Date.now() - snoozeTime) / (1000 * 60 * 60);
@@ -1527,13 +1393,9 @@ function Dashboard() {
 
       if (driveToShow) {
         setCurrentDrivePopup(driveToShow);
-        sendPushNotification(
-          "New Placement Drive!", 
-          `${driveToShow.title || driveToShow.Title} is happening at ${driveToShow.branch || driveToShow.Branch}. Tap to view.`
-        );
+        sendPushNotification("New Placement Drive!", `${driveToShow.title || driveToShow.Title} is happening at ${driveToShow.branch || driveToShow.Branch}. Tap to view.`);
       }
     }, 5000); 
-
     return () => clearInterval(checkDrives);
   }, [activeDrives, currentDrivePopup, pushPermission]);
 
@@ -1553,15 +1415,8 @@ function Dashboard() {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
         driveId: currentDrivePopup.id || currentDrivePopup['Drive ID'],
         title: currentDrivePopup.title || currentDrivePopup['Title'],
-        name: user.name,
-        phone: user.phone,
-        email: user.email,
-        course: user.course,
-        branch: user.branch,
-        resume: user.resume,
-        qualification: user.qualification,
-        status: status,
-        tpoBranch: currentDrivePopup.branch || currentDrivePopup['Branch']
+        name: user.name, phone: user.phone, email: user.email, course: user.course, branch: user.branch,
+        resume: user.resume, qualification: user.qualification, status: status, tpoBranch: currentDrivePopup.branch || currentDrivePopup['Branch']
       });
 
       if (res.data.success) {
@@ -1571,18 +1426,14 @@ function Dashboard() {
             respondedDrives[driveId] = status;
             setSafeLocalStorage('talentino_drive_responses', respondedDrives);
         }
-        
         if (status === 'Registered') {
             setShowConfetti(true);
             setTimeout(() => setShowConfetti(false), 3000);
         }
-
         setCurrentDrivePopup(null);
         setDriveActionStatus(null);
       }
-    } catch (err) {
-      setDriveActionStatus({ type: 'error', message: 'Failed to record response. Please try again.' });
-    }
+    } catch (err) { setDriveActionStatus({ type: 'error', message: 'Failed to record response. Please try again.' }); }
   };
 
   const toggleTheme = () => {
@@ -1645,118 +1496,63 @@ function Dashboard() {
   };
 
   const openEditProfileModal = () => {
-  setEpData({
-      age: user.age || '', 
-      gender: user.gender || 'Male',
-      parentName: user.parentName || '', 
-      parentContact: user.parentContact || '',
-      studyStatus: user.studyStatus || 'Currently Studying',
-      completedDate: user.completedDate && user.completedDate !== 'N/A' && !user.completedDate.includes('google') ? user.completedDate : '',
-      stream: user.stream || '', 
-      homeTown: user.homeTown || '',
-      fresherStatus: user.fresherStatus || 'Fresher', 
-      qualification: user.qualification || '',
-      linkedin: user.linkedin || '', 
-      instagram: user.instagram || '', 
-      placementReq: user.placementReq || ''
-  });
-  setEditProfileModal(true);
-};
+    setEpData({
+        age: user.age || '', gender: user.gender || 'Male', parentName: user.parentName || '', parentContact: user.parentContact || '',
+        studyStatus: user.studyStatus || 'Currently Studying', completedDate: user.completedDate && user.completedDate !== 'N/A' && !user.completedDate.includes('google') ? user.completedDate : '',
+        stream: user.stream || '', homeTown: user.homeTown || '', fresherStatus: user.fresherStatus || 'Fresher', qualification: user.qualification || '',
+        linkedin: user.linkedin || '', instagram: user.instagram || '', placementReq: user.placementReq || ''
+    });
+    setEditProfileModal(true);
+  };
 
-const handleProfileUpdate = async () => {
-  setEpStatus({ type: 'info', message: 'Saving changes...' });
-  try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/update`, { email: user.email, ...epData });
-      if(res.data.success) {
-          setEpStatus({ type: 'success', message: 'Profile updated!' });
-          const updatedUser = { ...user, ...res.data.user };
-          setUser(updatedUser);
-          setSafeLocalStorage('talentino_student_user', updatedUser);
-          setTimeout(() => { setEditProfileModal(false); setEpStatus(null); }, 1500);
-      }
-  } catch(err) { setEpStatus({ type: 'error', message: 'Server Error updating profile' }); }
-};
+  const handleProfileUpdate = async () => {
+    setEpStatus({ type: 'info', message: 'Saving changes...' });
+    try {
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/update`, { email: user.email, ...epData });
+        if(res.data.success) {
+            setEpStatus({ type: 'success', message: 'Profile updated!' });
+            const updatedUser = { ...user, ...res.data.user };
+            setUser(updatedUser);
+            setSafeLocalStorage('talentino_student_user', updatedUser);
+            setTimeout(() => { setEditProfileModal(false); setEpStatus(null); }, 1500);
+        }
+    } catch(err) { setEpStatus({ type: 'error', message: 'Server Error updating profile' }); }
+  };
 
   const handleDocumentUpload = async (e, docType) => {
     const file = e.target.files[0];
     if (!file) return;
-    
-    if (docType !== 'Photo' && file.type !== "application/pdf") { 
-        setDocStatus({ type: 'error', msg: 'Only PDF allowed for documents' });
-        e.target.value = null; 
-        return; 
-    }
-    if (docType === 'Photo' && !file.type.startsWith("image/")) {
-        alert("Only image files are allowed for profile photos.");
-        e.target.value = null;
-        return;
-    }
-    
-    if (docType === 'Photo') setPhotoUploading(true);
-    else setDocStatus({ type: 'info', msg: `Processing and uploading ${docType}...` });
-    
+    if (docType !== 'Photo' && file.type !== "application/pdf") { setDocStatus({ type: 'error', msg: 'Only PDF allowed for documents' }); e.target.value = null; return; }
+    if (docType === 'Photo' && !file.type.startsWith("image/")) { alert("Only image files are allowed for profile photos."); e.target.value = null; return; }
+    if (docType === 'Photo') setPhotoUploading(true); else setDocStatus({ type: 'info', msg: `Processing and uploading ${docType}...` });
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = async (event) => {
         let finalBase64 = event.target.result;
-
         if (docType === 'Photo') {
-            const img = new Image();
-            img.src = finalBase64;
+            const img = new Image(); img.src = finalBase64;
             await new Promise((resolve) => {
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400;
-                    const MAX_HEIGHT = 400;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                    } else {
-                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    finalBase64 = canvas.toDataURL('image/jpeg', 0.8); 
-                    resolve();
+                    const canvas = document.createElement('canvas'); const MAX_WIDTH = 400; const MAX_HEIGHT = 400;
+                    let width = img.width; let height = img.height;
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                    canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                    finalBase64 = canvas.toDataURL('image/jpeg', 0.8); resolve();
                 };
             });
         }
-
         try {
-            const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/document`, { 
-                email: user.email, rollNo: user.rollNo, base64: finalBase64, docType 
-            });
-            
+            const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/document`, { email: user.email, rollNo: user.rollNo, base64: finalBase64, docType });
             if (res.data.success) {
-                let key = 'certificate';
-                if (docType === 'Resume') key = 'resume';
-                else if (docType === 'Photo') key = 'photo';
-
+                let key = docType === 'Resume' ? 'resume' : docType === 'Photo' ? 'photo' : 'certificate';
                 const updatedUser = { ...user, [key]: res.data.url };
                 setUser(updatedUser);
                 setSafeLocalStorage('talentino_student_user', updatedUser);
-
-                if (docType === 'Photo') setPhotoUploading(false);
-                else {
-                    setDocStatus({ type: 'success', msg: `${docType} uploaded successfully!` });
-                    setTimeout(() => setDocStatus({ type: '', msg: '' }), 3000);
-                }
+                if (docType === 'Photo') setPhotoUploading(false); else { setDocStatus({ type: 'success', msg: `${docType} uploaded successfully!` }); setTimeout(() => setDocStatus({ type: '', msg: '' }), 3000); }
             }
         } catch(err) { 
-            if (docType === 'Photo') {
-                setPhotoUploading(false);
-                alert(`Upload failed: ${err.response?.data?.message || err.message}`);
-            } else {
-                setDocStatus({ type: 'error', msg: err.response?.data?.message || 'Upload failed.' }); 
-            }
-        } finally {
-            e.target.value = null; 
-        }
+            if (docType === 'Photo') { setPhotoUploading(false); alert(`Upload failed: ${err.response?.data?.message || err.message}`); } else { setDocStatus({ type: 'error', msg: err.response?.data?.message || 'Upload failed.' }); }
+        } finally { e.target.value = null; }
     };
   };
 
@@ -1767,11 +1563,7 @@ const handleProfileUpdate = async () => {
     setPwdStatus({ type: 'info', message: 'Updating password...' });
     try {
         const res = await axios.post(`${API_BASE_URL}/api/dashboard/profile/password`, { email: user.email, currentPassword: pwdData.current, newPassword: pwdData.newPwd });
-        if(res.data.success) {
-            setPwdStatus({ type: 'success', message: 'Password Updated Successfully!' });
-            setPwdData({ current: '', newPwd: '', confirm: '' });
-            setTimeout(() => setPwdStatus(null), 3000);
-        }
+        if(res.data.success) { setPwdStatus({ type: 'success', message: 'Password Updated Successfully!' }); setPwdData({ current: '', newPwd: '', confirm: '' }); setTimeout(() => setPwdStatus(null), 3000); }
     } catch(err) { setPwdStatus({ type: 'error', message: err.response?.data?.message || 'Error updating password' }); }
   };
 
@@ -1779,19 +1571,8 @@ const handleProfileUpdate = async () => {
     if(!issueText.trim()) return;
     setIssueStatus({ type: 'info', message: 'Submitting...' });
     try {
-        const res = await axios.post(`${API_BASE_URL}/api/dashboard/support/issue`, { 
-            email: user.email, 
-            name: user.name, 
-            phone: user.phone,    
-            rollNo: user.rollNo,  
-            branch: user.branch, 
-            course: user.course, 
-            issueDetails: issueText 
-        });
-        if(res.data.success) {
-            setIssueStatus({ type: 'success', message: 'Report submitted successfully.' });
-            setTimeout(() => { setHelpModal(false); setIssueText(''); setIssueStatus(null); }, 2500);
-        }
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/support/issue`, { email: user.email, name: user.name, phone: user.phone, rollNo: user.rollNo, branch: user.branch, course: user.course, issueDetails: issueText });
+        if(res.data.success) { setIssueStatus({ type: 'success', message: 'Report submitted successfully.' }); setTimeout(() => { setHelpModal(false); setIssueText(''); setIssueStatus(null); }, 2500); }
     } catch(err) { setIssueStatus({ type: 'error', message: 'Submission failed' }); }
   };
 
@@ -1799,95 +1580,36 @@ const handleProfileUpdate = async () => {
     if(!data.isScheduledToday || data.hasMarkedToday) return; 
     setLocStatus("Capturing...");
     if (!navigator.geolocation) { setLocStatus("GPS Not Supported"); return; }
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        setGpsCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLocStatus(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (GPS Verified)`);
-      },
-      err => { setLocStatus("GPS Permission Denied"); }
-    );
+    navigator.geolocation.getCurrentPosition(pos => { setGpsCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLocStatus(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (GPS Verified)`); }, err => { setLocStatus("GPS Permission Denied"); });
   };
 
   const submitAttendance = async () => {
     setAttStatus({ type: 'info', message: 'Verifying location and submitting...' });
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, { 
-        email: user.email, name: user.name, branch: user.branch, course: user.course, 
-        rating, location: locStatus, userLat: gpsCoords?.lat || null, userLng: gpsCoords?.lng || null, feedback 
-      });
-      if(res.data.success) { 
-        setAttStatus({ type: 'success', message: 'Attendance marked successfully!' }); 
-        fetchDashboard(user); 
-      }
-    } catch(err) { 
-      setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error. Failed to submit attendance.' }); 
-    }
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/attendance`, { email: user.email, name: user.name, branch: user.branch, course: user.course, rating, location: locStatus, userLat: gpsCoords?.lat || null, userLng: gpsCoords?.lng || null, feedback });
+      if(res.data.success) { setAttStatus({ type: 'success', message: 'Attendance marked successfully!' }); fetchDashboard(user); }
+    } catch(err) { setAttStatus({ type: 'error', message: err.response?.data?.message || 'Server Error. Failed to submit attendance.' }); }
   };
 
   const handleEventRSVP = async (status) => {
-    if (status === 'Registered' && (!user.resume || user.resume === 'N/A' || user.resume.trim() === '')) {
-        setRsvpStatus({ type: 'error', message: 'You must upload your Resume in your Profile before registering for an event.' });
-        return;
-    }
-    
+    if (status === 'Registered' && (!user.resume || user.resume === 'N/A' || user.resume.trim() === '')) { setRsvpStatus({ type: 'error', message: 'You must upload your Resume in your Profile before registering for an event.' }); return; }
     setRsvpStatus({ type: 'info', message: 'Recording response...' });
     try {
         const currentDriveId = eventModal.id || eventModal.title;
-        const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
-            driveId: currentDriveId, 
-            title: eventModal.title, 
-            name: user.name, 
-            phone: user.phone,
-            email: user.email, 
-            course: user.course, 
-            branch: user.branch,
-            qualification: user.qualification, 
-            resume: user.resume || "N/A", 
-            status: status,
-            tpoBranch: user.branch
-        });
-        if(res.data.success) {
-            setRsvpStatus({ type: 'success', message: `Status updated to: ${status}` });
-            
-            setData(prev => ({
-                ...prev,
-                driveRSVPs: [...(prev.driveRSVPs || []), { driveId: currentDriveId, status: status }]
-            }));
-
-            setTimeout(() => { setEventModal(null); setRsvpStatus(null); }, 2000);
-        }
-    } catch(e) { 
-        setRsvpStatus({ type: 'error', message: 'Failed to record response.' }); 
-    }
+        const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, { driveId: currentDriveId, title: eventModal.title, name: user.name, phone: user.phone, email: user.email, course: user.course, branch: user.branch, qualification: user.qualification, resume: user.resume || "N/A", status: status, tpoBranch: user.branch });
+        if(res.data.success) { setRsvpStatus({ type: 'success', message: `Status updated to: ${status}` }); setData(prev => ({ ...prev, driveRSVPs: [...(prev.driveRSVPs || []), { driveId: currentDriveId, status: status }] })); setTimeout(() => { setEventModal(null); setRsvpStatus(null); }, 2000); }
+    } catch(e) { setRsvpStatus({ type: 'error', message: 'Failed to record response.' }); }
   };
 
   const isPastDate = (dateStr) => {
     if (!dateStr || dateStr.toLowerCase() === 'open') return false;
     let parts = dateStr.split(/[-/]/);
-    if (parts.length === 3) {
-        let d = new Date(parts[2], parts[1] - 1, parts[0]);
-        let now = new Date(); now.setHours(0,0,0,0);
-        return d < now;
-    }
+    if (parts.length === 3) { let d = new Date(parts[2], parts[1] - 1, parts[0]); let now = new Date(); now.setHours(0,0,0,0); return d < now; }
     return false;
   };
 
-  const parseSafeDate = (dateStr) => {
-    if (!dateStr || dateStr === "N/A" || dateStr === "undefined") return null;
-    let parts = dateStr.split(/[-/]/);
-    if (parts.length === 3) {
-       if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
-       return new Date(parts[2], parts[1]-1, parts[0]);
-    }
-    let d = new Date(dateStr);
-    return isNaN(d) ? null : d;
-  }
-
   const openApplyConfirm = () => {
-    if (!user.resume || user.resume === "N/A" || !user.resume.startsWith("http")) {
-      setActionStatus({ type: 'error', message: 'Resume Required! Please upload your PDF Resume document in your Profile before applying.' });
-      setShowConsent(true);
-    } else { setShowConsent(true); setActionStatus(null); }
+    if (!user.resume || user.resume === "N/A" || !user.resume.startsWith("http")) { setActionStatus({ type: 'error', message: 'Resume Required! Please upload your PDF Resume document in your Profile before applying.' }); setShowConsent(true); } else { setShowConsent(true); setActionStatus(null); }
   };
 
   const handleApply = async () => {
@@ -1895,10 +1617,7 @@ const handleProfileUpdate = async () => {
     setActionStatus({ type: 'info', message: 'Submitting application...' });
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/apply`, { email: user.email, jobId: jobModal.newsletterId, companyName: jobModal.company, name: user.name, phone: user.phone, rollNo: user.rollNo, course: user.course, branch: user.branch, qualification: user.qualification, resume: user.resume });
-      if(res.data.success) {
-        setShowConfetti(true); fetchDashboard(user); 
-        setTimeout(() => { setJobModal(null); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); setShowConfetti(false); }, 2500);
-      } else { setActionStatus({ type: 'error', message: res.data.message }); }
+      if(res.data.success) { setShowConfetti(true); fetchDashboard(user); setTimeout(() => { setJobModal(null); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); setShowConfetti(false); }, 2500); } else { setActionStatus({ type: 'error', message: res.data.message }); }
     } catch(err) { setActionStatus({ type: 'error', message: 'Server Error applying for job' }); }
   };
 
@@ -1912,32 +1631,14 @@ const handleProfileUpdate = async () => {
   const prevMonth = () => setCalDate(new Date(calYear, calMonth - 1, 1));
   const nextMonth = () => setCalDate(new Date(calYear, calMonth + 1, 1));
 
-  const studentJoinDate = parseSafeDate(user.joiningDate);
-  const todayDate = new Date();
-  todayDate.setHours(0,0,0,0);
-  
-  const filteredEvents = (data.events || []).filter(ev => {
-    const d = new Date(ev.date);
-    if(isNaN(d)) return true;
-    d.setHours(0,0,0,0);
-    return d >= todayDate;
-  });
-
-  const processedVacancies = (data.vacancies || []).sort((a, b) => {
-    const aExp = isPastDate(a.lastDate);
-    const bExp = isPastDate(b.lastDate);
-    if (aExp && !bExp) return 1;
-    if (!aExp && bExp) return -1;
-    return 0; 
-  });
+  const todayDate = new Date(); todayDate.setHours(0,0,0,0);
+  const filteredEvents = (data.events || []).filter(ev => { const d = new Date(ev.date); if(isNaN(d)) return true; d.setHours(0,0,0,0); return d >= todayDate; });
+  const processedVacancies = (data.vacancies || []).sort((a, b) => { const aExp = isPastDate(a.lastDate); const bExp = isPastDate(b.lastDate); if (aExp && !bExp) return 1; if (!aExp && bExp) return -1; return 0; });
   
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
   (data.appliedJobs || []).forEach(job => {
     const s = (job.status || job.Status || '').toLowerCase();
-    if (s.includes('offer') || s.includes('placed') || s.includes('selected') || s.includes('joined')) { appStats.offers++; appStats.attended++; }
-    else if (s.includes('not attended')) { appStats.notAttended++; }
-    else if (s.includes('attended') || s.includes('completed')) { appStats.attended++; }
-    else if (s.includes('reject')) { appStats.rejected++; appStats.attended++; }
+    if (s.includes('offer') || s.includes('placed') || s.includes('selected') || s.includes('joined')) { appStats.offers++; appStats.attended++; } else if (s.includes('not attended')) { appStats.notAttended++; } else if (s.includes('attended') || s.includes('completed')) { appStats.attended++; } else if (s.includes('reject')) { appStats.rejected++; appStats.attended++; }
   });
 
   let journeyText = "Keep applying! Your placement journey is just beginning.";
@@ -1962,25 +1663,19 @@ const handleProfileUpdate = async () => {
   const tpoPhone = tpo.phone || tpo.contactNumber || tpo['Contact Number'] || "N/A";
   const tpoAssigned = tpo.assignedBranches || tpo.assignedRegions || tpo['Assigned Branches'] || "N/A";
 
-/* STREAMING_CHUNK: Dashboard Header & Layout Start */
   return (
     <div className="app-layout">
       <div className="top-header">
         <div className="header-left">
           {activeTab !== 'dashboard' ? (
-            <button type="button" onClick={() => changeTab('dashboard')} style={{ background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-main)', padding: '6px 14px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <i className="ph ph-arrow-left"></i> Dashboard
-            </button>
-          ) : (
-            <img src={GLOBAL_LOGO_URL} alt="IPCS Global" className="header-logo-img" />
-          )}
+            <button type="button" onClick={() => changeTab('dashboard')} style={{ background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-main)', padding: '6px 14px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}><i className="ph ph-arrow-left"></i> Dashboard</button>
+          ) : ( <img src={GLOBAL_LOGO_URL} alt="IPCS Global" className="header-logo-img" /> )}
           <span style={{ marginLeft: '10px', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>{getBreadcrumb()}</span>
         </div>
         <div className="header-right">
           <div style={{ position: 'relative' }}>
             <button className="header-icon-btn" onClick={() => setShowNotif(!showNotif)}>
-               <i className="ph ph-bell"></i>
-               {notifications.filter(n => !readNotifs.includes(n.id)).length > 0 && <span style={{ position: 'absolute', top: 0, right: 0, background: '#ef4444', width: '10px', height: '10px', borderRadius: '50%' }}></span>}
+               <i className="ph ph-bell"></i>{notifications.filter(n => !readNotifs.includes(n.id)).length > 0 && <span style={{ position: 'absolute', top: 0, right: 0, background: '#ef4444', width: '10px', height: '10px', borderRadius: '50%' }}></span>}
             </button>
             {showNotif && (
               <div className="notif-dropdown">
@@ -2001,9 +1696,7 @@ const handleProfileUpdate = async () => {
               </div>
             )}
           </div>
-          <button className="header-icon-btn" onClick={toggleTheme}>
-            <i className={`ph ${theme === 'dark' ? 'ph-moon' : 'ph-sun'}`}></i>
-          </button>
+          <button className="header-icon-btn" onClick={toggleTheme}><i className={`ph ${theme === 'dark' ? 'ph-moon' : 'ph-sun'}`}></i></button>
           <div className="user-profile-badge" onClick={() => setDrawerOpen(true)}>
             <div className="avatar-circle">
                {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} alt="Profile" /> : null}
@@ -2013,7 +1706,6 @@ const handleProfileUpdate = async () => {
         </div>
       </div>
 
-/* STREAMING_CHUNK: Dashboard Main Body */
       <div className="main-body">
         <div className="dashboard-content">
         
@@ -2022,11 +1714,7 @@ const handleProfileUpdate = async () => {
             <>
               <div className="dash-top-row">
                 <div className="hero-banner">
-                  <div className="hero-banner-avatar">
-                    <div className="hero-banner-avatar-inner">
-                      {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} alt="Profile" /> : (user?.name?.charAt(0).toUpperCase() || 'U')}
-                    </div>
-                  </div>
+                  <div className="hero-banner-avatar"><div className="hero-banner-avatar-inner">{user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} alt="Profile" /> : (user?.name?.charAt(0).toUpperCase() || 'U')}</div></div>
                   <div>
                     <div className="greeting-subtitle">{greeting.text} {greeting.emoji}</div>
                     <h2>Welcome back, <span style={{ color: 'var(--accent-cyan)' }}>{user.name?.split(' ')[0]}</span>!</h2>
@@ -2050,57 +1738,30 @@ const handleProfileUpdate = async () => {
               <div className="vacancy-quick-banner" onClick={() => changeTab('vacancies')}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <div style={{ background: 'rgba(255,255,255,0.1)', padding: '12px', borderRadius: '12px', color: '#a855f7' }}><i className="ph ph-briefcase" style={{ fontSize: '1.5rem' }}></i></div>
-                  <div>
-                    <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#ffffff' }}>Latest Placement Vacancies</div>
-                    <div style={{ fontSize: '0.82rem', color: '#a5b4fc' }}>Explore active job openings for your course</div>
-                  </div>
+                  <div><div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#ffffff' }}>Latest Placement Vacancies</div><div style={{ fontSize: '0.82rem', color: '#a5b4fc' }}>Explore active job openings for your course</div></div>
                 </div>
                 <button className="btn-action" style={{ background: '#6366f1', padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>View Openings</button>
               </div>
 
               <div className="stats-row">
-                <div className="stat-card-new">
-                  <div className="stat-icon-wrapper" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-check-circle"></i></div>
-                  <div><div className="stat-num">{data.stats?.attended || 0}</div><div className="stat-label">Talentino Attended</div></div>
-                </div>
-                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}>
-                  <div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-briefcase"></i></div>
-                  <div><div className="stat-num">{data.stats?.applied || 0}</div><div className="stat-label">Jobs Applied</div></div>
-                </div>
-                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}>
-                  <div className="stat-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-calendar-check"></i></div>
-                  <div><div className="stat-num">{data.stats?.interviews || 0}</div><div className="stat-label">Interviews Scheduled</div></div>
-                </div>
-                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}>
-                  <div className="stat-icon-wrapper" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-certificate"></i></div>
-                  <div><div className="stat-num">{data.stats?.offers || 0}</div><div className="stat-label">Offers Received</div></div>
-                </div>
+                <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-check-circle"></i></div><div><div className="stat-num">{data.stats?.attended || 0}</div><div className="stat-label">Talentino Attended</div></div></div>
+                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}><div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-briefcase"></i></div><div><div className="stat-num">{data.stats?.applied || 0}</div><div className="stat-label">Jobs Applied</div></div></div>
+                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}><div className="stat-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-calendar-check"></i></div><div><div className="stat-num">{data.stats?.interviews || 0}</div><div className="stat-label">Interviews Scheduled</div></div></div>
+                <div className="stat-card-new" onClick={() => changeTab('status')} style={{cursor:'pointer'}}><div className="stat-icon-wrapper" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-certificate"></i></div><div><div className="stat-num">{data.stats?.offers || 0}</div><div className="stat-label">Offers Received</div></div></div>
               </div>
 
               <div className="dash-bottom-row">
                 <div className="upcoming-wrapper">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--card-border)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
                     <h3 style={{ margin: 0, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="ph-fill ph-calendar-star" style={{ color: 'var(--accent-cyan)' }}></i> Upcoming Events</h3>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', background: 'var(--bg-dark)', padding: '5px 10px', borderRadius: '8px' }}><i className="ph ph-trend-up"></i></div>
                   </div>
-                  
-                  {filteredEvents.length === 0 ? (
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No upcoming events scheduled for today or later.</div>
-                  ) : (
+                  {filteredEvents.length === 0 ? ( <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No upcoming events scheduled for today or later.</div> ) : (
                     filteredEvents.map((ev, index) => {
-                       let monthStr = "TBA"; let dayStr = "-";
-                       let d = new Date(ev.date);
-                       if(!isNaN(d)) { dayStr = d.getDate(); monthStr = d.toLocaleString('en-US', { month: 'short' }); }
+                       let monthStr = "TBA"; let dayStr = "-"; let d = new Date(ev.date); if(!isNaN(d)) { dayStr = d.getDate(); monthStr = d.toLocaleString('en-US', { month: 'short' }); }
                        return (
                           <div className="event-row-card" key={index} style={{cursor: 'pointer'}} onClick={() => setEventModal(ev)}>
-                            <div className="event-date-box">
-                              <div className="ev-month">{monthStr}</div>
-                              <div className="ev-day">{dayStr}</div>
-                            </div>
-                            <div className="event-body">
-                              <div className="ev-title">{ev.title}</div>
-                              <div className="ev-meta"><i className="ph ph-clock"></i> {ev.time || 'TBA'}</div>
-                            </div>
+                            <div className="event-date-box"><div className="ev-month">{monthStr}</div><div className="ev-day">{dayStr}</div></div>
+                            <div className="event-body"><div className="ev-title">{ev.title}</div><div className="ev-meta"><i className="ph ph-clock"></i> {ev.time || 'TBA'}</div></div>
                             <div className="ev-badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid #7e22ce' }}>{ev.type}</div>
                           </div>
                        )
@@ -2111,7 +1772,7 @@ const handleProfileUpdate = async () => {
             </>
           )}
 
-/* STREAMING_CHUNK: Events Tab Component */
+          {/* Events Tab */}
           {activeTab === 'events' && (
             <div className="animate-fade-in" style={{ height: '100%' }}>
                <div className="calendar-layout">
@@ -2119,14 +1780,9 @@ const handleProfileUpdate = async () => {
                        <div className="mini-cal">
                            <h3 style={{margin: '0 0 15px 0', fontSize:'1.2rem', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                                <span>{monthNames[calMonth]} {calYear}</span>
-                               <div style={{display:'flex', gap:'10px'}}>
-                                 <i className="ph ph-caret-left" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={prevMonth}></i>
-                                 <i className="ph ph-caret-right" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={nextMonth}></i>
-                               </div>
+                               <div style={{display:'flex', gap:'10px'}}><i className="ph ph-caret-left" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={prevMonth}></i><i className="ph ph-caret-right" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={nextMonth}></i></div>
                            </h3>
-                           <div style={{display:'grid', gridTemplateColumns:'repeat(7, 1fr)', textAlign:'center', fontSize:'0.75rem', color:'var(--text-muted)', marginBottom:'10px'}}>
-                               <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                           </div>
+                           <div style={{display:'grid', gridTemplateColumns:'repeat(7, 1fr)', textAlign:'center', fontSize:'0.75rem', color:'var(--text-muted)', marginBottom:'10px'}}><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>
                            <div style={{display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:'5px', textAlign:'center', fontSize:'0.85rem'}}>
                                {blanks.map(b => <div key={`mblank-${b}`}></div>)}
                                {days.map(d => {
@@ -2138,18 +1794,9 @@ const handleProfileUpdate = async () => {
                        
                        <div className="mini-cal">
                            <h3 style={{margin: '0 0 15px 0', fontSize:'1rem', display:'flex', alignItems:'center', justifyContent:'space-between'}}>Event Categories <i className="ph ph-plus" style={{color:'var(--text-muted)'}}></i></h3>
-                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'12px', fontSize:'0.85rem'}}>
-                               <div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#3b82f6'}}></div> Placement Drives</div>
-                               <i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i>
-                           </div>
-                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'12px', fontSize:'0.85rem'}}>
-                               <div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#10b981'}}></div> Training Sessions</div>
-                               <i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i>
-                           </div>
-                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', fontSize:'0.85rem'}}>
-                               <div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#8b5cf6'}}></div> General Events</div>
-                               <i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i>
-                           </div>
+                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'12px', fontSize:'0.85rem'}}><div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#3b82f6'}}></div> Placement Drives</div><i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i></div>
+                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'12px', fontSize:'0.85rem'}}><div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#10b981'}}></div> Training Sessions</div><i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i></div>
+                           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', fontSize:'0.85rem'}}><div style={{display:'flex', alignItems:'center', gap:'10px'}}><div className="pill-dot" style={{background:'#8b5cf6'}}></div> General Events</div><i className="ph-fill ph-toggle-right" style={{color:'var(--accent-cyan)', fontSize:'1.2rem'}}></i></div>
                        </div>
 
                        <div className="mini-cal">
@@ -2171,11 +1818,7 @@ const handleProfileUpdate = async () => {
                                <div className={`cal-toggle-btn ${calView==='Week'?'active':''}`} onClick={()=>setCalView('Week')}>Week</div>
                                <div className={`cal-toggle-btn ${calView==='Month'?'active':''}`} onClick={()=>setCalView('Month')}>Month</div>
                            </div>
-                           <div style={{display:'flex', alignItems:'center', gap:'15px', fontWeight:800, fontSize:'1.1rem'}}>
-                               <i className="ph ph-caret-left" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={prevMonth}></i>
-                               {monthNames[calMonth]} {calYear}
-                               <i className="ph ph-caret-right" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={nextMonth}></i>
-                           </div>
+                           <div style={{display:'flex', alignItems:'center', gap:'15px', fontWeight:800, fontSize:'1.1rem'}}><i className="ph ph-caret-left" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={prevMonth}></i>{monthNames[calMonth]} {calYear}<i className="ph ph-caret-right" style={{cursor:'pointer', color:'var(--text-muted)'}} onClick={nextMonth}></i></div>
                        </div>
                        
                        {calView !== 'Month' ? (
@@ -2189,13 +1832,7 @@ const handleProfileUpdate = async () => {
 
                                   return (
                                     <div key={idx} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderLeft: `4px solid ${typeColor}`, padding: '15px 20px', borderRadius: '10px', marginBottom: '12px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => {setEventModal(ev); setRsvpStatus(null);}}>
-                                        <div>
-                                            <div style={{ fontWeight: 800, color: 'var(--text-main)', marginBottom: '6px', fontSize: '1.05rem' }}>{ev.title}</div>
-                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', gap: '15px' }}>
-                                                <span><i className="ph ph-calendar"></i> {ev.date}</span>
-                                                <span><i className="ph ph-clock"></i> {ev.time || 'TBA'}</span>
-                                            </div>
-                                        </div>
+                                        <div><div style={{ fontWeight: 800, color: 'var(--text-main)', marginBottom: '6px', fontSize: '1.05rem' }}>{ev.title}</div><div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', gap: '15px' }}><span><i className="ph ph-calendar"></i> {ev.date}</span><span><i className="ph ph-clock"></i> {ev.time || 'TBA'}</span></div></div>
                                         <div style={{ background: `${typeColor}22`, color: typeColor, padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>{ev.type}</div>
                                     </div>
                                   )
@@ -2203,19 +1840,13 @@ const handleProfileUpdate = async () => {
                           </div>
                        ) : (
                           <>
-                           <div className="cal-grid-header">
-                               <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                           </div>
+                           <div className="cal-grid-header"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
                            <div className="cal-grid-body">
                               {blanks.map(b => <div key={`blank-${b}`} className="cal-day-cell" style={{opacity: 0.3}}></div>)}
                               {days.map(d => {
                                   const dayEvents = (data.events || []).filter(ev => {
-                                      if(!ev.date || ev.date === 'TBA') return false;
-                                      const ed = new Date(ev.date);
-                                      if(isNaN(ed)) return false;
-                                      return ed.getDate() === d && ed.getMonth() === calMonth && ed.getFullYear() === calYear;
+                                      if(!ev.date || ev.date === 'TBA') return false; const ed = new Date(ev.date); if(isNaN(ed)) return false; return ed.getDate() === d && ed.getMonth() === calMonth && ed.getFullYear() === calYear;
                                   });
-                                  
                                   const isToday = new Date().getDate() === d && new Date().getMonth() === calMonth && new Date().getFullYear() === calYear;
 
                                   return (
@@ -2225,11 +1856,9 @@ const handleProfileUpdate = async () => {
                                               let typeColor = '#8b5cf6';
                                               if(ev.type && (ev.type.toLowerCase().includes('drive') || ev.type.toLowerCase().includes('placement'))) typeColor = '#3b82f6';
                                               else if(ev.type && ev.type.toLowerCase().includes('train')) typeColor = '#10b981';
-                                              
                                               return (
                                                   <div key={i} className="cal-event-pill" style={{background: `${typeColor}22`, border: `1px solid ${typeColor}55`, color: typeColor}} onClick={() => {setEventModal(ev); setRsvpStatus(null);}}>
-                                                      <div className="pill-dot" style={{background: typeColor}}></div>
-                                                      {ev.title}
+                                                      <div className="pill-dot" style={{background: typeColor}}></div>{ev.title}
                                                   </div>
                                               )
                                           })}
@@ -2244,7 +1873,7 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-/* STREAMING_CHUNK: Profile Tab Component */
+          {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -2255,24 +1884,14 @@ const handleProfileUpdate = async () => {
                 <div className="profile-left-col">
                   <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1rem auto' }}>
                     <div className="profile-large-avatar" style={{ margin: 0, width: '100%', height: '100%' }}>
-                       {photoUploading ? (
-                           <i className="ph ph-spinner" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></i>
-                       ) : (
-                           <>
-                             {user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} alt="Profile" /> : null}
-                             <span style={{ display: (!user?.photo || user.photo === "N/A") ? 'flex' : 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>{user?.name?.charAt(0).toUpperCase()}</span>
-                           </>
+                       {photoUploading ? <i className="ph ph-spinner" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></i> : (
+                           <>{user?.photo && user.photo !== "N/A" ? <img src={getDriveImageUrl(user.photo)} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} alt="Profile" /> : null}
+                             <span style={{ display: (!user?.photo || user.photo === "N/A") ? 'flex' : 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>{user?.name?.charAt(0).toUpperCase()}</span></>
                        )}
                     </div>
-                    <div 
-                       onClick={() => document.getElementById('photoUploadInput').click()} 
-                       style={{ position: 'absolute', bottom: '0px', right: '0px', background: 'var(--accent-blue)', color: '#fff', width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid var(--card-bg)', zIndex: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}
-                     >
-                       <i className="ph-fill ph-camera"></i>
-                    </div>
+                    <div onClick={() => document.getElementById('photoUploadInput').click()} style={{ position: 'absolute', bottom: '0px', right: '0px', background: 'var(--accent-blue)', color: '#fff', width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid var(--card-bg)', zIndex: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}><i className="ph-fill ph-camera"></i></div>
                     <input type="file" id="photoUploadInput" accept="image/*" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Photo')} />
                   </div>
-                  
                   <h2 style={{ margin: '10px 0 5px 0', fontSize: '1.4rem', position: 'relative', zIndex: 2 }}>{user.name}</h2>
                   <div style={{ color: 'var(--text-muted)', marginBottom: '15px', position: 'relative', zIndex: 2 }}>{user.course}</div>
                   <div style={{ display: 'inline-block', position: 'relative', zIndex: 2, background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid #22c55e' }}>{user.studyStatus || 'Active'}</div>
@@ -2332,35 +1951,13 @@ const handleProfileUpdate = async () => {
 
                   <div className="info-card">
                     <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '0.8rem' }}>Documents (Resume & Certificate)</div>
-                    
                     <div className="doc-box">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <i className="ph-fill ph-file-pdf" style={{ fontSize: '1.8rem', color: '#ef4444' }}></i>
-                        <div>
-                          <div style={{ fontWeight: 700 }}>📄 Resume.pdf</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status: {user.resume && user.resume !== 'N/A' && user.resume.includes('http') ? <span style={{color: '#4ade80'}}>Uploaded</span> : 'Not Uploaded'}</div>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <input type="file" id="resumeUploadInput" accept=".pdf" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Resume')} />
-                        <button className="btn-cancel" style={{ padding: '0.5rem 1rem' }} onClick={() => document.getElementById('resumeUploadInput').click()}><i className="ph ph-upload-simple"></i> Upload</button>
-                        {user.resume && user.resume !== 'N/A' && user.resume.includes('http') && <a href={user.resume} target="_blank" rel="noreferrer" className="btn-action" style={{ padding: '0.5rem 1rem', textDecoration: 'none' }}><i className="ph ph-download-simple"></i> View</a>}
-                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}><i className="ph-fill ph-file-pdf" style={{ fontSize: '1.8rem', color: '#ef4444' }}></i><div><div style={{ fontWeight: 700 }}>📄 Resume.pdf</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status: {user.resume && user.resume !== 'N/A' && user.resume.includes('http') ? <span style={{color: '#4ade80'}}>Uploaded</span> : 'Not Uploaded'}</div></div></div>
+                      <div style={{ display: 'flex', gap: '10px' }}><input type="file" id="resumeUploadInput" accept=".pdf" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Resume')} /><button className="btn-cancel" style={{ padding: '0.5rem 1rem' }} onClick={() => document.getElementById('resumeUploadInput').click()}><i className="ph ph-upload-simple"></i> Upload</button>{user.resume && user.resume !== 'N/A' && user.resume.includes('http') && <a href={user.resume} target="_blank" rel="noreferrer" className="btn-action" style={{ padding: '0.5rem 1rem', textDecoration: 'none' }}><i className="ph ph-download-simple"></i> View</a>}</div>
                     </div>  
-                    
                     <div className="doc-box">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <i className="ph-fill ph-certificate" style={{ fontSize: '1.8rem', color: '#f59e0b' }}></i>
-                        <div>
-                          <div style={{ fontWeight: 700 }}>🏅 Course Certificate.pdf</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status: {user.certificate && user.certificate !== 'N/A' && user.certificate.includes('http') ? <span style={{color: '#4ade80'}}>Uploaded</span> : 'Not Uploaded'}</div>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <input type="file" id="certUploadInput" accept=".pdf" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Certificate')} />
-                        <button className="btn-cancel" style={{ padding: '0.5rem 1rem' }} onClick={() => document.getElementById('certUploadInput').click()}><i className="ph ph-upload-simple"></i> Upload</button>
-                        {user.certificate && user.certificate !== 'N/A' && user.certificate.includes('http') && <a href={user.certificate} target="_blank" rel="noreferrer" className="btn-action" style={{ padding: '0.5rem 1rem', textDecoration: 'none' }}><i className="ph ph-download-simple"></i> View</a>}
-                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}><i className="ph-fill ph-certificate" style={{ fontSize: '1.8rem', color: '#f59e0b' }}></i><div><div style={{ fontWeight: 700 }}>🏅 Course Certificate.pdf</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status: {user.certificate && user.certificate !== 'N/A' && user.certificate.includes('http') ? <span style={{color: '#4ade80'}}>Uploaded</span> : 'Not Uploaded'}</div></div></div>
+                      <div style={{ display: 'flex', gap: '10px' }}><input type="file" id="certUploadInput" accept=".pdf" className="hidden" onChange={(e) => handleDocumentUpload(e, 'Certificate')} /><button className="btn-cancel" style={{ padding: '0.5rem 1rem' }} onClick={() => document.getElementById('certUploadInput').click()}><i className="ph ph-upload-simple"></i> Upload</button>{user.certificate && user.certificate !== 'N/A' && user.certificate.includes('http') && <a href={user.certificate} target="_blank" rel="noreferrer" className="btn-action" style={{ padding: '0.5rem 1rem', textDecoration: 'none' }}><i className="ph ph-download-simple"></i> View</a>}</div>
                     </div>
                     {docStatus.msg && <div className={`alert alert-${docStatus.type}`} style={{marginTop: '10px'}}>{docStatus.msg}</div>}
                   </div>
@@ -2369,7 +1966,7 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-/* STREAMING_CHUNK: Study Materials Tab Component */
+          {/* Study Materials Tab */}
           {activeTab === 'materials' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -2379,8 +1976,7 @@ const handleProfileUpdate = async () => {
 
               {studyMatStatus && studyMatStatus.type === 'error' ? (
                 <div className="alert alert-error" style={{ padding: '2rem', textAlign: 'center', maxWidth: '600px', margin: '2rem auto' }}>
-                  <i className="ph-fill ph-lock-key" style={{ fontSize: '2.5rem', display: 'block', marginBottom: '10px' }}></i>
-                  {studyMatStatus.message}
+                  <i className="ph-fill ph-lock-key" style={{ fontSize: '2.5rem', display: 'block', marginBottom: '10px' }}></i>{studyMatStatus.message}
                 </div>
               ) : studyMaterials.length === 0 ? (
                 <div className="alert alert-info" style={{ textAlign: 'center', padding: '2rem' }}>No study materials uploaded for your course yet.</div>
@@ -2388,14 +1984,8 @@ const handleProfileUpdate = async () => {
                 <div className="resume-grid">
                   {studyMaterials.map((mat, idx) => (
                     <div key={idx} className="resume-card" onClick={() => handleViewMaterial(mat)}>
-                      <div className="resume-icon-box" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899' }}>
-                        <i className={`ph-fill ${mat.fileType.toLowerCase().includes('pdf') ? 'ph-file-pdf' : 'ph-presentation'}`}></i>
-                      </div>
-                      <div style={{ flex: 1, overflow: 'hidden' }}>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>{mat.topic}</div>
-                        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mat.title}</h3>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Format: {mat.fileType}</span>
-                      </div>
+                      <div className="resume-icon-box" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899' }}><i className={`ph-fill ${mat.fileType.toLowerCase().includes('pdf') ? 'ph-file-pdf' : 'ph-presentation'}`}></i></div>
+                      <div style={{ flex: 1, overflow: 'hidden' }}><div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>{mat.topic}</div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{mat.title}</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Format: {mat.fileType}</span></div>
                       <button className="btn-action" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', background: '#ec4899' }}>View</button>
                     </div>
                   ))}
@@ -2404,54 +1994,32 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-/* STREAMING_CHUNK: Gamified Aptitude Tab Component */
+          {/* Gamified Aptitude Tab */}
           {activeTab === 'aptitude' && (
             <div className="animate-fade-in">
-              
-              {/* 1. THE LOBBY & LEADERBOARD */}
               {aptitudeView === 'lobby' && (
                 <div className="test-layout-grid">
                   <div>
                       <div className="aptitude-lobby-card" style={{ marginBottom: '1.5rem', background: 'radial-gradient(circle at top left, #1e1b4b, var(--card-bg))' }}>
                           <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Pro Assessment Engine</div>
                           <h2 style={{ margin: '10px 0', fontSize: '2.5rem', color: '#fff', textShadow: '0 4px 15px rgba(0,0,0,0.5)' }}>Level Up Your Skills.</h2>
-                          <p style={{ color: '#a5b4fc', margin: '0 0 2rem 0', fontSize: '1rem', lineHeight: '1.6' }}>
-                              Survive 3 increasingly difficult levels. Compete against students across all branches and secure your spot on the Leaderboard.
-                          </p>
-                          <button className="btn-action" style={{ padding: '1.2rem 2.5rem', fontSize: '1.1rem', background: 'linear-gradient(90deg, #3b82f6, #38bdf8)', boxShadow: '0 10px 25px rgba(56, 189, 248, 0.4)', borderRadius: '30px' }} onClick={handleStartAptitude}>
-                              <i className="ph-bold ph-play"></i> Enter the Arena
-                          </button>
+                          <p style={{ color: '#a5b4fc', margin: '0 0 2rem 0', fontSize: '1rem', lineHeight: '1.6' }}>Survive 3 increasingly difficult levels. Compete against students across all branches and secure your spot on the Leaderboard.</p>
+                          <button className="btn-action" style={{ padding: '1.2rem 2.5rem', fontSize: '1.1rem', background: 'linear-gradient(90deg, #3b82f6, #38bdf8)', boxShadow: '0 10px 25px rgba(56, 189, 248, 0.4)', borderRadius: '30px' }} onClick={handleStartAptitude}><i className="ph-bold ph-play"></i> Enter the Arena</button>
                       </div>
-
                       <div className="stats-row">
                           <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-sword"></i></div><div><div className="stat-num">3</div><div className="stat-label">Levels</div></div></div>
                           <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-percent"></i></div><div><div className="stat-num">60%</div><div className="stat-label">To Advance</div></div></div>
                       </div>
                   </div>
-
-                  {/* Global Leaderboard Panel */}
                   <div className="leaderboard-card">
-                      <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b' }}>
-                          <i className="ph-fill ph-trophy"></i> Top 10 Hall of Fame
-                      </h3>
-                      {leaderboard.length === 0 ? (
-                          <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Arena is empty. Be the first to play!</div>
-                      ) : (
+                      <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b' }}><i className="ph-fill ph-trophy"></i> Top 10 Hall of Fame</h3>
+                      {leaderboard.length === 0 ? ( <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Arena is empty. Be the first to play!</div> ) : (
                           leaderboard.map((player, idx) => {
                               let rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'rank-other';
                               return (
                                   <div key={idx} className="leaderboard-row">
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                          <div className={`leaderboard-rank ${rankClass}`}>{idx + 1}</div>
-                                          <div>
-                                              <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.9rem' }}>{player.name}</div>
-                                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{player.branch} • {player.levelReached}</div>
-                                          </div>
-                                      </div>
-                                      <div style={{ textAlign: 'right' }}>
-                                          <div style={{ fontWeight: 900, color: 'var(--accent-cyan)' }}>{player.score} pts</div>
-                                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{Math.floor(player.timeSeconds/60)}m {player.timeSeconds%60}s</div>
-                                      </div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><div className={`leaderboard-rank ${rankClass}`}>{idx + 1}</div><div><div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.9rem' }}>{player.name}</div><div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{player.branch} • {player.levelReached}</div></div></div>
+                                      <div style={{ textAlign: 'right' }}><div style={{ fontWeight: 900, color: 'var(--accent-cyan)' }}>{player.score} pts</div><div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{Math.floor(player.timeSeconds/60)}m {player.timeSeconds%60}s</div></div>
                                   </div>
                               );
                           })
@@ -2460,111 +2028,68 @@ const handleProfileUpdate = async () => {
                 </div>
               )}
 
-              {/* 2. TRANSITION ANIMATION SCREEN */}
               {aptitudeView === 'transition' && (
                 <div className="level-transition-screen">
                     <div style={{ fontSize: '1.2rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '10px' }}>Preparing Next Stage</div>
                     <div className="level-badge-large">LEVEL {currentLevel}</div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-                        {currentLevel === 1 ? "Warming up... Basic Concepts." : currentLevel === 2 ? "Things are heating up... Intermediate Concepts." : "Final Boss... Advanced Concepts."}
-                    </p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>{currentLevel === 1 ? "Warming up... Basic Concepts." : currentLevel === 2 ? "Things are heating up... Intermediate Concepts." : "Final Boss... Advanced Concepts."}</p>
                     <div style={{ marginTop: '2rem', width: '60px', height: '60px', borderRadius: '50%', borderTop: '4px solid var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></div>
                 </div>
               )}
 
-              {/* 3. LIVE GAME ENGINE */}
               {aptitudeView === 'live' && levelData[currentLevel] && (
                 <div className="test-layout-grid">
                   <div className="test-main-card" style={{ animation: 'borderPulse 3s infinite' }}>
-                    
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                      <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>
-                        Level {currentLevel} • {levelData[currentLevel][currentQIndex]?.category}
-                      </span>
-                      <div className={`test-timer-badge ${testTimeLeft <= 60 ? 'warning' : ''}`}>
-                        <i className="ph-bold ph-timer"></i>
-                        {Math.floor(testTimeLeft / 60).toString().padStart(2, '0')}:{(testTimeLeft % 60).toString().padStart(2, '0')}
-                      </div>
+                      <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>Level {currentLevel} • {levelData[currentLevel][currentQIndex]?.category}</span>
+                      <div className={`test-timer-badge ${testTimeLeft <= 60 ? 'warning' : ''}`}><i className="ph-bold ph-timer"></i>{Math.floor(testTimeLeft / 60).toString().padStart(2, '0')}:{(testTimeLeft % 60).toString().padStart(2, '0')}</div>
                     </div>
-
-                    {/* Gamified Progress Bar */}
-                    <div className="game-progress-container">
-                        <div className="game-progress-fill" style={{ width: `${((currentQIndex + 1) / levelData[currentLevel].length) * 100}%` }}></div>
-                    </div>
-
-                    <h3 style={{ fontSize: '1.3rem', lineHeight: 1.5, marginBottom: '2rem', color: 'var(--text-main)' }}>
-                      {levelData[currentLevel][currentQIndex]?.question}
-                    </h3>
-
+                    <div className="game-progress-container"><div className="game-progress-fill" style={{ width: `${((currentQIndex + 1) / levelData[currentLevel].length) * 100}%` }}></div></div>
+                    <h3 style={{ fontSize: '1.3rem', lineHeight: 1.5, marginBottom: '2rem', color: 'var(--text-main)' }}>{levelData[currentLevel][currentQIndex]?.question}</h3>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       {Object.entries(levelData[currentLevel][currentQIndex]?.options || {}).map(([optKey, optText]) => {
                         const isSelected = userAnswers[levelData[currentLevel][currentQIndex].id] === optKey;
                         return (
-                          <div
-                            key={optKey}
-                            className={`option-select-box ${isSelected ? 'selected' : ''}`}
-                            onClick={() => handleOptionSelect(levelData[currentLevel][currentQIndex].id, optKey)}
-                          >
-                            <div className="option-circle">{optKey}</div>
-                            <span style={{ fontSize: '1rem', fontWeight: 600 }}>{optText}</span>
+                          <div key={optKey} className={`option-select-box ${isSelected ? 'selected' : ''}`} onClick={() => handleOptionSelect(levelData[currentLevel][currentQIndex].id, optKey)}>
+                            <div className="option-circle">{optKey}</div><span style={{ fontSize: '1rem', fontWeight: 600 }}>{optText}</span>
                           </div>
                         );
                       })}
                     </div>
-
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--card-border)' }}>
-                      <button className="btn-cancel" disabled={currentQIndex === 0} onClick={() => setCurrentQIndex(prev => prev - 1)}>
-                        &larr; Prev
-                      </button>
+                      <button className="btn-cancel" disabled={currentQIndex === 0} onClick={() => setCurrentQIndex(prev => prev - 1)}>&larr; Prev</button>
                       {currentQIndex < levelData[currentLevel].length - 1 ? (
-                        <button className="btn-action" onClick={() => setCurrentQIndex(prev => prev + 1)}>
-                          Next &rarr;
-                        </button>
+                        <button className="btn-action" onClick={() => setCurrentQIndex(prev => prev + 1)}>Next &rarr;</button>
                       ) : (
-                        <button className="btn-action" style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)' }} onClick={handleLevelComplete}>
-                          {currentLevel < 3 ? 'Evaluate & Advance 🚀' : 'Finish Final Level 🏆'}
-                        </button>
+                        <button className="btn-action" style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)' }} onClick={handleLevelComplete}>{currentLevel < 3 ? 'Evaluate & Advance 🚀' : 'Finish Final Level 🏆'}</button>
                       )}
                     </div>
                   </div>
-
-                  {/* Sidebar Mini Map */}
                   <div className="test-main-card">
                       <h4 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Level Map</h4>
                       <div className="palette-grid">
                         {levelData[currentLevel].map((q, idx) => {
                           const isAnswered = !!userAnswers[q.id];
-                          return (
-                            <div key={q.id} className={`palette-btn ${currentQIndex === idx ? 'active' : ''} ${isAnswered ? 'answered' : ''}`} onClick={() => setCurrentQIndex(idx)}>
-                              {idx + 1}
-                            </div>
-                          );
+                          return ( <div key={q.id} className={`palette-btn ${currentQIndex === idx ? 'active' : ''} ${isAnswered ? 'answered' : ''}`} onClick={() => setCurrentQIndex(idx)}>{idx + 1}</div> );
                         })}
                       </div>
-                      <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel)}>
-                        Surrender / End Test
-                      </button>
+                      <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel)}>Surrender / End Test</button>
                   </div>
                 </div>
               )}
 
-              {/* 4. FINAL GAME OVER / VICTORY SCREEN */}
               {aptitudeView === 'result' && (
                 <div className="level-transition-screen">
                     <div style={{ fontSize: '5rem', marginBottom: '10px' }}>{currentLevel >= 3 ? '🏆' : '💀'}</div>
-                    <div className="level-badge-large" style={{ fontSize: '3rem' }}>
-                        {currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER'}
-                    </div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
-                        You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.
-                    </p>
+                    <div className="level-badge-large" style={{ fontSize: '3rem' }}>{currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER'}</div>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</p>
                     <button className="btn-action" onClick={() => setAptitudeView('lobby')}>Return to Lobby</button>
                 </div>
               )}
             </div>
           )}
 
-/* STREAMING_CHUNK: Settings Tab Component */
+          {/* Settings Tab */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
@@ -2592,14 +2117,8 @@ const handleProfileUpdate = async () => {
                           <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem' }}>Appearance</h3>
                           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '1rem' }}>Choose how the dashboard looks. You can also toggle the theme from the top bar.</p>
                           <div style={{ display: 'flex', gap: '15px' }}>
-                             <div onClick={() => toggleTheme()} style={{ flex: 1, border: `2px solid ${theme === 'light' ? 'var(--accent-cyan)' : 'var(--input-border)'}`, borderRadius: '12px', padding: '1rem', textAlign: 'center', cursor: 'pointer' }}>
-                                <div style={{ height: '60px', borderRadius: '8px', marginBottom: '10px', border: '1px solid var(--input-border)', background: '#ffffff' }}></div>
-                                <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>Light</div>
-                             </div>
-                             <div onClick={() => toggleTheme()} style={{ flex: 1, border: `2px solid ${theme === 'dark' ? 'var(--accent-cyan)' : 'var(--input-border)'}`, borderRadius: '12px', padding: '1rem', textAlign: 'center', cursor: 'pointer' }}>
-                                <div style={{ height: '60px', borderRadius: '8px', marginBottom: '10px', border: '1px solid var(--input-border)', background: '#0f172a' }}></div>
-                                <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>Dark</div>
-                             </div>
+                             <div onClick={() => toggleTheme()} style={{ flex: 1, border: `2px solid ${theme === 'light' ? 'var(--accent-cyan)' : 'var(--input-border)'}`, borderRadius: '12px', padding: '1rem', textAlign: 'center', cursor: 'pointer' }}><div style={{ height: '60px', borderRadius: '8px', marginBottom: '10px', border: '1px solid var(--input-border)', background: '#ffffff' }}></div><div style={{ fontSize: '0.85rem', fontWeight: 700 }}>Light</div></div>
+                             <div onClick={() => toggleTheme()} style={{ flex: 1, border: `2px solid ${theme === 'dark' ? 'var(--accent-cyan)' : 'var(--input-border)'}`, borderRadius: '12px', padding: '1rem', textAlign: 'center', cursor: 'pointer' }}><div style={{ height: '60px', borderRadius: '8px', marginBottom: '10px', border: '1px solid var(--input-border)', background: '#0f172a' }}></div><div style={{ fontSize: '0.85rem', fontWeight: 700 }}>Dark</div></div>
                           </div>
                        </div>
                     )}
@@ -2608,71 +2127,29 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-/* STREAMING_CHUNK: Guide Tab Component */
+          {/* Guide Tab */}
           {activeTab === 'guide' && (
             <div className="animate-fade-in">
-              <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Guide & Resume Resources</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Explore top platforms and guides to create a professional resume and prepare for placements.</p>
-              </div>
+              <div style={{ marginBottom: '2rem' }}><h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Guide & Resume Resources</h2><p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Explore top platforms and guides to create a professional resume and prepare for placements.</p></div>
               <div className="resume-grid">
-                 <div className="resume-card" onClick={() => window.open('https://drive.google.com/file/d/10IFApxJGwGwRmVFpEtfQxc1RR-IraOq7/view?pli=1', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80' }}><i className="ph-fill ph-book-open"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Talentino HandBook</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>The official IPCS placement guide</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.canva.com/en_in/login/?redirect=%2Fs%2Ftemplates%3Fquery%3Dprofessional%2Bresume', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(2, 132, 199, 0.15)', color: '#38bdf8' }}><i className="ph-fill ph-palette"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Canva Templates</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Design highly visual & modern resumes</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=ZMByWenSRdI', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume Writing Part 1</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Essential basics for beginners</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=VB376MMEq38', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume Writing Part 2</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Structuring your skills and experience</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=gDN7cJ3Rt80', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Interview Prep Guide</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>How to confidently answer questions</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=7JRj3r5vunU', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>ATS Resume Guide</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>How to beat Applicant Tracking Systems</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=EW4dEzfBst0', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Body Language Tips</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Master your non-verbal communication</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=k_f4Mb2ARdA', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Group Discussion Strategy</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Stand out during group evaluations</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=UjX_kl5UxPo', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Common Mistakes</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Watch out for these CV errors</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://resume.io/resume-templates', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}><i className="ph-fill ph-file-text"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume.io</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Professional builder with ATS templates</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://www.myperfectresume.com/', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80' }}><i className="ph-fill ph-check-square"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>MyPerfectResume</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Fast and easy online resume creator</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://zety.com/', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}><i className="ph-fill ph-pen-nib"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Zety Builder</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Create a winning resume in minutes</span></div>
-                 </div>
-                 <div className="resume-card" onClick={() => window.open('https://word.cloud.microsoft/en-us/search/resume/?wdOrigin=SEO-INTENT.WD-SE-L27-1-L27-1.SEARCHTEMPLATES', '_blank')}>
-                    <div className="resume-icon-box" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}><i className="ph-fill ph-file-doc"></i></div>
-                    <div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>MS Word Templates</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Classic and reliable word document formats</span></div>
-                 </div>
+                 <div className="resume-card" onClick={() => window.open('https://drive.google.com/file/d/10IFApxJGwGwRmVFpEtfQxc1RR-IraOq7/view?pli=1', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80' }}><i className="ph-fill ph-book-open"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Talentino HandBook</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>The official IPCS placement guide</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.canva.com/en_in/login/?redirect=%2Fs%2Ftemplates%3Fquery%3Dprofessional%2Bresume', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(2, 132, 199, 0.15)', color: '#38bdf8' }}><i className="ph-fill ph-palette"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Canva Templates</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Design highly visual & modern resumes</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=ZMByWenSRdI', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume Writing Part 1</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Essential basics for beginners</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=VB376MMEq38', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume Writing Part 2</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Structuring your skills and experience</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=gDN7cJ3Rt80', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Interview Prep Guide</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>How to confidently answer questions</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=7JRj3r5vunU', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>ATS Resume Guide</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>How to beat Applicant Tracking Systems</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=EW4dEzfBst0', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Body Language Tips</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Master your non-verbal communication</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=k_f4Mb2ARdA', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Group Discussion Strategy</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Stand out during group evaluations</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.youtube.com/watch?v=UjX_kl5UxPo', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}><i className="ph-fill ph-youtube-logo"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Common Mistakes</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Watch out for these CV errors</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://resume.io/resume-templates', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}><i className="ph-fill ph-file-text"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Resume.io</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Professional builder with ATS templates</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://www.myperfectresume.com/', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80' }}><i className="ph-fill ph-check-square"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>MyPerfectResume</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Fast and easy online resume creator</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://zety.com/', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}><i className="ph-fill ph-pen-nib"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>Zety Builder</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Create a winning resume in minutes</span></div></div>
+                 <div className="resume-card" onClick={() => window.open('https://word.cloud.microsoft/en-us/search/resume/?wdOrigin=SEO-INTENT.WD-SE-L27-1-L27-1.SEARCHTEMPLATES', '_blank')}><div className="resume-icon-box" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}><i className="ph-fill ph-file-doc"></i></div><div><h3 style={{ margin: '0 0 4px 0', fontSize: '1.15rem' }}>MS Word Templates</h3><span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Classic and reliable word document formats</span></div></div>
               </div>
             </div>
           )}
 
-/* STREAMING_CHUNK: Talentino Tab Component */
+          {/* Talentino Tab */}
           {activeTab === 'talentino' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -2779,7 +2256,7 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-/* STREAMING_CHUNK: Vacancies Tab Component */
+          {/* Vacancies Tab */}
           {activeTab === 'vacancies' && (
             <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
@@ -2846,7 +2323,7 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-/* STREAMING_CHUNK: Status Tab Component */
+          {/* Status Tab */}
           {activeTab === 'status' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -2917,7 +2394,6 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-/* STREAMING_CHUNK: Modals and Popups */
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
             <div className="report-modal-overlay material-modal-overlay" style={{ zIndex: 99999 }}>
@@ -3189,69 +2665,130 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
+          {/* EDIT PROFILE MODAL */}
+          {editProfileModal && (
+            <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
+              <div className="report-card" style={{ maxWidth: '700px' }}>
+                <div className="modal-header-border">
+                  <h3 style={{ margin: 0, color: 'var(--text-main)' }}><i className="ph ph-pencil-simple" style={{ color: 'var(--accent-cyan)' }}></i> Edit Profile Details</h3>
+                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setEditProfileModal(false)}></i>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', background: 'var(--hover-bg)', padding: '10px', borderRadius: '8px' }}><strong>Note:</strong> Core ID details (Name, Roll No, Branch, Email, Course) are strictly uneditable by students. Contact admin for corrections.</div>
+                <div className="grid-2col">
+                  <div className="form-group"><label>Age</label><input type="number" value={epData.age} onChange={(e) => setEpData({...epData, age: e.target.value})} /></div>
+                  <div className="form-group"><label>Gender</label><select value={epData.gender} onChange={(e) => setEpData({...epData, gender: e.target.value})}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+                  <div className="form-group"><label>Parent / Guardian Name</label><input type="text" value={epData.parentName} onChange={(e) => setEpData({...epData, parentName: e.target.value})} /></div>
+                  <div className="form-group"><label>Parent Contact No.</label><input type="tel" value={epData.parentContact} onChange={(e) => setEpData({...epData, parentContact: e.target.value})} /></div>
+                  <div className="form-group"><label>Studying Status</label><select value={epData.studyStatus} onChange={(e) => setEpData({...epData, studyStatus: e.target.value})}><option value="Currently Studying">Currently Studying</option><option value="Completed Course">Completed Course</option></select></div>
+                  <div className="form-group"><label>Course Completed Date</label><input type="date" value={epData.completedDate} onChange={(e) => setEpData({...epData, completedDate: e.target.value})} /></div>
+                  <div className="form-group"><label>Stream</label><input type="text" value={epData.stream} onChange={(e) => setEpData({...epData, stream: e.target.value})} /></div>
+                  <div className="form-group"><label>Home Town</label><input type="text" value={epData.homeTown} onChange={(e) => setEpData({...epData, homeTown: e.target.value})} /></div>
+                  <div className="form-group"><label>Fresher Status</label><select value={epData.fresherStatus} onChange={(e) => setEpData({...epData, fresherStatus: e.target.value})}><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option></select></div>
+                  <div className="form-group"><label>Qualification</label><input type="text" value={epData.qualification} onChange={(e) => setEpData({...epData, qualification: e.target.value})} /></div>
+                </div>
+                <div className="grid-2col" style={{ marginTop: '1rem' }}>
+                  <div className="form-group"><label>LinkedIn</label><input type="text" value={epData.linkedin} onChange={(e) => setEpData({...epData, linkedin: e.target.value})} /></div>
+                  <div className="form-group"><label>Instagram Handle</label><input type="text" value={epData.instagram} onChange={(e) => setEpData({...epData, instagram: e.target.value})} /></div>
+                </div>
+                <div className="form-group"><label>Placement Requirements</label><textarea rows="2" value={epData.placementReq} onChange={(e) => setEpData({...epData, placementReq: e.target.value})}></textarea></div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '15px' }}>
+                  <button className="btn-cancel" onClick={() => setEditProfileModal(false)}>Cancel</button>
+                  <button className="btn-action" onClick={handleProfileUpdate}>Save Changes</button>
+                </div>
+                {epStatus && <div className={`alert alert-${epStatus.type}`} style={{marginTop: '10px'}}>{epStatus.message}</div>}
+              </div>
+            </div>
+          )}
+
+          {/* TPO MODAL */}
+          {tpoModal && (
+            <div className="report-modal-overlay">
+              <div className="report-card" style={{ maxWidth: '420px', padding: 0, overflow: 'hidden' }}>
+                <div style={{ background: `url(${COVER_BANNER_URL}) center/cover`, position: 'relative', padding: '2.5rem 1.5rem 3.5rem 1.5rem', textAlign: 'center' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(11,15,23,0.85)' }}></div>
+                  <i className="ph ph-x" style={{ position: 'absolute', top: '15px', right: '15px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem', zIndex: 10 }} onClick={() => setTpoModal(false)}></i>
+                  
+                  <div style={{ position: 'relative', zIndex: 2 }}>
+                    <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', margin: '0 auto 12px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid var(--accent-cyan)', overflow: 'hidden' }}>
+                      {tpoPhoto && tpoPhoto !== "N/A" ? <img src={getDriveImageUrl(tpoPhoto)} style={{width: '100%', height: '100%', objectFit: 'cover'}} alt="TPO" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} /> : null}
+                      <i className="ph ph-user-tie" style={{ fontSize: '2.5rem', color: 'var(--accent-cyan)', display: (!tpoPhoto || tpoPhoto === "N/A") ? 'block' : 'none' }}></i>
+                    </div>
+                    <h2 style={{ margin: '0 0 5px 0', color: '#fff' }}>{tpoName}</h2>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Sitting Branch: <strong style={{ color: 'var(--accent-cyan)' }}>{tpoSitting}</strong></div>
+                  </div>
+                </div>
+                
+                <div style={{ padding: '0 2rem 2rem 2rem', marginTop: '-20px', position: 'relative', zIndex: 3 }}>
+                  <div style={{ background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', marginBottom: '20px', textAlign: 'left', fontSize: '0.9rem', border: '1px solid var(--card-border)' }}>
+                    <div style={{ marginBottom: '10px' }}><strong>Email:</strong> <span style={{ color: 'var(--accent-cyan)' }}>{tpoEmail}</span></div>
+                    <div style={{ marginBottom: '10px' }}><strong>Phone:</strong> <span>{tpoPhone}</span></div>
+                    <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--card-border)' }}><strong>Assigned Regions:</strong> <span style={{ color: 'var(--text-muted)' }}>{tpoAssigned}</span></div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                    <a href={`tel:${tpoPhone}`} className="btn-action" style={{ flex: 1, background: '#2563eb', textDecoration: 'none' }}><i className="ph-fill ph-phone"></i> Call</a>
+                    <a href={`https://wa.me/${tpoPhone.toString().replace(/\D/g,'')}`} className="btn-action" style={{ flex: 1, background: '#22c55e', textDecoration: 'none' }}><i className="ph-fill ph-whatsapp-logo"></i> WhatsApp</a>
+                    <a href={`mailto:${tpoEmail}?cc=placementcell.ipcs@gmail.com&subject=Student Inquiry: ${user?.name} (${user?.rollNo})`} className="btn-action" style={{ flex: 1, background: '#ef4444', textDecoration: 'none' }}><i className="ph-fill ph-envelope"></i> Mail</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* HELP MODAL */}
+          {helpModal && (
+            <div className="report-modal-overlay">
+              <div className="report-card">
+                <div className="modal-header-border">
+                  <h3 style={{ margin: 0, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="ph ph-headset" style={{ color: 'var(--accent-cyan)' }}></i> Request Help / Inquiry</h3>
+                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }} onClick={() => { setHelpModal(false); setIssueText(''); setIssueStatus(null); }}></i>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 0, marginBottom: '15px' }}>Your issue will be forwarded directly to your TPO and the Master Placement Cell.</p>
+                <div className="form-group"><label>Describe Your Issue or Inquiry *</label><textarea rows="5" value={issueText} onChange={(e) => setIssueText(e.target.value)} placeholder="Explain the problem or inquiry in detail..."></textarea></div>
+                <button className="btn-action" style={{ width: '100%' }} onClick={handleIssueSubmit}>Submit Report &rarr;</button>
+                {issueStatus && <div className={`alert alert-${issueStatus.type}`} style={{marginTop: '10px'}}>{issueStatus.message}</div>}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
+    </div>
+  );
+}
 
-/* STREAMING_CHUNK: Side Drawer Menu */
-      <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
-        <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
-          <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
-            <div className="drawer-close-btn" onClick={() => setDrawerOpen(false)}><i className="ph ph-x"></i></div>
-            <div className="drawer-profile-row">
-              <div className="drawer-avatar">
-                 {user?.photo && user.photo.includes('http') ? <img src={getDriveImageUrl(user.photo)} alt="Profile" /> : user?.name?.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <strong style={{ display:'block', fontSize:'1.1rem', fontWeight:700, color: '#fff' }}>{user?.name}</strong>
-                <span style={{ fontSize:'0.8rem', color: '#38bdf8', fontWeight: 600 }}>{user?.rollNo}</span>
-              </div>
-            </div>
+function NotFound() {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', textAlign: 'center', padding: '1.5rem', background: 'var(--bg-dark)', color: 'var(--text-main)' }}>
+      <div style={{ maxWidth: '500px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'var(--card-bg)', padding: '3rem 2rem', borderRadius: '20px', border: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'relative', width: '100%', maxWidth: '280px', height: '180px', marginBottom: '1.5rem' }}>
+          <div style={{ position: 'absolute', borderRadius: '50%', width: '35px', height: '35px', background: '#ef4444', top: '10px', right: '15%' }}></div>
+          <div style={{ position: 'absolute', borderRadius: '50%', width: '45px', height: '45px', background: '#f59e0b', top: '0px', left: '10%' }}></div>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', fontSize: '5rem', fontWeight: 900, color: 'var(--text-muted)', height: '100%' }}>
+            <span>4</span><span style={{ color: 'var(--accent-cyan)' }}>0</span><span>4</span>
           </div>
-          <div className="drawer-menu">
-            <div className="drawer-item" onClick={() => changeTab('dashboard')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-house"></i> Dashboard</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('talentino')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('materials')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-books"></i> Study Material</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('events')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-calendar-blank"></i> Events & Drives</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('aptitude')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-brain"></i> Aptitude & Assessment</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('profile')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('status')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('vacancies')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('guide')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-book-open"></i> Guide</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setTpoModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-address-book"></i> Contact TPO</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => { setHelpModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-info"></i> Request Help</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('settings')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-gear"></i> Settings</div><span>&rsaquo;</span></div>
-          </div>
-          <div className="drawer-footer">
-            <button className="btn-logout-drawer" onClick={handleLogout}>Log Out</button>
-            <div style={{ fontSize:'0.72rem', color:'var(--text-muted)' }}>Copyright &copy; 2026 Talentino IPCS Global</div>
-          </div>
+          <div style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', width: '80%', height: '20px', background: 'var(--accent-blue)', borderRadius: '50px' }}></div>
         </div>
+        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-main)' }}>Oops!</h1>
+        <p style={{ fontSize: '1.125rem', color: 'var(--accent-cyan)', marginBottom: '0.25rem', fontWeight: 600 }}>Who spilled the paint?</p>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '2rem' }}>The page you are looking for doesn't exist or has been moved.</p>
+        <a href="/" style={{ background: 'var(--accent-blue)', color: '#ffffff', padding: '0.8rem 2rem', borderRadius: '10px', fontWeight: 700, textDecoration: 'none', transition: 'opacity 0.2s', display: 'inline-block' }}>Go Back Home &rarr;</a>
       </div>
+    </div>
+  );
+}
 
-/* STREAMING_CHUNK: Global UI Modals (Edit Profile, TPO, Help) */
-      {editProfileModal && (
-        <div className="report-modal-overlay" style={{ zIndex: 1200 }}>
-          <div className="report-card" style={{ maxWidth: '700px' }}>
-            <div className="modal-header-border">
-              <h3 style={{ margin: 0, color: 'var(--text-main)' }}><i className="ph ph-pencil-simple" style={{ color: 'var(--accent-cyan)' }}></i> Edit Profile Details</h3>
-              <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setEditProfileModal(false)}></i>
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', background: 'var(--hover-bg)', padding: '10px', borderRadius: '8px' }}><strong>Note:</strong> Core ID details (Name, Roll No, Branch, Email, Course) are strictly uneditable by students. Contact admin for corrections.</div>
-            <div className="grid-2col">
-              <div className="form-group"><label>Age</label><input type="number" value={epData.age} onChange={(e) => setEpData({...epData, age: e.target.value})} /></div>
-              <div className="form-group"><label>Gender</label><select value={epData.gender} onChange={(e) => setEpData({...epData, gender: e.target.value})}><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-              <div className="form-group"><label>Parent / Guardian Name</label><input type="text" value={epData.parentName} onChange={(e) => setEpData({...epData, parentName: e.target.value})} /></div>
-              <div className="form-group"><label>Parent Contact No.</label><input type="tel" value={epData.parentContact} onChange={(e) => setEpData({...epData, parentContact: e.target.value})} /></div>
-              <div className="form-group"><label>Studying Status</label><select value={epData.studyStatus} onChange={(e) => setEpData({...epData, studyStatus: e.target.value})}><option value="Currently Studying">Currently Studying</option><option value="Completed Course">Completed Course</option></select></div>
-              <div className="form-group"><label>Course Completed Date</label><input type="date" value={epData.completedDate} onChange={(e) => setEpData({...epData, completedDate: e.target.value})} /></div>
-              <div className="form-group"><label>Stream</label><input type="text" value={epData.stream} onChange={(e) => setEpData({...epData, stream: e.target.value})} /></div>
-              <div className="form-group"><label>Home Town</label><input type="text" value={epData.homeTown} onChange={(e) => setEpData({...epData, homeTown: e.target.value})} /></div>
-              <div className="form-group"><label>Fresher Status</label><select value={epData.fresherStatus} onChange={(e) => setEpData({...epData, fresherStatus: e.target.value})}><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option></select></div>
-              <div className="form-group"><label>Qualification</label><input type="text" value={epData.qualification} onChange={(e) => setEpData({...epData, qualification: e.target.value})} /></div>
-            </div>
-            <div className="grid-2col" style={{ marginTop: '1rem' }}>
-              <div className="form-group"><label>LinkedIn</label><input type="text" value={epData.linkedin} onChange={(e) => setEpData({...epData, linkedin: e.target.value})} /></div>
-              <div className="form-group"><label>Instagram Handle</label><input type="text" value={epData.instagram} onChange={(e) => setEpData({...epData, instagram: e.target.value})} /></div>
-            </div>
-            <div className="form-group"><label>Placement Requirements</label><textarea rows="2" value={epData.placementReq} onChange={(e) => setEpData({...epData, placementReq: e.target.value})}></textarea></div>
-            I seem to be encountering an error. Can I try something else for you?
+export default function App() {
+  return (
+    <>
+      <GlobalStyle />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
+}
