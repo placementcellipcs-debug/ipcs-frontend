@@ -4,6 +4,24 @@ import axios from 'axios';
 import Cropper from 'react-easy-crop';
 import loadingVideo from './assets/video.mp4';
 
+// Helper for safe localStorage access across restrictive mobile browsers
+const getSafeLocalStorage = (key, fallback) => {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
+const setSafeLocalStorage = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.error("LocalStorage write failed:", e);
+  }
+};
+
 const GlobalStyle = () => {
   useEffect(() => {
     if (!document.getElementById('phosphor-icons')) {
@@ -145,11 +163,11 @@ const GlobalStyle = () => {
       }
       @media (max-width: 768px) {
         .report-modal-overlay.material-modal-overlay {
-          padding: 0 !important; /* Removes the 20px gap on mobile */
+          padding: 0 !important;
         }
         .material-viewer-card {
           width: 100vw !important;
-          height: 100dvh !important; /* Uses dynamic viewport to fix iOS Safari gaps */
+          height: 100dvh !important;
           max-height: 100dvh !important;
           border-radius: 0 !important;
           border: none !important;
@@ -397,8 +415,8 @@ function Login() {
     try {
       const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
       if (response.data.success) {
-        localStorage.setItem('talentino_student_token', response.data.token);
-        localStorage.setItem('talentino_student_user', JSON.stringify(response.data.user));
+        setSafeLocalStorage('talentino_student_token', response.data.token);
+        setSafeLocalStorage('talentino_student_user', response.data.user);
         
         setIsLoggingIn(true);
         setTimeout(() => setFadeVideo(true), 5500); 
@@ -906,14 +924,13 @@ function Signup() {
 const isEventExpired = (dateStr) => {
   if (!dateStr || dateStr === "TBA") return false;
   
-  // Clean string e.g. "07 August , 2026" -> "07 August 2026"
   const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
   const eventDate = new Date(cleanStr);
   
-  if (isNaN(eventDate.getTime())) return false; // Fallback if unparseable
+  if (isNaN(eventDate.getTime())) return false;
   
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Start of today (00:00:00)
+  today.setHours(0, 0, 0, 0);
   
   return eventDate < today;
 };
@@ -944,7 +961,7 @@ function Dashboard() {
   const [calView, setCalView] = useState('Month');
 
   const [showNotif, setShowNotif] = useState(false);
-  const [readNotifs, setReadNotifs] = useState(() => JSON.parse(localStorage.getItem('talentino_read_notifs') || '[]'));
+  const [readNotifs, setReadNotifs] = useState(() => getSafeLocalStorage('talentino_read_notifs', []));
 
   const [gpsCoords, setGpsCoords] = useState(null);
   const [locStatus, setLocStatus] = useState("Capture my location");
@@ -970,13 +987,15 @@ function Dashboard() {
   const [issueText, setIssueText] = useState('');
   const [issueStatus, setIssueStatus] = useState(null);
 
-  // --- NEW PLACEMENT DRIVE STATES ---
+  // --- PLACEMENT DRIVE STATES ---
   const [activeDrives, setActiveDrives] = useState([]);
   const [currentDrivePopup, setCurrentDrivePopup] = useState(null);
   const [driveActionStatus, setDriveActionStatus] = useState(null);
   
-  // --- PUSH NOTIFICATION STATE ---
-  const [pushPermission, setPushPermission] = useState(Notification.permission);
+  // --- PUSH NOTIFICATION STATE (SAFELY INITIALIZED FOR MOBILE BROWSERS) ---
+  const [pushPermission, setPushPermission] = useState(() => {
+    return (typeof window !== 'undefined' && 'Notification' in window) ? Notification.permission : 'denied';
+  });
 
   // --- STUDY MATERIAL STATES ---
   const [studyMaterials, setStudyMaterials] = useState([]);
@@ -985,19 +1004,25 @@ function Dashboard() {
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
 
-  // Request Push Notification Permission on load
+  // Request Push Notification Permission on load safely
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then(permission => {
-        setPushPermission(permission);
-      });
-    }
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+          setPushPermission(permission);
+        }).catch(() => {});
+      }
+    } catch (e) {}
   }, []);
 
-  // Utility to send Push Notifications
+  // Safe Push Notification Dispatcher
   const sendPushNotification = (title, body, icon = GLOBAL_LOGO_URL) => {
-    if (pushPermission === 'granted') {
-      new Notification(title, { body, icon });
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window && pushPermission === 'granted') {
+        new Notification(title, { body, icon });
+      }
+    } catch (e) {
+      console.log("Mobile browser notification ignored safely:", e);
     }
   };
 
@@ -1023,24 +1048,22 @@ function Dashboard() {
       if(res.data.success) {
         setData(prev => ({
             ...res.data,
-            // SMART MERGE: If Google Sheets glitches and returns empty arrays, keep the previous data on screen!
             vacancies: (res.data.vacancies && res.data.vacancies.length > 0) ? res.data.vacancies : (prev.vacancies || []),
             events: (res.data.events && res.data.events.length > 0) ? res.data.events : (prev.events || []),
             appliedJobs: (res.data.appliedJobs && res.data.appliedJobs.length > 0) ? res.data.appliedJobs : (prev.appliedJobs || []),
             attendanceHistory: (res.data.attendanceHistory && res.data.attendanceHistory.length > 0) ? res.data.attendanceHistory : (prev.attendanceHistory || []),
         }));
-        
+
         if (res.data.userInfo) {
             const mergedUser = { ...storedUser, ...res.data.userInfo };
             setUser(mergedUser);
-            localStorage.setItem('talentino_student_user', JSON.stringify(mergedUser));
+            setSafeLocalStorage('talentino_student_user', mergedUser);
         }
       }
     } catch (error) { console.error("Data error", error); }
   }, []);
 
   const fetchStudyMaterials = useCallback(async (storedUser, currentLength) => {
-    // Only show loading screen if we have no materials yet
     if (currentLength === 0) setStudyMatStatus({ type: 'info', message: 'Loading study materials...' });
     
     try {
@@ -1053,7 +1076,6 @@ function Dashboard() {
         setStudyMatStatus(null);
       }
     } catch (err) {
-      // Only show the red error box if the screen is currently completely empty
       if (currentLength === 0) {
         setStudyMatStatus({ 
           type: 'error', 
@@ -1075,7 +1097,6 @@ function Dashboard() {
         });
 
         if (res.data.success && res.data.embedUrl) {
-            // Set the iframe source directly to the secure embed link
             setPdfBlobUrl(res.data.embedUrl);
             setIsPdfLoading(false);
         } else {
@@ -1108,19 +1129,20 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('talentino_student_user') || '{}');
+    const storedUser = getSafeLocalStorage('talentino_student_user', {});
     if (!storedUser.email) { navigate('/'); return; }
     setUser(storedUser);
     fetchDashboard(storedUser);
-    const interval = setInterval(() => { fetchDashboard(storedUser); }, 300000); 
+    
+    const interval = setInterval(() => { fetchDashboard(storedUser); }, 300000); // 5 minute refresh
     return () => clearInterval(interval);
   }, [navigate, fetchDashboard]);
 
   useEffect(() => {
-    if (activeTab === 'materials') {
+    if (activeTab === 'materials' && user?.email) {
       fetchStudyMaterials(user, studyMaterials.length);
     }
-  }, [activeTab, user.email, user.course]);
+  }, [activeTab, user?.email, user?.course]);
 
   useEffect(() => {
     if (showNotif) {
@@ -1131,7 +1153,6 @@ function Dashboard() {
 
   // Fetch active drives & Handle 1-hour Snooze
   useEffect(() => {
-    // 1. Filter drives from the fetched data
     if (data.events && data.events.length > 0) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -1142,30 +1163,28 @@ function Dashboard() {
         if (!driveDateStr) return false;
         
         const driveDate = new Date(driveDateStr);
-        return driveDate >= today; // Only upcoming or today
+        return driveDate >= today;
       });
       setActiveDrives(drives);
     }
   }, [data.events]);
 
   useEffect(() => {
-    // 2. Interval to check for popups every 5 seconds
     const checkDrives = setInterval(() => {
       if (activeDrives.length === 0 || currentDrivePopup) return;
 
-      const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
-      const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+      const respondedDrives = getSafeLocalStorage('talentino_drive_responses', {});
+      const snoozedDrives = getSafeLocalStorage('talentino_drive_snoozes', {});
 
-      // Find the first drive the user hasn't responded to, and isn't currently snoozed
       const driveToShow = activeDrives.find(drive => {
         const driveId = drive.id || drive['Drive ID'];
         if (!driveId) return false;
-        if (respondedDrives[driveId]) return false; // Already registered or not interested
+        if (respondedDrives[driveId]) return false;
 
         const snoozeTime = snoozedDrives[driveId];
         if (snoozeTime) {
           const hoursPassed = (Date.now() - snoozeTime) / (1000 * 60 * 60);
-          if (hoursPassed < 1) return false; // Still within 1 hour snooze
+          if (hoursPassed < 1) return false;
         }
         return true;
       });
@@ -1183,18 +1202,16 @@ function Dashboard() {
   }, [activeDrives, currentDrivePopup, pushPermission]);
 
   const handleDriveDismiss = () => {
-    // Snooze for 1 hour
     const driveId = currentDrivePopup.id || currentDrivePopup['Drive ID'];
     if(driveId) {
-       const snoozedDrives = JSON.parse(localStorage.getItem('talentino_drive_snoozes') || '{}');
+       const snoozedDrives = getSafeLocalStorage('talentino_drive_snoozes', {});
        snoozedDrives[driveId] = Date.now();
-       localStorage.setItem('talentino_drive_snoozes', JSON.stringify(snoozedDrives));
+       setSafeLocalStorage('talentino_drive_snoozes', snoozedDrives);
     }
     setCurrentDrivePopup(null);
   };
 
   const handleDriveResponsePopup = async (status) => {
-    // status = 'Registered' or 'Not Interested'
     setDriveActionStatus({ type: 'info', message: 'Recording your response...' });
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dashboard/drive-response`, {
@@ -1207,17 +1224,16 @@ function Dashboard() {
         branch: user.branch,
         resume: user.resume,
         qualification: user.qualification,
-        status: status, // 'Registered' or 'Not Interested'
-        tpoBranch: currentDrivePopup.branch || currentDrivePopup['Branch'] // To CC the right TPO
+        status: status,
+        tpoBranch: currentDrivePopup.branch || currentDrivePopup['Branch']
       });
 
       if (res.data.success) {
-        // Save to local storage so it never shows again
         const driveId = currentDrivePopup.id || currentDrivePopup['Drive ID'];
         if(driveId) {
-            const respondedDrives = JSON.parse(localStorage.getItem('talentino_drive_responses') || '{}');
+            const respondedDrives = getSafeLocalStorage('talentino_drive_responses', {});
             respondedDrives[driveId] = status;
-            localStorage.setItem('talentino_drive_responses', JSON.stringify(respondedDrives));
+            setSafeLocalStorage('talentino_drive_responses', respondedDrives);
         }
         
         if (status === 'Registered') {
@@ -1286,7 +1302,7 @@ function Dashboard() {
   const handleNotifClick = (n) => {
     const updated = [...new Set([...readNotifs, n.id])];
     setReadNotifs(updated);
-    localStorage.setItem('talentino_read_notifs', JSON.stringify(updated));
+    setSafeLocalStorage('talentino_read_notifs', updated);
     changeTab(n.tab);
     setShowNotif(false);
   };
@@ -1318,7 +1334,7 @@ const handleProfileUpdate = async () => {
           setEpStatus({ type: 'success', message: 'Profile updated!' });
           const updatedUser = { ...user, ...res.data.user };
           setUser(updatedUser);
-          localStorage.setItem('talentino_student_user', JSON.stringify(updatedUser));
+          setSafeLocalStorage('talentino_student_user', updatedUser);
           setTimeout(() => { setEditProfileModal(false); setEpStatus(null); }, 1500);
       }
   } catch(err) { setEpStatus({ type: 'error', message: 'Server Error updating profile' }); }
@@ -1386,7 +1402,7 @@ const handleProfileUpdate = async () => {
 
                 const updatedUser = { ...user, [key]: res.data.url };
                 setUser(updatedUser);
-                localStorage.setItem('talentino_student_user', JSON.stringify(updatedUser));
+                setSafeLocalStorage('talentino_student_user', updatedUser);
 
                 if (docType === 'Photo') setPhotoUploading(false);
                 else {
