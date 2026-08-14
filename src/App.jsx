@@ -351,6 +351,118 @@ const GlobalStyle = () => {
         .dashboard-content, .landing-grid { max-width: 1600px; }
         body { font-size: 17px; }
       }
+
+      /* --- APTITUDE TEST MODULE STYLES --- */
+.aptitude-lobby-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.test-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+.test-main-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.test-timer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-weight: 800;
+  font-size: 1rem;
+}
+.test-timer-badge.warning {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: #ef4444;
+  animation: pulse 1s infinite;
+}
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 1rem;
+}
+.palette-btn {
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-muted);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.palette-btn.active {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+.palette-btn.answered {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+.option-select-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  padding: 1.1rem 1.4rem;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0.9rem;
+}
+.option-select-box:hover {
+  border-color: var(--accent-cyan);
+  background: var(--hover-bg);
+}
+.option-select-box.selected {
+  border-color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.08);
+}
+.option-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--input-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.option-select-box.selected .option-circle {
+  border-color: var(--accent-cyan);
+  background: var(--accent-cyan);
+  color: #0b0f17;
+}
+
+@media (max-width: 900px) {
+  .test-layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
     `}</style>
   );
 };
@@ -1020,6 +1132,16 @@ function Dashboard() {
     return (typeof window !== 'undefined' && 'Notification' in window) ? Notification.permission : 'denied';
   });
 
+  // --- APTITUDE TEST STATES ---
+  const [aptitudeView, setAptitudeView] = useState('lobby'); // 'lobby' | 'live' | 'result'
+  const [testQuestions, setTestQuestions] = useState([]);
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [testTimeLeft, setTestTimeLeft] = useState(0);
+  const [testStatsResult, setTestStatsResult] = useState(null);
+  const [testHistoryList, setTestHistoryList] = useState([]);
+  const [isTestSubmitting, setIsTestSubmitting] = useState(false);
+
   // --- STUDY MATERIAL STATES ---
   const [studyMaterials, setStudyMaterials] = useState([]);
   const [studyMatStatus, setStudyMatStatus] = useState(null);
@@ -1135,6 +1257,67 @@ function Dashboard() {
     setMaterialModal(null);
     setPdfBlobUrl(null);
   };
+
+  // Start Test
+  const handleStartAptitude = async () => {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/start`);
+      if (res.data.success && res.data.questions.length > 0) {
+        setTestQuestions(res.data.questions);
+        setUserAnswers({});
+        setCurrentQIndex(0);
+        setTestTimeLeft(res.data.timeLimitMinutes * 60);
+        setAptitudeView('live');
+      } else {
+        alert("No active questions found in question bank.");
+      }
+    } catch (err) {
+      alert("Failed to initialize test. Ensure backend is running.");
+    }
+  };
+
+  // Live Timer Effect
+  useEffect(() => {
+    let timer;
+    if (aptitudeView === 'live' && testTimeLeft > 0) {
+      timer = setInterval(() => setTestTimeLeft(prev => prev - 1), 1000);
+    } else if (aptitudeView === 'live' && testTimeLeft === 0) {
+      handleFinalSubmitTest();
+    }
+    return () => clearInterval(timer);
+  }, [aptitudeView, testTimeLeft]);
+
+  // Submit Test
+  const handleFinalSubmitTest = async () => {
+    setIsTestSubmitting(true);
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, {
+        email: user.email,
+        name: user.name,
+        rollNo: user.rollNo,
+        branch: user.branch,
+        userAnswers,
+        timeSpentSeconds: (20 * 60) - testTimeLeft
+      });
+      if (res.data.success) {
+        setTestStatsResult(res.data.results);
+        setAptitudeView('result');
+      }
+    } catch (e) {
+      alert("Error submitting answers.");
+    } finally {
+      setIsTestSubmitting(false);
+    }
+  };
+
+  // Fetch History when opening Lobby
+  useEffect(() => {
+    if (activeTab === 'aptitude' && aptitudeView === 'lobby' && user?.email) {
+      axios.post(`${API_BASE_URL}/api/dashboard/aptitude/history`, { email: user.email })
+        .then(res => { if (res.data.success) setTestHistoryList(res.data.history); })
+        .catch(() => {});
+    }
+  }, [activeTab, aptitudeView, user?.email]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -1726,6 +1909,21 @@ const handleProfileUpdate = async () => {
                     <div className="qa-btn" onClick={() => changeTab('events')}><div className="qa-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-calendar-blank"></i></div><div>Events & Drives</div></div>
                     <div className="qa-btn" onClick={() => setTpoModal(true)}><div className="qa-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-address-book"></i></div><div>Contact TPO</div></div>
                     <div className="qa-btn" onClick={() => changeTab('profile')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-user"></i></div><div>Profile</div></div>
+                  {/* Quick Action Button */}
+<div className="qa-btn" onClick={() => changeTab('aptitude')}>
+  <div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}>
+    <i className="ph-fill ph-brain"></i>
+  </div>
+  <div>Aptitude Test</div>
+</div>
+
+{/* Side Drawer Link */}
+<div className="drawer-item" onClick={() => changeTab('aptitude')}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <i className="ph ph-brain"></i> Aptitude & Assessment
+  </div>
+  <span>&rsaquo;</span>
+</div>
                   </div>
                 </div>
               </div>
@@ -2086,6 +2284,236 @@ const handleProfileUpdate = async () => {
               )}
             </div>
           )}
+
+          {/* ========================================================= */}
+{/* APTITUDE ASSESSMENT TAB                                    */}
+{/* ========================================================= */}
+{activeTab === 'aptitude' && (
+  <div className="animate-fade-in">
+    {/* 1. LOBBY VIEW */}
+    {aptitudeView === 'lobby' && (
+      <div className="aptitude-lobby-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px', marginBottom: '2rem' }}>
+          <div>
+            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--accent-cyan)', letterSpacing: '1px', textTransform: 'uppercase' }}>Interview Readiness</div>
+            <h2 style={{ margin: '6px 0', fontSize: '2rem' }}>Aptitude & Technical Mock Portal</h2>
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.95rem' }}>Practice real industry assessment papers with live timers, section analytics, and review guides.</p>
+          </div>
+          <button className="btn-action" style={{ padding: '1rem 2rem', fontSize: '1rem', background: '#0284c7' }} onClick={handleStartAptitude}>
+            <i className="ph-bold ph-play"></i> Start Assessment
+          </button>
+        </div>
+
+        <div className="stats-row">
+          <div className="stat-card-new">
+            <div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-clock"></i></div>
+            <div><div className="stat-num">20 Mins</div><div className="stat-label">Duration</div></div>
+          </div>
+          <div className="stat-card-new">
+            <div className="stat-icon-wrapper" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-list-numbers"></i></div>
+            <div><div className="stat-num">MCQs</div><div className="stat-label">Format</div></div>
+          </div>
+          <div className="stat-card-new">
+            <div className="stat-icon-wrapper" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-chart-pie-slice"></i></div>
+            <div><div className="stat-num">4 Sectors</div><div className="stat-label">Quant/Logic/Verbal</div></div>
+          </div>
+          <div className="stat-card-new">
+            <div className="stat-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-trophy"></i></div>
+            <div><div className="stat-num">{testHistoryList.length}</div><div className="stat-label">Attempts Taken</div></div>
+          </div>
+        </div>
+
+        {/* Previous Attempts History */}
+        <h3 style={{ margin: '2rem 0 1rem 0', fontSize: '1.2rem' }}>Attempt History</h3>
+        <div className="location-table-card">
+          <table className="vac-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Score</th>
+                <th>Percentage</th>
+                <th>Time Spent</th>
+                <th>Section Breakdown</th>
+              </tr>
+            </thead>
+            <tbody>
+              {testHistoryList.length === 0 ? (
+                <tr><td colSpan="5" style={{ textAlign: 'center' }}>No test attempts recorded yet. Start your first mock test!</td></tr>
+              ) : (
+                testHistoryList.map((hist, idx) => (
+                  <tr key={idx}>
+                    <td style={{ color: 'var(--text-muted)' }}>{hist.date}</td>
+                    <td style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>{hist.score} / {hist.total}</td>
+                    <td><span className="status-badge" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80' }}>{hist.percentage}</span></td>
+                    <td style={{ color: 'var(--text-muted)' }}>{hist.timeTaken}</td>
+                    <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{hist.breakdown}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+
+    {/* 2. LIVE TEST ENGINE VIEW */}
+    {aptitudeView === 'live' && testQuestions.length > 0 && (
+      <div className="test-layout-grid">
+        <div className="test-main-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '1rem' }}>
+            <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>
+              {testQuestions[currentQIndex].category}
+            </span>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+              Question {currentQIndex + 1} of {testQuestions.length}
+            </span>
+          </div>
+
+          <h3 style={{ fontSize: '1.25rem', lineHeight: 1.5, marginBottom: '2rem', color: 'var(--text-main)' }}>
+            {testQuestions[currentQIndex].question}
+          </h3>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {Object.entries(testQuestions[currentQIndex].options).map(([optKey, optText]) => {
+              const isSelected = userAnswers[testQuestions[currentQIndex].id] === optKey;
+              return (
+                <div
+                  key={optKey}
+                  className={`option-select-box ${isSelected ? 'selected' : ''}`}
+                  onClick={() => setUserAnswers({ ...userAnswers, [testQuestions[currentQIndex].id]: optKey })}
+                >
+                  <div className="option-circle">{optKey}</div>
+                  <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{optText}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--card-border)' }}>
+            <button
+              className="btn-cancel"
+              disabled={currentQIndex === 0}
+              onClick={() => setCurrentQIndex(prev => prev - 1)}
+            >
+              &larr; Previous
+            </button>
+            {currentQIndex < testQuestions.length - 1 ? (
+              <button className="btn-action" onClick={() => setCurrentQIndex(prev => prev + 1)}>
+                Next Question &rarr;
+              </button>
+            ) : (
+              <button className="btn-action" style={{ background: '#22c55e' }} onClick={handleFinalSubmitTest}>
+                Submit Test &rarr;
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Sidebar: Floating Timer & Palette */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="test-main-card" style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Time Remaining</div>
+            <div className={`test-timer-badge ${testTimeLeft <= 300 ? 'warning' : ''}`}>
+              <i className="ph-bold ph-hourglass"></i>
+              {Math.floor(testTimeLeft / 60).toString().padStart(2, '0')}:{(testTimeLeft % 60).toString().padStart(2, '0')}
+            </div>
+          </div>
+
+          <div className="test-main-card">
+            <h4 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Question Navigation</h4>
+            <div className="palette-grid">
+              {testQuestions.map((q, idx) => {
+                const isAnswered = !!userAnswers[q.id];
+                const isCurrent = currentQIndex === idx;
+                return (
+                  <div
+                    key={q.id}
+                    className={`palette-btn ${isCurrent ? 'active' : ''} ${isAnswered ? 'answered' : ''}`}
+                    onClick={() => setCurrentQIndex(idx)}
+                  >
+                    {idx + 1}
+                  </div>
+                );
+              })}
+            </div>
+            <button
+              className="btn-action"
+              style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }}
+              onClick={handleFinalSubmitTest}
+              disabled={isTestSubmitting}
+            >
+              {isTestSubmitting ? 'Evaluating...' : 'End & Submit'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* 3. SCORECARD & REVIEW VIEW */}
+    {aptitudeView === 'result' && testStatsResult && (
+      <div className="aptitude-lobby-card animate-fade-in">
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '10px' }}>
+            {testStatsResult.percentage >= 70 ? '🎯' : '📚'}
+          </div>
+          <h2 style={{ fontSize: '2.2rem', margin: '0 0 8px 0' }}>
+            {testStatsResult.percentage >= 70 ? 'Interview Qualified!' : 'Keep Practicing!'}
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+            You scored <strong>{testStatsResult.totalScore}</strong> out of <strong>{testStatsResult.totalQuestions}</strong> ({testStatsResult.percentage}%) in {testStatsResult.timeTakenFormatted}.
+          </p>
+        </div>
+
+        {/* Sectional Breakdown Cards */}
+        <h3 style={{ margin: '0 0 1rem 0' }}>Sectional Performance</h3>
+        <div className="stats-row" style={{ marginBottom: '2.5rem' }}>
+          {Object.entries(testStatsResult.categoryStats || {}).map(([cat, stat], i) => (
+            <div key={i} className="stat-card-new">
+              <div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--accent-cyan)', textTransform: 'uppercase' }}>{cat}</div>
+                <div className="stat-num">{stat.correct} / {stat.total}</div>
+                <div className="stat-label">{Math.round((stat.correct / stat.total) * 100)}% Accuracy</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Detailed Solutions Breakdown */}
+        <h3 style={{ margin: '0 0 1.2rem 0' }}>Detailed Answer Key & Solutions</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {testStatsResult.reviewList.map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                background: 'var(--input-bg)',
+                borderLeft: `4px solid ${item.isCorrect ? '#10b981' : '#ef4444'}`,
+                padding: '1.2rem 1.5rem',
+                borderRadius: '12px',
+                border: '1px solid var(--input-border)'
+              }}
+            >
+              <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '8px' }}>
+                Q{idx + 1}. {item.question}
+              </div>
+              <div style={{ fontSize: '0.88rem', color: item.isCorrect ? '#4ade80' : '#f87171', marginBottom: '6px' }}>
+                <strong>Your Answer:</strong> {item.selectedOption ? `${item.selectedOption} (${item.options[item.selectedOption]})` : 'Unanswered'} 
+                {item.isCorrect ? ' ✓' : ` (Correct: ${item.correctOption} - ${item.options[item.correctOption]})`}
+              </div>
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', background: 'var(--card-bg)', padding: '10px 14px', borderRadius: '8px', marginTop: '6px' }}>
+                <strong>Explanation:</strong> {item.explanation}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '2.5rem' }}>
+          <button className="btn-action" onClick={handleStartAptitude}>Retake Test</button>
+          <button className="btn-cancel" onClick={() => setAptitudeView('lobby')}>Back to Hub</button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
 
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
