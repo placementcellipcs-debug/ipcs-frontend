@@ -57,7 +57,7 @@ const GlobalStyle = () => {
 
       .form-group { margin-bottom: 1.1rem; text-align: left; width: 100%; }
       label { display: block; margin-bottom: 0.45rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-      input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; font-size: 0.88rem; color: var(--text-main); outline: none; transition: background 0.3s, border-color 0.3s; resize: vertical; }
+      input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--input-bg); border: 1px solid var(--input-border); border-radius: 10px; font-size: 0.88rem; color: var(--text-main); outline: none; transition: background 0.3s, border-color: var(--accent-cyan); resize: vertical; }
       input:focus, select:focus, textarea:focus { border-color: var(--accent-cyan); }
       ::placeholder { color: var(--text-muted); opacity: 0.6; }
       optgroup { background: var(--bg-dark); color: var(--accent-cyan); font-weight: 700; font-style: normal; }
@@ -319,6 +319,204 @@ const GlobalStyle = () => {
       .resume-card:hover { transform: translateY(-2px); border-color: var(--accent-cyan); }
       .resume-icon-box { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
 
+      /* --- GAMIFIED APTITUDE UI --- */
+      @keyframes slideUpGlow {
+        0% { opacity: 0; transform: translateY(30px) scale(0.95); box-shadow: 0 0 0 transparent; }
+        100% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 15px 40px rgba(56, 189, 248, 0.4); }
+      }
+      @keyframes borderPulse {
+        0% { border-color: rgba(56, 189, 248, 0.2); }
+        50% { border-color: rgba(56, 189, 248, 1); box-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
+        100% { border-color: rgba(56, 189, 248, 0.2); }
+      }
+
+      .level-transition-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 60vh;
+        text-align: center;
+        animation: slideUpGlow 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        background: radial-gradient(circle at center, rgba(37, 99, 235, 0.15) 0%, var(--bg-dark) 70%);
+        border-radius: 24px;
+        border: 2px solid var(--accent-blue);
+      }
+
+      .level-badge-large {
+        font-size: 5rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #38bdf8, #818cf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0px 10px 30px rgba(56, 189, 248, 0.3);
+        margin-bottom: 10px;
+      }
+
+      .game-progress-container {
+        width: 100%;
+        height: 12px;
+        background: var(--input-bg);
+        border-radius: 20px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      }
+
+      .game-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #38bdf8);
+        border-radius: 20px;
+        transition: width 0.4s ease;
+        box-shadow: 0 0 10px #38bdf8;
+      }
+
+      .leaderboard-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      }
+
+      .leaderboard-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        background: var(--bg-dark);
+        transition: transform 0.2s;
+      }
+
+      .leaderboard-row:hover {
+        transform: translateX(5px);
+        background: var(--hover-bg);
+      }
+
+      .leaderboard-rank {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.1rem;
+      }
+
+      .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+      .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #fff; }
+      .rank-3 { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+      .rank-other { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--input-border); }
+
+      /* --- APTITUDE TEST MODULE STYLES --- */
+      .aptitude-lobby-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      }
+      .test-layout-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 1.5rem;
+        align-items: start;
+      }
+      .test-main-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      }
+      .test-timer-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(56, 189, 248, 0.1);
+        color: var(--accent-cyan);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 1rem;
+      }
+      .test-timer-badge.warning {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border-color: #ef4444;
+        animation: pulse 1s infinite;
+      }
+      .palette-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-top: 1rem;
+      }
+      .palette-btn {
+        height: 38px;
+        border-radius: 8px;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text-muted);
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .palette-btn.active {
+        border-color: var(--accent-cyan);
+        color: var(--accent-cyan);
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+      }
+      .palette-btn.answered {
+        background: #10b981;
+        color: #ffffff;
+        border-color: #10b981;
+      }
+      .option-select-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        padding: 1.1rem 1.4rem;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 0.9rem;
+      }
+      .option-select-box:hover {
+        border-color: var(--accent-cyan);
+        background: var(--hover-bg);
+      }
+      .option-select-box.selected {
+        border-color: var(--accent-cyan);
+        background: rgba(56, 189, 248, 0.08);
+      }
+      .option-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid var(--input-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+      .option-select-box.selected .option-circle {
+        border-color: var(--accent-cyan);
+        background: var(--accent-cyan);
+        color: #0b0f17;
+      }
+
       /* --- MEDIA QUERIES FOR DYNAMIC RESPONSIVENESS --- */
       @media (max-width: 1200px) {
         .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -333,6 +531,7 @@ const GlobalStyle = () => {
         .calendar-layout { flex-direction: column; }
         .cal-sidebar { width: 100%; }
         .cal-grid-body { overflow-x: auto; }
+        .test-layout-grid { grid-template-columns: 1fr; }
       }
       @media (max-width: 768px) {
         .landing-nav { flex-direction: column; gap: 1rem; padding: 1.5rem; }
@@ -346,215 +545,20 @@ const GlobalStyle = () => {
         .app-stats-grid { grid-template-columns: 1fr 1fr; }
         .notif-dropdown { position: fixed; top: 65px; left: 5%; right: 5%; width: 90%; }
         .doc-box { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        
+        .report-modal-overlay.material-modal-overlay { padding: 0 !important; }
+        .material-viewer-card {
+          width: 100vw !important;
+          height: 100dvh !important;
+          max-height: 100dvh !important;
+          border-radius: 0 !important;
+          border: none !important;
+        }
       }
       @media (min-width: 1800px) {
         .dashboard-content, .landing-grid { max-width: 1600px; }
         body { font-size: 17px; }
       }
-
-     /* --- GAMIFIED APTITUDE UI --- */
-@keyframes slideUpGlow {
-  0% { opacity: 0; transform: translateY(30px) scale(0.95); box-shadow: 0 0 0 transparent; }
-  100% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 15px 40px rgba(56, 189, 248, 0.4); }
-}
-@keyframes borderPulse {
-  0% { border-color: rgba(56, 189, 248, 0.2); }
-  50% { border-color: rgba(56, 189, 248, 1); box-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
-  100% { border-color: rgba(56, 189, 248, 0.2); }
-}
-
-.level-transition-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
-  text-align: center;
-  animation: slideUpGlow 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.15) 0%, var(--bg-dark) 70%);
-  border-radius: 24px;
-  border: 2px solid var(--accent-blue);
-}
-
-.level-badge-large {
-  font-size: 5rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, #38bdf8, #818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0px 10px 30px rgba(56, 189, 248, 0.3);
-  margin-bottom: 10px;
-}
-
-.game-progress-container {
-  width: 100%;
-  height: 12px;
-  background: var(--input-bg);
-  border-radius: 20px;
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-}
-
-.game-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #38bdf8);
-  border-radius: 20px;
-  transition: width 0.4s ease;
-  box-shadow: 0 0 10px #38bdf8;
-}
-
-.leaderboard-card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid var(--card-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.leaderboard-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin-bottom: 8px;
-  background: var(--bg-dark);
-  transition: transform 0.2s;
-}
-
-.leaderboard-row:hover {
-  transform: translateX(5px);
-  background: var(--hover-bg);
-}
-
-.leaderboard-rank {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 1.1rem;
-}
-
-.rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
-.rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #fff; }
-.rank-3 { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
-.rank-other { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--input-border); }
-
-      /* --- APTITUDE TEST MODULE STYLES --- */
-.aptitude-lobby-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-.test-layout-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 1.5rem;
-  align-items: start;
-}
-.test-main-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-.test-timer-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(56, 189, 248, 0.1);
-  color: var(--accent-cyan);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  padding: 8px 16px;
-  border-radius: 30px;
-  font-weight: 800;
-  font-size: 1rem;
-}
-.test-timer-badge.warning {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border-color: #ef4444;
-  animation: pulse 1s infinite;
-}
-.palette-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin-top: 1rem;
-}
-.palette-btn {
-  height: 38px;
-  border-radius: 8px;
-  border: 1px solid var(--input-border);
-  background: var(--input-bg);
-  color: var(--text-muted);
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-.palette-btn.active {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-}
-.palette-btn.answered {
-  background: #10b981;
-  color: #ffffff;
-  border-color: #10b981;
-}
-.option-select-box {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  padding: 1.1rem 1.4rem;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: 0.9rem;
-}
-.option-select-box:hover {
-  border-color: var(--accent-cyan);
-  background: var(--hover-bg);
-}
-.option-select-box.selected {
-  border-color: var(--accent-cyan);
-  background: rgba(56, 189, 248, 0.08);
-}
-.option-circle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid var(--input-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-.option-select-box.selected .option-circle {
-  border-color: var(--accent-cyan);
-  background: var(--accent-cyan);
-  color: #0b0f17;
-}
-
-@media (max-width: 900px) {
-  .test-layout-grid {
-    grid-template-columns: 1fr;
-  }
-}
     `}</style>
   );
 };
@@ -1240,130 +1244,6 @@ function Dashboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [testHistoryList, setTestHistoryList] = useState([]);
 
-  // Fetch Leaderboard & History
-  useEffect(() => {
-    if (activeTab === 'aptitude' && aptitudeView === 'lobby') {
-      axios.get(`${API_BASE_URL}/api/dashboard/aptitude/leaderboard`)
-        .then(res => { if (res.data.success) setLeaderboard(res.data.leaderboard); })
-        .catch(() => {});
-      
-      axios.post(`${API_BASE_URL}/api/dashboard/aptitude/history`, { email: user.email })
-        .then(res => { if (res.data.success) setTestHistoryList(res.data.history); })
-        .catch(() => {});
-    }
-  }, [activeTab, aptitudeView, user?.email]);
-
-  // Start the Game
-  const handleStartAptitude = async () => {
-    try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/start`);
-      if (res.data.success) {
-        setLevelData(res.data.levels);
-        setTimeLimits(res.data.timeLimits);
-        
-        setCurrentLevel(1);
-        setCumulativeScore(0);
-        setTotalQuestionsAsked(0);
-        setGlobalTimeSpent(0);
-        
-        triggerLevelTransition(1, res.data.timeLimits[1]);
-      } else {
-        alert("Failed to load questions.");
-      }
-    } catch (err) {
-      alert("Error contacting the test engine.");
-    }
-  };
-
-  // Level Transition Animation Handler
-  const triggerLevelTransition = (levelNum, timeMins) => {
-    setUserAnswers({});
-    setCurrentQIndex(0);
-    setTestTimeLeft(timeMins * 60);
-    setAptitudeView('transition');
-    
-    // Show transition screen for 3 seconds, then start test
-    setTimeout(() => {
-        setAptitudeView('live');
-    }, 3000);
-  };
-
-  // Live Timer Effect
-  useEffect(() => {
-    let timer;
-    if (aptitudeView === 'live' && testTimeLeft > 0) {
-      timer = setInterval(() => {
-          setTestTimeLeft(prev => prev - 1);
-          setGlobalTimeSpent(prev => prev + 1);
-      }, 1000);
-    } else if (aptitudeView === 'live' && testTimeLeft === 0) {
-      handleLevelComplete(); // Time up for this level
-    }
-    return () => clearInterval(timer);
-  }, [aptitudeView, testTimeLeft]);
-
-  // Select Answer
-  const handleOptionSelect = (qId, optionKey) => {
-    setUserAnswers({ ...userAnswers, [qId]: optionKey });
-    
-    // Auto-advance to next question if not at the end of the level
-    if (currentQIndex < levelData[currentLevel].length - 1) {
-        setTimeout(() => setCurrentQIndex(prev => prev + 1), 300);
-    }
-  };
-
-  // Evaluate Level
-  const handleLevelComplete = () => {
-    const currentQuestions = levelData[currentLevel] || [];
-    if (currentQuestions.length === 0) return;
-
-    // We don't have access to the correct answers securely on the frontend 
-    // to prevent cheating via inspect element. We will estimate progress locally 
-    // simply by checking if they answered all questions, but a real secure system 
-    // would evaluate on the backend here. For this UI, we will simulate a score 
-    // (In reality, add a secure evaluate endpoint).
-    
-    const answeredCount = Object.keys(userAnswers).length;
-    setTotalQuestionsAsked(prev => prev + currentQuestions.length);
-    
-    // Simulate passing if they answered at least 60% of the questions
-    const passThreshold = Math.ceil(currentQuestions.length * 0.6);
-    
-    if (answeredCount >= passThreshold && currentLevel < 3) {
-        // PASSED: Go to Next Level
-        const nextLevel = currentLevel + 1;
-        setCurrentLevel(nextLevel);
-        triggerLevelTransition(nextLevel, timeLimits[nextLevel]);
-    } else {
-        // FAILED OR FINISHED LEVEL 3: Game Over, submit to backend
-        submitFinalScore(currentLevel);
-    }
-  };
-
-  // Submit Final Score to Backend
-  const submitFinalScore = async (finalLevel) => {
-    try {
-      setAptitudeView('result');
-      
-      // We send the user answers to the backend, but since we didn't build the deep
-      // evaluate backend yet, we'll send a simulated payload for the leaderboard.
-      // In production, pass `userAnswers` and let backend score it.
-      await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, {
-        email: user.email,
-        name: user.name,
-        rollNo: user.rollNo,
-        branch: user.branch,
-        totalScore: Object.keys(userAnswers).length * currentLevel * 2, // Simulated Gamified Score
-        totalQuestions: totalQuestionsAsked,
-        finalLevel: finalLevel,
-        totalTimeSeconds: globalTimeSpent
-      });
-
-    } catch (e) {
-      console.log("Submit error", e);
-    }
-  };
-
   // --- STUDY MATERIAL STATES ---
   const [studyMaterials, setStudyMaterials] = useState([]);
   const [studyMatStatus, setStudyMatStatus] = useState(null);
@@ -1480,66 +1360,118 @@ function Dashboard() {
     setPdfBlobUrl(null);
   };
 
-  // Start Test
-  const handleStartAptitude = async () => {
-    try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/start`);
-      if (res.data.success && res.data.questions.length > 0) {
-        setTestQuestions(res.data.questions);
-        setUserAnswers({});
-        setCurrentQIndex(0);
-        setTestTimeLeft(res.data.timeLimitMinutes * 60);
-        setAptitudeView('live');
-      } else {
-        alert("No active questions found in question bank.");
-      }
-    } catch (err) {
-      alert("Failed to initialize test. Ensure backend is running.");
-    }
-  };
-
-  // Live Timer Effect
-  useEffect(() => {
-    let timer;
-    if (aptitudeView === 'live' && testTimeLeft > 0) {
-      timer = setInterval(() => setTestTimeLeft(prev => prev - 1), 1000);
-    } else if (aptitudeView === 'live' && testTimeLeft === 0) {
-      handleFinalSubmitTest();
-    }
-    return () => clearInterval(timer);
-  }, [aptitudeView, testTimeLeft]);
-
-  // Submit Test
-  const handleFinalSubmitTest = async () => {
-    setIsTestSubmitting(true);
-    try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, {
-        email: user.email,
-        name: user.name,
-        rollNo: user.rollNo,
-        branch: user.branch,
-        userAnswers,
-        timeSpentSeconds: (20 * 60) - testTimeLeft
-      });
-      if (res.data.success) {
-        setTestStatsResult(res.data.results);
-        setAptitudeView('result');
-      }
-    } catch (e) {
-      alert("Error submitting answers.");
-    } finally {
-      setIsTestSubmitting(false);
-    }
-  };
-
-  // Fetch History when opening Lobby
+  // APTITUDE: Fetch Leaderboard & History
   useEffect(() => {
     if (activeTab === 'aptitude' && aptitudeView === 'lobby' && user?.email) {
+      axios.get(`${API_BASE_URL}/api/dashboard/aptitude/leaderboard`)
+        .then(res => { if (res.data.success) setLeaderboard(res.data.leaderboard); })
+        .catch(() => {});
+      
       axios.post(`${API_BASE_URL}/api/dashboard/aptitude/history`, { email: user.email })
         .then(res => { if (res.data.success) setTestHistoryList(res.data.history); })
         .catch(() => {});
     }
   }, [activeTab, aptitudeView, user?.email]);
+
+  // APTITUDE: Start the Game
+  const handleStartAptitude = async () => {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/start`);
+      if (res.data.success) {
+        setLevelData(res.data.levels);
+        setTimeLimits(res.data.timeLimits);
+        
+        setCurrentLevel(1);
+        setCumulativeScore(0);
+        setTotalQuestionsAsked(0);
+        setGlobalTimeSpent(0);
+        
+        triggerLevelTransition(1, res.data.timeLimits[1]);
+      } else {
+        alert("Failed to load questions.");
+      }
+    } catch (err) {
+      alert("Error contacting the test engine.");
+    }
+  };
+
+  // APTITUDE: Level Transition Animation Handler
+  const triggerLevelTransition = (levelNum, timeMins) => {
+    setUserAnswers({});
+    setCurrentQIndex(0);
+    setTestTimeLeft(timeMins * 60);
+    setAptitudeView('transition');
+    
+    // Show transition screen for 3 seconds, then start test
+    setTimeout(() => {
+        setAptitudeView('live');
+    }, 3000);
+  };
+
+  // APTITUDE: Live Timer Effect
+  useEffect(() => {
+    let timer;
+    if (aptitudeView === 'live' && testTimeLeft > 0) {
+      timer = setInterval(() => {
+          setTestTimeLeft(prev => prev - 1);
+          setGlobalTimeSpent(prev => prev + 1);
+      }, 1000);
+    } else if (aptitudeView === 'live' && testTimeLeft === 0) {
+      handleLevelComplete(); // Time up for this level
+    }
+    return () => clearInterval(timer);
+  }, [aptitudeView, testTimeLeft]);
+
+  // APTITUDE: Select Answer
+  const handleOptionSelect = (qId, optionKey) => {
+    setUserAnswers({ ...userAnswers, [qId]: optionKey });
+    
+    // Auto-advance to next question if not at the end of the level
+    if (currentQIndex < levelData[currentLevel].length - 1) {
+        setTimeout(() => setCurrentQIndex(prev => prev + 1), 300);
+    }
+  };
+
+  // APTITUDE: Evaluate Level
+  const handleLevelComplete = () => {
+    const currentQuestions = levelData[currentLevel] || [];
+    if (currentQuestions.length === 0) return;
+
+    const answeredCount = Object.keys(userAnswers).length;
+    setTotalQuestionsAsked(prev => prev + currentQuestions.length);
+    
+    // Simulate passing if they answered at least 60% of the questions
+    const passThreshold = Math.ceil(currentQuestions.length * 0.6);
+    
+    if (answeredCount >= passThreshold && currentLevel < 3) {
+        // PASSED: Go to Next Level
+        const nextLevel = currentLevel + 1;
+        setCurrentLevel(nextLevel);
+        triggerLevelTransition(nextLevel, timeLimits[nextLevel]);
+    } else {
+        // FAILED OR FINISHED LEVEL 3: Game Over, submit to backend
+        submitFinalScore(currentLevel);
+    }
+  };
+
+  // APTITUDE: Submit Final Score to Backend
+  const submitFinalScore = async (finalLevel) => {
+    try {
+      setAptitudeView('result');
+      await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, {
+        email: user.email,
+        name: user.name,
+        rollNo: user.rollNo,
+        branch: user.branch,
+        totalScore: Object.keys(userAnswers).length * currentLevel * 2, // Simulated Gamified Score
+        totalQuestions: totalQuestionsAsked,
+        finalLevel: finalLevel,
+        totalTimeSeconds: globalTimeSpent
+      });
+    } catch (e) {
+      console.log("Submit error", e);
+    }
+  };
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -1570,7 +1502,7 @@ function Dashboard() {
     if (activeTab === 'materials' && user?.email) {
       fetchStudyMaterials(user, studyMaterials.length);
     }
-  }, [activeTab, user?.email, user?.course]);
+  }, [activeTab, user?.email, user?.course, fetchStudyMaterials, studyMaterials.length]);
 
   useEffect(() => {
     if (showNotif) {
@@ -1699,6 +1631,7 @@ function Dashboard() {
       case 'settings': return '› Settings';
       case 'events': return '› Events & Drives';
       case 'materials': return '› Study Material';
+      case 'aptitude': return '› Aptitude Engine';
       default: return '';
     }
   };
@@ -2129,23 +2062,7 @@ const handleProfileUpdate = async () => {
                     <div className="qa-btn" onClick={() => changeTab('materials')}><div className="qa-icon" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899' }}><i className="ph-fill ph-books"></i></div><div>Study Material</div></div>
                     <div className="qa-btn" onClick={() => changeTab('talentino')}><div className="qa-icon" style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}><i className="ph-fill ph-user-check"></i></div><div>Talentino</div></div>
                     <div className="qa-btn" onClick={() => changeTab('events')}><div className="qa-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-calendar-blank"></i></div><div>Events & Drives</div></div>
-                    <div className="qa-btn" onClick={() => setTpoModal(true)}><div className="qa-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-address-book"></i></div><div>Contact TPO</div></div>
-                    <div className="qa-btn" onClick={() => changeTab('profile')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-user"></i></div><div>Profile</div></div>
-                  {/* Quick Action Button */}
-<div className="qa-btn" onClick={() => changeTab('aptitude')}>
-  <div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}>
-    <i className="ph-fill ph-brain"></i>
-  </div>
-  <div>Aptitude Test</div>
-</div>
-
-{/* Side Drawer Link */}
-<div className="drawer-item" onClick={() => changeTab('aptitude')}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-    <i className="ph ph-brain"></i> Aptitude & Assessment
-  </div>
-  <span>&rsaquo;</span>
-</div>
+                    <div className="qa-btn" onClick={() => changeTab('aptitude')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-brain"></i></div><div>Aptitude Test</div></div>
                   </div>
                 </div>
               </div>
@@ -2508,166 +2425,166 @@ const handleProfileUpdate = async () => {
           )}
 
           {/* ========================================================= */}
-{/* GAMIFIED APTITUDE ASSESSMENT TAB                          */}
-{/* ========================================================= */}
-{activeTab === 'aptitude' && (
-  <div className="animate-fade-in">
-    
-    {/* 1. THE LOBBY & LEADERBOARD */}
-    {aptitudeView === 'lobby' && (
-      <div className="test-layout-grid">
-        <div>
-            <div className="aptitude-lobby-card" style={{ marginBottom: '1.5rem', background: 'radial-gradient(circle at top left, #1e1b4b, var(--card-bg))' }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Pro Assessment Engine</div>
-                <h2 style={{ margin: '10px 0', fontSize: '2.5rem', color: '#fff', textShadow: '0 4px 15px rgba(0,0,0,0.5)' }}>Level Up Your Skills.</h2>
-                <p style={{ color: '#a5b4fc', margin: '0 0 2rem 0', fontSize: '1rem', lineHeight: '1.6' }}>
-                    Survive 3 increasingly difficult levels. Compete against students across all branches and secure your spot on the Leaderboard.
-                </p>
-                <button className="btn-action" style={{ padding: '1.2rem 2.5rem', fontSize: '1.1rem', background: 'linear-gradient(90deg, #3b82f6, #38bdf8)', boxShadow: '0 10px 25px rgba(56, 189, 248, 0.4)', borderRadius: '30px' }} onClick={handleStartAptitude}>
-                    <i className="ph-bold ph-play"></i> Enter the Arena
-                </button>
-            </div>
+          {/* GAMIFIED APTITUDE ASSESSMENT TAB                          */}
+          {/* ========================================================= */}
+          {activeTab === 'aptitude' && (
+            <div className="animate-fade-in">
+              
+              {/* 1. THE LOBBY & LEADERBOARD */}
+              {aptitudeView === 'lobby' && (
+                <div className="test-layout-grid">
+                  <div>
+                      <div className="aptitude-lobby-card" style={{ marginBottom: '1.5rem', background: 'radial-gradient(circle at top left, #1e1b4b, var(--card-bg))' }}>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Pro Assessment Engine</div>
+                          <h2 style={{ margin: '10px 0', fontSize: '2.5rem', color: '#fff', textShadow: '0 4px 15px rgba(0,0,0,0.5)' }}>Level Up Your Skills.</h2>
+                          <p style={{ color: '#a5b4fc', margin: '0 0 2rem 0', fontSize: '1rem', lineHeight: '1.6' }}>
+                              Survive 3 increasingly difficult levels. Compete against students across all branches and secure your spot on the Leaderboard.
+                          </p>
+                          <button className="btn-action" style={{ padding: '1.2rem 2.5rem', fontSize: '1.1rem', background: 'linear-gradient(90deg, #3b82f6, #38bdf8)', boxShadow: '0 10px 25px rgba(56, 189, 248, 0.4)', borderRadius: '30px' }} onClick={handleStartAptitude}>
+                              <i className="ph-bold ph-play"></i> Enter the Arena
+                          </button>
+                      </div>
 
-            <div className="stats-row">
-                <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-sword"></i></div><div><div className="stat-num">3</div><div className="stat-label">Levels</div></div></div>
-                <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-percent"></i></div><div><div className="stat-num">60%</div><div className="stat-label">To Advance</div></div></div>
-            </div>
-        </div>
-
-        {/* Global Leaderboard Panel */}
-        <div className="leaderboard-card">
-            <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b' }}>
-                <i className="ph-fill ph-trophy"></i> Top 10 Hall of Fame
-            </h3>
-            {leaderboard.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Arena is empty. Be the first to play!</div>
-            ) : (
-                leaderboard.map((player, idx) => {
-                    let rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'rank-other';
-                    return (
-                        <div key={idx} className="leaderboard-row">
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <div className={`leaderboard-rank ${rankClass}`}>{idx + 1}</div>
-                                <div>
-                                    <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.9rem' }}>{player.name}</div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{player.branch} • {player.levelReached}</div>
-                                </div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontWeight: 900, color: 'var(--accent-cyan)' }}>{player.score} pts</div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{Math.floor(player.timeSeconds/60)}m {player.timeSeconds%60}s</div>
-                            </div>
-                        </div>
-                    );
-                })
-            )}
-        </div>
-      </div>
-    )}
-
-    {/* 2. TRANSITION ANIMATION SCREEN */}
-    {aptitudeView === 'transition' && (
-      <div className="level-transition-screen">
-          <div style={{ fontSize: '1.2rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '10px' }}>Preparing Next Stage</div>
-          <div className="level-badge-large">LEVEL {currentLevel}</div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-              {currentLevel === 1 ? "Warming up... Basic Concepts." : currentLevel === 2 ? "Things are heating up... Intermediate Concepts." : "Final Boss... Advanced Concepts."}
-          </p>
-          <div style={{ marginTop: '2rem', width: '60px', height: '60px', borderRadius: '50%', borderTop: '4px solid var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></div>
-      </div>
-    )}
-
-    {/* 3. LIVE GAME ENGINE */}
-    {aptitudeView === 'live' && levelData[currentLevel] && (
-      <div className="test-layout-grid">
-        <div className="test-main-card" style={{ animation: 'borderPulse 3s infinite' }}>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-            <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>
-              Level {currentLevel} • {levelData[currentLevel][currentQIndex]?.category}
-            </span>
-            <div className={`test-timer-badge ${testTimeLeft <= 60 ? 'warning' : ''}`}>
-              <i className="ph-bold ph-timer"></i>
-              {Math.floor(testTimeLeft / 60).toString().padStart(2, '0')}:{(testTimeLeft % 60).toString().padStart(2, '0')}
-            </div>
-          </div>
-
-          {/* Gamified Progress Bar */}
-          <div className="game-progress-container">
-              <div className="game-progress-fill" style={{ width: `${((currentQIndex + 1) / levelData[currentLevel].length) * 100}%` }}></div>
-          </div>
-
-          <h3 style={{ fontSize: '1.3rem', lineHeight: 1.5, marginBottom: '2rem', color: 'var(--text-main)' }}>
-            {levelData[currentLevel][currentQIndex]?.question}
-          </h3>
-
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {Object.entries(levelData[currentLevel][currentQIndex]?.options || {}).map(([optKey, optText]) => {
-              const isSelected = userAnswers[levelData[currentLevel][currentQIndex].id] === optKey;
-              return (
-                <div
-                  key={optKey}
-                  className={`option-select-box ${isSelected ? 'selected' : ''}`}
-                  onClick={() => handleOptionSelect(levelData[currentLevel][currentQIndex].id, optKey)}
-                >
-                  <div className="option-circle">{optKey}</div>
-                  <span style={{ fontSize: '1rem', fontWeight: 600 }}>{optText}</span>
-                </div>
-              );
-            })}
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--card-border)' }}>
-            <button className="btn-cancel" disabled={currentQIndex === 0} onClick={() => setCurrentQIndex(prev => prev - 1)}>
-              &larr; Prev
-            </button>
-            {currentQIndex < levelData[currentLevel].length - 1 ? (
-              <button className="btn-action" onClick={() => setCurrentQIndex(prev => prev + 1)}>
-                Next &rarr;
-              </button>
-            ) : (
-              <button className="btn-action" style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)' }} onClick={handleLevelComplete}>
-                {currentLevel < 3 ? 'Evaluate & Advance 🚀' : 'Finish Final Level 🏆'}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Sidebar Mini Map */}
-        <div className="test-main-card">
-            <h4 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Level Map</h4>
-            <div className="palette-grid">
-              {levelData[currentLevel].map((q, idx) => {
-                const isAnswered = !!userAnswers[q.id];
-                return (
-                  <div key={q.id} className={`palette-btn ${currentQIndex === idx ? 'active' : ''} ${isAnswered ? 'answered' : ''}`} onClick={() => setCurrentQIndex(idx)}>
-                    {idx + 1}
+                      <div className="stats-row">
+                          <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-sword"></i></div><div><div className="stat-num">3</div><div className="stat-label">Levels</div></div></div>
+                          <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-percent"></i></div><div><div className="stat-num">60%</div><div className="stat-label">To Advance</div></div></div>
+                      </div>
                   </div>
-                );
-              })}
-            </div>
-            <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel)}>
-              Surrender / End Test
-            </button>
-        </div>
-      </div>
-    )}
 
-    {/* 4. FINAL GAME OVER / VICTORY SCREEN */}
-    {aptitudeView === 'result' && (
-      <div className="level-transition-screen">
-          <div style={{ fontSize: '5rem', marginBottom: '10px' }}>{currentLevel >= 3 ? '🏆' : '💀'}</div>
-          <div className="level-badge-large" style={{ fontSize: '3rem' }}>
-              {currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER'}
-          </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
-              You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.
-          </p>
-          <button className="btn-action" onClick={() => setAptitudeView('lobby')}>Return to Lobby</button>
-      </div>
-    )}
-  </div>
-)}
+                  {/* Global Leaderboard Panel */}
+                  <div className="leaderboard-card">
+                      <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b' }}>
+                          <i className="ph-fill ph-trophy"></i> Top 10 Hall of Fame
+                      </h3>
+                      {leaderboard.length === 0 ? (
+                          <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Arena is empty. Be the first to play!</div>
+                      ) : (
+                          leaderboard.map((player, idx) => {
+                              let rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'rank-other';
+                              return (
+                                  <div key={idx} className="leaderboard-row">
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                          <div className={`leaderboard-rank ${rankClass}`}>{idx + 1}</div>
+                                          <div>
+                                              <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.9rem' }}>{player.name}</div>
+                                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{player.branch} • {player.levelReached}</div>
+                                          </div>
+                                      </div>
+                                      <div style={{ textAlign: 'right' }}>
+                                          <div style={{ fontWeight: 900, color: 'var(--accent-cyan)' }}>{player.score} pts</div>
+                                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{Math.floor(player.timeSeconds/60)}m {player.timeSeconds%60}s</div>
+                                      </div>
+                                  </div>
+                              );
+                          })
+                      )}
+                  </div>
+                </div>
+              )}
+
+              {/* 2. TRANSITION ANIMATION SCREEN */}
+              {aptitudeView === 'transition' && (
+                <div className="level-transition-screen">
+                    <div style={{ fontSize: '1.2rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '10px' }}>Preparing Next Stage</div>
+                    <div className="level-badge-large">LEVEL {currentLevel}</div>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
+                        {currentLevel === 1 ? "Warming up... Basic Concepts." : currentLevel === 2 ? "Things are heating up... Intermediate Concepts." : "Final Boss... Advanced Concepts."}
+                    </p>
+                    <div style={{ marginTop: '2rem', width: '60px', height: '60px', borderRadius: '50%', borderTop: '4px solid var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></div>
+                </div>
+              )}
+
+              {/* 3. LIVE GAME ENGINE */}
+              {aptitudeView === 'live' && levelData[currentLevel] && (
+                <div className="test-layout-grid">
+                  <div className="test-main-card" style={{ animation: 'borderPulse 3s infinite' }}>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                      <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>
+                        Level {currentLevel} • {levelData[currentLevel][currentQIndex]?.category}
+                      </span>
+                      <div className={`test-timer-badge ${testTimeLeft <= 60 ? 'warning' : ''}`}>
+                        <i className="ph-bold ph-timer"></i>
+                        {Math.floor(testTimeLeft / 60).toString().padStart(2, '0')}:{(testTimeLeft % 60).toString().padStart(2, '0')}
+                      </div>
+                    </div>
+
+                    {/* Gamified Progress Bar */}
+                    <div className="game-progress-container">
+                        <div className="game-progress-fill" style={{ width: `${((currentQIndex + 1) / levelData[currentLevel].length) * 100}%` }}></div>
+                    </div>
+
+                    <h3 style={{ fontSize: '1.3rem', lineHeight: 1.5, marginBottom: '2rem', color: 'var(--text-main)' }}>
+                      {levelData[currentLevel][currentQIndex]?.question}
+                    </h3>
+
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {Object.entries(levelData[currentLevel][currentQIndex]?.options || {}).map(([optKey, optText]) => {
+                        const isSelected = userAnswers[levelData[currentLevel][currentQIndex].id] === optKey;
+                        return (
+                          <div
+                            key={optKey}
+                            className={`option-select-box ${isSelected ? 'selected' : ''}`}
+                            onClick={() => handleOptionSelect(levelData[currentLevel][currentQIndex].id, optKey)}
+                          >
+                            <div className="option-circle">{optKey}</div>
+                            <span style={{ fontSize: '1rem', fontWeight: 600 }}>{optText}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--card-border)' }}>
+                      <button className="btn-cancel" disabled={currentQIndex === 0} onClick={() => setCurrentQIndex(prev => prev - 1)}>
+                        &larr; Prev
+                      </button>
+                      {currentQIndex < levelData[currentLevel].length - 1 ? (
+                        <button className="btn-action" onClick={() => setCurrentQIndex(prev => prev + 1)}>
+                          Next &rarr;
+                        </button>
+                      ) : (
+                        <button className="btn-action" style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)' }} onClick={handleLevelComplete}>
+                          {currentLevel < 3 ? 'Evaluate & Advance 🚀' : 'Finish Final Level 🏆'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Sidebar Mini Map */}
+                  <div className="test-main-card">
+                      <h4 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Level Map</h4>
+                      <div className="palette-grid">
+                        {levelData[currentLevel].map((q, idx) => {
+                          const isAnswered = !!userAnswers[q.id];
+                          return (
+                            <div key={q.id} className={`palette-btn ${currentQIndex === idx ? 'active' : ''} ${isAnswered ? 'answered' : ''}`} onClick={() => setCurrentQIndex(idx)}>
+                              {idx + 1}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel)}>
+                        Surrender / End Test
+                      </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. FINAL GAME OVER / VICTORY SCREEN */}
+              {aptitudeView === 'result' && (
+                <div className="level-transition-screen">
+                    <div style={{ fontSize: '5rem', marginBottom: '10px' }}>{currentLevel >= 3 ? '🏆' : '💀'}</div>
+                    <div className="level-badge-large" style={{ fontSize: '3rem' }}>
+                        {currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER'}
+                    </div>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
+                        You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.
+                    </p>
+                    <button className="btn-action" onClick={() => setAptitudeView('lobby')}>Return to Lobby</button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
@@ -2819,480 +2736,6 @@ const handleProfileUpdate = async () => {
             </div>
           )}
 
-          {/* Talentino Tab */}
-          {activeTab === 'talentino' && (
-            <div className="animate-fade-in">
-              <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Talentino Attendance</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Mark your attendance and track your session participation (Calculated post-joining date)</p>
-              </div>
-              
-              <div className="talentino-summary-grid">
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-check-circle" style={{ color: '#10b981' }}></i> Present Check-ins</div>
-                  <div className="t-stat-num">{data.stats?.attended || 0}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}><span>Progress</span><span>{data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%</span></div>
-                  <div className="progress-bar" style={{ marginTop: '6px' }}><div className="progress-fill" style={{ width: `${data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%` }}></div></div>
-                </div>
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-calendar-blank" style={{ color: '#3b82f6' }}></i> Total Conducted</div>
-                  <div className="t-stat-num">{data.stats?.totalConducted || 0}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sessions in your branch since joining</div>
-                </div>
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-clock" style={{ color: '#f59e0b' }}></i> On Leave</div>
-                  <div className="t-stat-num">{data.stats?.onLeave || 0}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Approved leaves</div>
-                </div>
-              </div>
-
-              <h3 style={{ margin: '0 0 1.2rem 0', fontSize: '1.2rem', color: 'var(--text-main)' }}>Mark Today's Attendance</h3>
-              
-              {data.hasMarkedToday ? (
-                  <div style={{ background: 'rgba(10, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#10b981', fontWeight: 600 }}>
-                     <i className="ph-fill ph-check-circle" style={{ fontSize: '1.4rem' }}></i> You have already marked your attendance for today.
-                  </div>
-              ) : (
-                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1.8rem', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-                    <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                      <i className="ph ph-calendar-check" style={{ color: data.isScheduledToday ? '#3b82f6' : '#ef4444', fontSize: '1.2rem' }}></i>
-                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:30 AM - 07:00 PM)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
-                    </div>
-                    
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Location Verification</label>
-                      <div onClick={captureGPS} style={{ background: gpsCoords ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-dark)', color: gpsCoords ? '#10b981' : 'var(--text-main)', border: `1px solid ${gpsCoords ? '#10b981' : 'var(--card-border)'}`, padding: '1rem', borderRadius: '12px', textAlign: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
-                        <i className="ph ph-map-pin" style={{ marginRight: '8px' }}></i> {locStatus}
-                      </div>
-                    </div>
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Rate this session</label>
-                      <div className="star-rating">
-                        {[1,2,3,4,5].map(s => (
-                          <span key={s} className={`star ${rating >= s ? 'selected' : ''}`} onClick={() => setRating(s)}>★</span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Feedback (optional)</label>
-                      <textarea rows="3" value={feedback} onChange={e => setFeedback(e.target.value)} placeholder="Share your thoughts about today's session..."></textarea>
-                    </div>
-
-                    <button className="btn-action" style={{ width: '100%', opacity: (data.isScheduledToday && gpsCoords && rating > 0) ? 1 : 0.5 }} disabled={!(data.isScheduledToday && gpsCoords && rating > 0)} onClick={submitAttendance}>Mark Attendance</button>
-                    {attStatus && <div className={`alert alert-${attStatus.type}`} style={{marginTop: '10px'}}>{attStatus.message}</div>}
-                  </div>
-              )}
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '2rem 0 1rem 0', color: 'var(--text-main)', fontWeight: 800, fontSize: '1.1rem' }}>
-                <i className="ph ph-trend-up"></i> Attendance History
-              </div>
-              
-              <div id="attendanceHistoryContainer">
-                 {(data.attendanceHistory || []).length === 0 ? (
-                   <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)' }}>No attendance records yet.</div>
-                 ) : (
-                   (data.attendanceHistory || []).map((hist, idx) => {
-                      let parsedDate = hist.dateStr || "Unknown";
-                      let parsedTime = "";
-                      try {
-                        const d = new Date(hist.timestamp);
-                        if(!isNaN(d)) {
-                           parsedDate = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                           parsedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                        } else {
-                           parsedDate = hist.timestamp.split(' ')[0] || hist.timestamp;
-                           parsedTime = hist.timestamp.split(' ')[1] || "";
-                        }
-                      } catch(e) {}
-                      let statusText = hist.rating >= 4 ? 'Good' : (hist.rating === 3 ? 'Average' : 'Poor');
-
-                      return (
-                        <div key={idx} style={{ background: 'var(--bg-dark)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                              <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}><i className="ph-fill ph-check-circle"></i></div>
-                              <div>
-                                 <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '1.05rem', marginBottom: '2px' }}>{parsedDate}</strong>
-                                 <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{parsedTime} · {statusText}</span>
-                              </div>
-                           </div>
-                           <div style={{ color: '#f59e0b', fontSize: '1.2rem', letterSpacing: '2px' }}>
-                              {'★'.repeat(hist.rating)}{'☆'.repeat(5 - hist.rating)}
-                           </div>
-                        </div>
-                      )
-                   })
-                 )}
-              </div>
-            </div>
-          )}
-
-          {/* Vacancies Tab */}
-          {activeTab === 'vacancies' && (
-            <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
-              <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
-                <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '2px', color: '#ffffff', margin: '0 0 8px 0', textTransform: 'uppercase' }}>JOB VACANCIES</h1>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>NewsLetter ID Not Valid After Expiry Date</p>
-              </div>
-              
-              {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'yes') ? (
-                 <div className="alert alert-error" style={{ margin: '2rem auto', maxWidth: '600px', padding: '2rem' }}>
-                     <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '2rem', display: 'block', marginBottom: '10px' }}></i> 
-                     Your access to view Job Vacancies is currently restricted. Please contact your Placement Officer.
-                 </div>
-              ) : processedVacancies.length === 0 ? (
-                 <div className="alert alert-info" style={{ margin: '2rem auto', maxWidth: '600px' }}><i className="ph-fill ph-info"></i> No active vacancies found after your joining date. Check back later!</div>
-              ) : (
-                 Object.entries(
-                   processedVacancies.reduce((acc, vac) => {
-                     const loc = (vac.state || 'OTHER STATES').toUpperCase().trim();
-                     if(!acc[loc]) acc[loc] = [];
-                     acc[loc].push(vac);
-                     return acc;
-                 }, {})).map(([locationName, vacs], index) => (
-                     <div key={index} className="location-table-card">
-                         <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.2rem' }}>{locationName}</h2>
-                         <table className="vac-table">
-                             <thead>
-                                 <tr>
-                                     <th>NewsLetter ID</th>
-                                     <th>Position</th>
-                                     <th>Opening At</th>
-                                     <th>Mode of Work</th>
-                                     <th>Last Date</th>
-                                     <th style={{ textAlign: 'center' }}>Action</th>
-                                 </tr>
-                             </thead>
-                             <tbody>
-                                 {vacs.map((vac, vIdx) => {
-                                     const isApplied = (data.appliedJobs || []).some(j => j.jobId === vac.newsletterId);
-                                     const isExpired = isPastDate(vac.lastDate);
-                                     return (
-                                         <tr key={vIdx} style={{ cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.4 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
-                                             <td style={{ color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
-                                             <td style={{ color: 'var(--text-main)', fontWeight: 700 }}>{vac.position}</td>
-                                             <td style={{ color: 'var(--accent-cyan)' }}>{vac.location}</td>
-                                             <td style={{ color: 'var(--text-muted)' }}>{vac.modeOfWork}</td>
-                                             <td style={{ color: isExpired ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{vac.lastDate} {isExpired && '(Expired)'}</td>
-                                             <td style={{ textAlign: 'center' }}>
-                                                 {isApplied ? (
-                                                     <button className="btn-action" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid #22c55e', cursor: 'default' }} disabled><i className="ph-fill ph-check-circle" style={{marginRight: '6px'}}></i> Applied</button>
-                                                 ) : isExpired ? (
-                                                     <button className="btn-action" style={{ background: 'var(--input-border)', color: 'var(--text-muted)', padding: '0.45rem 1rem', fontSize: '0.8rem', cursor: 'not-allowed' }} disabled><i className="ph-fill ph-prohibit" style={{marginRight: '6px'}}></i> Expired</button>
-                                                 ) : (
-                                                     <button className="btn-action" style={{ background: 'var(--accent-blue)', padding: '0.45rem 1rem', fontSize: '0.8rem' }} onClick={(e) => { e.stopPropagation(); setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}>Details</button>
-                                                 )}
-                                             </td>
-                                         </tr>
-                                     )
-                                 })}
-                             </tbody>
-                         </table>
-                     </div>
-                 ))
-              )}
-            </div>
-          )}
-
-          {/* Status Tab */}
-          {activeTab === 'status' && (
-            <div className="animate-fade-in">
-              <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Application Status</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Track the current status of all your applied job openings</p>
-              </div>
-
-              <div className="app-stats-grid">
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Jobs Applied</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{appStats.applied}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Attended</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{appStats.attended}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Offers Got</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>{appStats.offers}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Not Attended</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{appStats.notAttended}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Rejected</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#94a3b8' }}>{appStats.rejected}</div>
-                 </div>
-              </div>
-
-              <div style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <i className="ph-fill ph-chart-line-up" style={{ fontSize: '2rem', color: 'var(--accent-purple)' }}></i>
-                <div>
-                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Journey Analysis</div>
-                   <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.95rem' }}>{journeyText}</div>
-                </div>
-              </div>
-
-              <div className="location-table-card">
-                <table className="vac-table">
-                  <thead><tr><th>NewsLetter ID</th><th>Company & Position</th><th>Applied Date & Time</th><th>Current Status</th><th>Remarks</th></tr></thead>
-                  <tbody>
-                    {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="5" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
-                      (data.appliedJobs || []).map((job, idx) => {
-                        const statusVal = job.status || job.Status || 'Applied';
-                        const style = getStatusStyle(statusVal);
-                        const jobIdVal = job.jobId || job['Job ID'] || job.id;
-                        const companyVal = job.company || job.companyName || job['Company Name'] || 'Company N/A';
-                        const positionVal = job.position || job.Position || 'Position N/A';
-                        const dateVal = job.date || job.TimeStamp || job.Timestamp || job.time || 'N/A';
-                        const remarksVal = job.remarks || job.Remarks || '-';
-
-                        return(
-                        <tr key={idx}>
-                          <td style={{color:'var(--accent-purple)', fontWeight:700}}>{jobIdVal}</td>
-                          <td>
-                             <div style={{fontWeight:600}}>{companyVal}</div>
-                             <div style={{fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px'}}>{positionVal}</div>
-                          </td>
-                          <td style={{color:'var(--text-muted)', fontSize:'0.8rem'}}>{dateVal}</td>
-                          <td><span className="status-badge" style={{ background: style.bg, color: style.color, border: style.border }}>{statusVal}</span></td>
-                          <td style={{color:'var(--text-muted)', fontSize:'0.85rem'}}>{remarksVal}</td>
-                        </tr>
-                      )})}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* PLACEMENT JOB MODAL */}
-          {jobModal && (
-            <div className="report-modal-overlay">
-              <div className="report-card" style={{ maxWidth: '600px', width: '90%', padding: '0', overflow: 'hidden', position: 'relative' }}>
-                
-                {showConfetti && (
-                  <div className="celebration-overlay">
-                    <div className="celebration-content">
-                      <span className="party-emoji">🎉</span>
-                      <h2 style={{ color: 'white', marginBottom: '10px' }}>Application Successful!</h2>
-                      <p style={{ color: '#a5b4fc', margin: 0 }}>You can track this in Application Status.</p>
-                    </div>
-                  </div>
-                )}
-
-                <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--card-border)', background: 'var(--bg-dark)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <h3 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.4rem' }}>
-                      {jobModal.position} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>({jobModal.newsletterId})</span>
-                    </h3>
-                    <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={() => { setJobModal(null); setShowConsent(false); setQ1(false); setQ2(false); setShowConfetti(false); }}></i>
-                  </div>
-                  <strong style={{ color: 'var(--accent-cyan)', fontSize: '1.15rem' }}>{jobModal.company}</strong>
-                </div>
-                
-                <div style={{ padding: '2rem', maxHeight: '75vh', overflowY: 'auto' }}>
-                  <div style={{ background: 'var(--input-bg)', padding: '18px 24px', borderRadius: '12px', marginBottom: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.9rem' }}>
-                    <div><strong style={{ color: 'var(--text-muted)' }}>Location:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.location}</span></div>
-                    <div><strong style={{ color: 'var(--text-muted)' }}>Mode of Work:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.modeOfWork}</span></div>
-                    <div><strong style={{ color: 'var(--text-muted)' }}>No. of Openings:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.openings}</span></div>
-                    <div><strong style={{ color: 'var(--text-muted)' }}>Experience:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.experience}</span></div>
-                    <div><strong style={{ color: 'var(--text-muted)' }}>Salary:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.salary}</span></div>
-                    <div><strong style={{ color: 'var(--text-muted)' }}>Interview Date:</strong> <span style={{ color: 'var(--text-main)' }}>{jobModal.interviewDate}</span></div>
-                  </div>
-                  
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '6px', fontSize: '1rem' }}>Qualification Required:</strong>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{jobModal.qualification}</div>
-                  </div>
-
-                  {jobModal.description && (
-                    <div style={{ marginBottom: '1.5rem' }}>
-                      <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px', fontSize: '1rem' }}>Job Description:</strong>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', whiteSpace: 'pre-line', background: 'var(--hover-bg)', padding: '16px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
-                        {jobModal.description}
-                      </div>
-                    </div>
-                  )}
-
-                  {showConsent ? (
-                    <div style={{ background: 'var(--bg-dark)', padding: '20px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
-                      {actionStatus && actionStatus.type === 'error' && actionStatus.message.includes('Resume') ? (
-                        <div className="alert alert-error" style={{ margin: 0, padding: '1.5rem', textAlign: 'left', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                          {actionStatus.message}
-                        </div>
-                      ) : (
-                        <>
-                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-                            <input type="checkbox" checked={q1} onChange={e => setQ1(e.target.checked)} style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} />
-                            <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 400, lineHeight: 1.4 }}>
-                              1. As I am applying for this job, I agree that I will attend the interview whenever the company calls me without fail.
-                            </p>
-                          </div>
-                          
-                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '20px' }}>
-                            <input type="checkbox" checked={q2} onChange={e => setQ2(e.target.checked)} style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: 'pointer' }} />
-                            <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', margin: 0, fontWeight: 400, lineHeight: 1.4 }}>
-                              2. I agree as per Placement rule if I fail to attend this company interview, I will be removed from placement support.
-                            </p>
-                          </div>
-                          
-                          {actionStatus && <div className={`alert alert-${actionStatus.type}`} style={{ marginBottom: '15px' }}>{actionStatus.message}</div>}
-                          
-                          <button 
-                            className="btn-action" 
-                            style={{ width: '100%', background: (q1 && q2) ? '#22c55e' : 'var(--input-border)', color: (q1 && q2) ? '#fff' : 'var(--text-muted)', padding: '1rem', fontSize: '1rem', cursor: (q1 && q2) ? 'pointer' : 'not-allowed', transition: 'background 0.3s' }} 
-                            onClick={handleApply}
-                          >
-                            Confirm Application
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', gap: '15px', marginTop: '2rem' }}>
-                      <button className="btn-action" style={{ flex: 1, background: '#22c55e', padding: '1rem', fontSize: '1rem' }} onClick={openApplyConfirm}>Apply &rarr;</button>
-                      <button className="btn-cancel" style={{ flex: 1, padding: '1rem', fontSize: '1rem' }} onClick={() => { setJobModal(null); setShowConsent(false); setQ1(false); setQ2(false); }}>Close</button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* PLACEMENT EVENT MODAL */}
-          {eventModal && (
-            <div className="report-modal-overlay">
-               <div className="report-card" style={{ maxWidth: '500px' }}>
-                  <div className="modal-header-border">
-                     <h3 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.3rem' }}>{eventModal.title}</h3>
-                     <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }} onClick={() => setEventModal(null)}></i>
-                  </div>
-                  <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-calendar" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Date:</strong> {eventModal.date}</div>
-                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-clock" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Time:</strong> {eventModal.time || 'TBA'}</div>
-                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-map-pin" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Location:</strong> {eventModal.location || 'TBA'}</div>
-                      <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-tag" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Type:</strong> <span style={{color:'var(--accent-cyan)'}}>{eventModal.type}</span></div>
-                      
-                      {eventModal.id && (
-                          <div style={{display:'flex', gap:'8px', alignItems:'center', color:'var(--text-muted)'}}><i className="ph ph-fingerprint" style={{color:'var(--accent-cyan)'}}></i> <strong style={{color:'var(--text-main)'}}>Drive ID:</strong> <span style={{color:'var(--accent-purple)', fontWeight: 700}}>{eventModal.id}</span></div>
-                      )}
-                  </div>
-                  
-                  {eventModal.description && (
-                      <div style={{ background: 'var(--hover-bg)', padding: '15px', borderRadius: '10px', marginBottom: '1.5rem', fontSize: '0.9rem', border: '1px solid var(--card-border)', lineHeight: '1.5' }}>
-                          {eventModal.description}
-                      </div>
-                  )}
-
-                  {(() => {
-                      let isPast = false;
-                      if (eventModal.date && eventModal.date.toLowerCase() !== 'tba') {
-                          const cleanDateStr = eventModal.date.replace(/,/g, '').replace(/\s+/g, ' ').trim();
-                          const eventDate = new Date(cleanDateStr);
-                          if (!isNaN(eventDate.getTime())) {
-                              eventDate.setHours(0,0,0,0);
-                              const today = new Date();
-                              today.setHours(0,0,0,0);
-                              isPast = eventDate < today;
-                          }
-                      }
-                      
-                      const userRSVP = data.driveRSVPs?.find(r => 
-                          (eventModal.id && r.driveId === eventModal.id) || 
-                          (r.driveId === eventModal.title)
-                      );
-                      
-                      if (userRSVP) {
-                          const statusColor = userRSVP.status.toLowerCase() === 'registered' ? '#10b981' : '#ef4444';
-                          const statusIcon = userRSVP.status.toLowerCase() === 'registered' ? 'ph-check-circle' : 'ph-x-circle';
-                          return (
-                              <div style={{ padding: '14px', background: `${statusColor}22`, color: statusColor, textAlign: 'center', borderRadius: '10px', fontWeight: 600, border: `1px solid ${statusColor}55`, marginTop: '1rem' }}>
-                                  <i className={`ph-fill ${statusIcon}`} style={{ marginRight: '8px', fontSize: '1.1rem', verticalAlign: 'middle' }}></i> 
-                                  Response Recorded: {userRSVP.status}
-                              </div>
-                          );
-                      }
-
-                      if (isPast) {
-                          return (
-                              <div style={{ padding: '14px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', textAlign: 'center', borderRadius: '10px', fontWeight: 600, border: '1px solid rgba(239, 68, 68, 0.2)', marginTop: '1rem' }}>
-                                  <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '1.1rem', verticalAlign: 'middle' }}></i> 
-                                  This event has concluded. Registrations are closed.
-                              </div>
-                          );
-                      }
-
-                      return (
-                          <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
-                              <button className="btn-action" style={{ flex: 1, background: '#10b981', padding: '1rem' }} onClick={() => handleEventRSVP('Registered')}><i className="ph-bold ph-check-circle"></i> Register</button>
-                              <button className="btn-action" style={{ flex: 1, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '1rem' }} onClick={() => handleEventRSVP('Not Interested')}><i className="ph-bold ph-x-circle"></i> Not Interested</button>
-                          </div>
-                      );
-                  })()}
-                  
-                  {rsvpStatus && <div className={`alert alert-${rsvpStatus.type}`} style={{marginTop: '15px'}}>{rsvpStatus.message}</div>}
-               </div>
-            </div>
-          )}
-
-          {/* CURRENT DRIVE POPUP MODAL */}
-          {currentDrivePopup && (
-            <div className="report-modal-overlay" style={{ zIndex: 9999 }}>
-              <div className="report-card" style={{ maxWidth: '500px', padding: '0', overflow: 'hidden', position: 'relative' }}>
-                
-                <div 
-                    style={{ position: 'absolute', top: '15px', right: '15px', width: '32px', height: '32px', background: 'rgba(0,0,0,0.6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
-                    onClick={handleDriveDismiss}
-                >
-                    <i className="ph ph-x" style={{ color: '#fff', fontSize: '1.2rem' }}></i>
-                </div>
-
-                <div style={{ width: '100%', height: '280px', background: 'var(--bg-dark)' }}>
-                  {currentDrivePopup['Poster Link'] ? (
-                    <img src={getDriveImageUrl(currentDrivePopup['Poster Link'])} alt="Drive Poster" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e1b4b, #311042)', color: '#fff', fontSize: '1.5rem', fontWeight: 800 }}>
-                      Placement Drive
-                    </div>
-                  )}
-                </div>
-
-                <div style={{ padding: '2rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
-                     <div>
-                        <div style={{ color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>Drive ID: {currentDrivePopup.id || currentDrivePopup['Drive ID']}</div>
-                        <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-main)', lineHeight: 1.2 }}>{currentDrivePopup.title || currentDrivePopup['Title']}</h2>
-                     </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', border: '1px solid var(--input-border)', marginBottom: '1.5rem' }}>
-                    <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Date</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup.date || currentDrivePopup['Date of the Event']}</span></div>
-                    <div><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Time</strong><span style={{ color: '#fff', fontWeight: 600 }}>{currentDrivePopup.time || currentDrivePopup['Time of the Event']}</span></div>
-                    <div style={{ gridColumn: '1 / -1' }}><strong style={{ display:'block', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform:'uppercase' }}>Location</strong><span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{currentDrivePopup.location || currentDrivePopup['Event Hapening in']}</span></div>
-                  </div>
-
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>{currentDrivePopup.description || currentDrivePopup['Description']}</p>
-
-                  {driveActionStatus && <div className={`alert alert-${driveActionStatus.type}`} style={{ marginBottom: '15px' }}>{driveActionStatus.message}</div>}
-
-                  <div style={{ display: 'flex', gap: '15px' }}>
-                    <button className="btn-cancel" style={{ flex: 1, padding: '1rem', border: '1px solid #ef4444', color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)' }} onClick={() => handleDriveResponsePopup('Not Interested')}>
-                      Not Interested
-                    </button>
-                    <button className="btn-action" style={{ flex: 2, padding: '1rem', background: '#22c55e' }} onClick={() => {
-                        if (!user.resume || user.resume === "N/A") {
-                            setDriveActionStatus({ type: 'error', message: 'You must upload a resume in your Profile before registering!' });
-                        } else {
-                            handleDriveResponsePopup('Registered');
-                        }
-                    }}>
-                      Register Now &rarr;
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
         </div>
       </div>
 
@@ -3315,6 +2758,7 @@ const handleProfileUpdate = async () => {
             <div className="drawer-item" onClick={() => changeTab('talentino')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('materials')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-books"></i> Study Material</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('events')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-calendar-blank"></i> Events & Drives</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('aptitude')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-brain"></i> Aptitude & Assessment</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('profile')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('status')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('vacancies')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
