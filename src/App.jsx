@@ -2158,7 +2158,9 @@ function Dashboard() {
           )}
 
           {/* Talentino / Vacancy / Status Modals UI */}
-          {/* Talentino Tab */}
+          {/* ========================================= */}
+          {/* TALENTINO TAB                             */}
+          {/* ========================================= */}
           {activeTab === 'talentino' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -2265,7 +2267,9 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Vacancies Tab */}
+          {/* ========================================= */}
+          {/* 2. JOB VACANCIES TAB                      */}
+          {/* ========================================= */}
           {activeTab === 'vacancies' && (
             <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
@@ -2332,7 +2336,9 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Status Tab */}
+          {/* ========================================= */}
+          {/* 3. APPLICATION STATUS TAB                 */}
+          {/* ========================================= */}
           {activeTab === 'status' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -2402,8 +2408,6 @@ function Dashboard() {
               </div>
             </div>
           )}
-
-
 
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
