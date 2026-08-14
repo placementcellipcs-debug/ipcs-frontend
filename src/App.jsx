@@ -2158,6 +2158,251 @@ function Dashboard() {
           )}
 
           {/* Talentino / Vacancy / Status Modals UI */}
+          {/* Talentino Tab */}
+          {activeTab === 'talentino' && (
+            <div className="animate-fade-in">
+              <div style={{ marginBottom: '2rem' }}>
+                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Talentino Attendance</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Mark your attendance and track your session participation (Calculated post-joining date)</p>
+              </div>
+              
+              <div className="talentino-summary-grid">
+                <div className="talentino-stat-card">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-check-circle" style={{ color: '#10b981' }}></i> Present Check-ins</div>
+                  <div className="t-stat-num">{data.stats?.attended || 0}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}><span>Progress</span><span>{data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%</span></div>
+                  <div className="progress-bar" style={{ marginTop: '6px' }}><div className="progress-fill" style={{ width: `${data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%` }}></div></div>
+                </div>
+                <div className="talentino-stat-card">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-calendar-blank" style={{ color: '#3b82f6' }}></i> Total Conducted</div>
+                  <div className="t-stat-num">{data.stats?.totalConducted || 0}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sessions in your branch since joining</div>
+                </div>
+                <div className="talentino-stat-card">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-clock" style={{ color: '#f59e0b' }}></i> On Leave</div>
+                  <div className="t-stat-num">{data.stats?.onLeave || 0}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Approved leaves</div>
+                </div>
+              </div>
+
+              <h3 style={{ margin: '0 0 1.2rem 0', fontSize: '1.2rem', color: 'var(--text-main)' }}>Mark Today's Attendance</h3>
+              
+              {data.hasMarkedToday ? (
+                  <div style={{ background: 'rgba(10, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#10b981', fontWeight: 600 }}>
+                     <i className="ph-fill ph-check-circle" style={{ fontSize: '1.4rem' }}></i> You have already marked your attendance for today.
+                  </div>
+              ) : (
+                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1.8rem', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+                    <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                      <i className="ph ph-calendar-check" style={{ color: data.isScheduledToday ? '#3b82f6' : '#ef4444', fontSize: '1.2rem' }}></i>
+                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:30 AM - 07:00 PM)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
+                    </div>
+                    
+                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
+                      <label>Location Verification</label>
+                      <div onClick={captureGPS} style={{ background: gpsCoords ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-dark)', color: gpsCoords ? '#10b981' : 'var(--text-main)', border: `1px solid ${gpsCoords ? '#10b981' : 'var(--card-border)'}`, padding: '1rem', borderRadius: '12px', textAlign: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
+                        <i className="ph ph-map-pin" style={{ marginRight: '8px' }}></i> {locStatus}
+                      </div>
+                    </div>
+                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
+                      <label>Rate this session</label>
+                      <div className="star-rating">
+                        {[1,2,3,4,5].map(s => (
+                          <span key={s} className={`star ${rating >= s ? 'selected' : ''}`} onClick={() => setRating(s)}>★</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
+                      <label>Feedback (optional)</label>
+                      <textarea rows="3" value={feedback} onChange={e => setFeedback(e.target.value)} placeholder="Share your thoughts about today's session..."></textarea>
+                    </div>
+
+                    <button className="btn-action" style={{ width: '100%', opacity: (data.isScheduledToday && gpsCoords && rating > 0) ? 1 : 0.5 }} disabled={!(data.isScheduledToday && gpsCoords && rating > 0)} onClick={submitAttendance}>Mark Attendance</button>
+                    {attStatus && <div className={`alert alert-${attStatus.type}`} style={{marginTop: '10px'}}>{attStatus.message}</div>}
+                  </div>
+              )}
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '2rem 0 1rem 0', color: 'var(--text-main)', fontWeight: 800, fontSize: '1.1rem' }}>
+                <i className="ph ph-trend-up"></i> Attendance History
+              </div>
+              
+              <div id="attendanceHistoryContainer">
+                 {(data.attendanceHistory || []).length === 0 ? (
+                   <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)' }}>No attendance records yet.</div>
+                 ) : (
+                   (data.attendanceHistory || []).map((hist, idx) => {
+                      let parsedDate = hist.dateStr || "Unknown";
+                      let parsedTime = "";
+                      try {
+                        const d = new Date(hist.timestamp);
+                        if(!isNaN(d)) {
+                           parsedDate = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                           parsedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        } else {
+                           parsedDate = hist.timestamp.split(' ')[0] || hist.timestamp;
+                           parsedTime = hist.timestamp.split(' ')[1] || "";
+                        }
+                      } catch(e) {}
+                      let statusText = hist.rating >= 4 ? 'Good' : (hist.rating === 3 ? 'Average' : 'Poor');
+
+                      return (
+                        <div key={idx} style={{ background: 'var(--bg-dark)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                              <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}><i className="ph-fill ph-check-circle"></i></div>
+                              <div>
+                                 <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '1.05rem', marginBottom: '2px' }}>{parsedDate}</strong>
+                                 <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{parsedTime} · {statusText}</span>
+                              </div>
+                           </div>
+                           <div style={{ color: '#f59e0b', fontSize: '1.2rem', letterSpacing: '2px' }}>
+                              {'★'.repeat(hist.rating)}{'☆'.repeat(5 - hist.rating)}
+                           </div>
+                        </div>
+                      )
+                   })
+                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Vacancies Tab */}
+          {activeTab === 'vacancies' && (
+            <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
+              <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
+                <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '2px', color: '#ffffff', margin: '0 0 8px 0', textTransform: 'uppercase' }}>JOB VACANCIES</h1>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>NewsLetter ID Not Valid After Expiry Date</p>
+              </div>
+              
+              {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'yes') ? (
+                 <div className="alert alert-error" style={{ margin: '2rem auto', maxWidth: '600px', padding: '2rem' }}>
+                     <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '2rem', display: 'block', marginBottom: '10px' }}></i> 
+                     Your access to view Job Vacancies is currently restricted. Please contact your Placement Officer.
+                 </div>
+              ) : processedVacancies.length === 0 ? (
+                 <div className="alert alert-info" style={{ margin: '2rem auto', maxWidth: '600px' }}><i className="ph-fill ph-info"></i> No active vacancies found after your joining date. Check back later!</div>
+              ) : (
+                 Object.entries(
+                   processedVacancies.reduce((acc, vac) => {
+                     const loc = (vac.state || 'OTHER STATES').toUpperCase().trim();
+                     if(!acc[loc]) acc[loc] = [];
+                     acc[loc].push(vac);
+                     return acc;
+                 }, {})).map(([locationName, vacs], index) => (
+                     <div key={index} className="location-table-card">
+                         <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.2rem' }}>{locationName}</h2>
+                         <table className="vac-table">
+                             <thead>
+                                 <tr>
+                                     <th>NewsLetter ID</th>
+                                     <th>Position</th>
+                                     <th>Opening At</th>
+                                     <th>Mode of Work</th>
+                                     <th>Last Date</th>
+                                     <th style={{ textAlign: 'center' }}>Action</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                                 {vacs.map((vac, vIdx) => {
+                                     const isApplied = (data.appliedJobs || []).some(j => j.jobId === vac.newsletterId);
+                                     const isExpired = isPastDate(vac.lastDate);
+                                     return (
+                                         <tr key={vIdx} style={{ cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.4 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
+                                             <td style={{ color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
+                                             <td style={{ color: 'var(--text-main)', fontWeight: 700 }}>{vac.position}</td>
+                                             <td style={{ color: 'var(--accent-cyan)' }}>{vac.location}</td>
+                                             <td style={{ color: 'var(--text-muted)' }}>{vac.modeOfWork}</td>
+                                             <td style={{ color: isExpired ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{vac.lastDate} {isExpired && '(Expired)'}</td>
+                                             <td style={{ textAlign: 'center' }}>
+                                                 {isApplied ? (
+                                                     <button className="btn-action" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid #22c55e', cursor: 'default' }} disabled><i className="ph-fill ph-check-circle" style={{marginRight: '6px'}}></i> Applied</button>
+                                                 ) : isExpired ? (
+                                                     <button className="btn-action" style={{ background: 'var(--input-border)', color: 'var(--text-muted)', padding: '0.45rem 1rem', fontSize: '0.8rem', cursor: 'not-allowed' }} disabled><i className="ph-fill ph-prohibit" style={{marginRight: '6px'}}></i> Expired</button>
+                                                 ) : (
+                                                     <button className="btn-action" style={{ background: 'var(--accent-blue)', padding: '0.45rem 1rem', fontSize: '0.8rem' }} onClick={(e) => { e.stopPropagation(); setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}>Details</button>
+                                                 )}
+                                             </td>
+                                         </tr>
+                                     )
+                                 })}
+                             </tbody>
+                         </table>
+                     </div>
+                 ))
+              )}
+            </div>
+          )}
+
+          {/* Status Tab */}
+          {activeTab === 'status' && (
+            <div className="animate-fade-in">
+              <div style={{ marginBottom: '2rem' }}>
+                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Application Status</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Track the current status of all your applied job openings</p>
+              </div>
+
+              <div className="app-stats-grid">
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Jobs Applied</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{appStats.applied}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Attended</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{appStats.attended}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Offers Got</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>{appStats.offers}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Not Attended</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{appStats.notAttended}</div>
+                 </div>
+                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Rejected</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#94a3b8' }}>{appStats.rejected}</div>
+                 </div>
+              </div>
+
+              <div style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <i className="ph-fill ph-chart-line-up" style={{ fontSize: '2rem', color: 'var(--accent-purple)' }}></i>
+                <div>
+                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Journey Analysis</div>
+                   <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.95rem' }}>{journeyText}</div>
+                </div>
+              </div>
+
+              <div className="location-table-card">
+                <table className="vac-table">
+                  <thead><tr><th>NewsLetter ID</th><th>Company & Position</th><th>Applied Date & Time</th><th>Current Status</th><th>Remarks</th></tr></thead>
+                  <tbody>
+                    {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="5" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
+                      (data.appliedJobs || []).map((job, idx) => {
+                        const statusVal = job.status || job.Status || 'Applied';
+                        const style = getStatusStyle(statusVal);
+                        const jobIdVal = job.jobId || job['Job ID'] || job.id;
+                        const companyVal = job.company || job.companyName || job['Company Name'] || 'Company N/A';
+                        const positionVal = job.position || job.Position || 'Position N/A';
+                        const dateVal = job.date || job.TimeStamp || job.Timestamp || job.time || 'N/A';
+                        const remarksVal = job.remarks || job.Remarks || '-';
+
+                        return(
+                        <tr key={idx}>
+                          <td style={{color:'var(--accent-purple)', fontWeight:700}}>{jobIdVal}</td>
+                          <td>
+                             <div style={{fontWeight:600}}>{companyVal}</div>
+                             <div style={{fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px'}}>{positionVal}</div>
+                          </td>
+                          <td style={{color:'var(--text-muted)', fontSize:'0.8rem'}}>{dateVal}</td>
+                          <td><span className="status-badge" style={{ background: style.bg, color: style.color, border: style.border }}>{statusVal}</span></td>
+                          <td style={{color:'var(--text-muted)', fontSize:'0.85rem'}}>{remarksVal}</td>
+                        </tr>
+                      )})}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
             <div className="report-modal-overlay material-modal-overlay" style={{ zIndex: 99999 }}>
