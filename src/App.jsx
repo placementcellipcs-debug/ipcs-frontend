@@ -2332,6 +2332,73 @@ function Dashboard() {
             </div>
           )}
 
+          {/* Vacancies Tab */}
+          {activeTab === 'vacancies' && (
+            <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
+              <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
+                <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '2px', color: '#ffffff', margin: '0 0 8px 0', textTransform: 'uppercase' }}>JOB VACANCIES</h1>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>NewsLetter ID Not Valid After Expiry Date</p>
+              </div>
+              
+              {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'yes') ? (
+                 <div className="alert alert-error" style={{ margin: '2rem auto', maxWidth: '600px', padding: '2rem' }}>
+                     <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '2rem', display: 'block', marginBottom: '10px' }}></i> 
+                     Your access to view Job Vacancies is currently restricted. Please contact your Placement Officer.
+                 </div>
+              ) : processedVacancies.length === 0 ? (
+                 <div className="alert alert-info" style={{ margin: '2rem auto', maxWidth: '600px' }}><i className="ph-fill ph-info"></i> No active vacancies found after your joining date. Check back later!</div>
+              ) : (
+                 Object.entries(
+                   processedVacancies.reduce((acc, vac) => {
+                     const loc = (vac.state || 'OTHER STATES').toUpperCase().trim();
+                     if(!acc[loc]) acc[loc] = [];
+                     acc[loc].push(vac);
+                     return acc;
+                 }, {})).map(([locationName, vacs], index) => (
+                     <div key={index} className="location-table-card">
+                         <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.2rem' }}>{locationName}</h2>
+                         <table className="vac-table">
+                             <thead>
+                                 <tr>
+                                     <th>NewsLetter ID</th>
+                                     <th>Position</th>
+                                     <th>Opening At</th>
+                                     <th>Mode of Work</th>
+                                     <th>Last Date</th>
+                                     <th style={{ textAlign: 'center' }}>Action</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                                 {vacs.map((vac, vIdx) => {
+                                     const isApplied = (data.appliedJobs || []).some(j => j.jobId === vac.newsletterId);
+                                     const isExpired = isPastDate(vac.lastDate);
+                                     return (
+                                         <tr key={vIdx} style={{ cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.4 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
+                                             <td style={{ color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
+                                             <td style={{ color: 'var(--text-main)', fontWeight: 700 }}>{vac.position}</td>
+                                             <td style={{ color: 'var(--accent-cyan)' }}>{vac.location}</td>
+                                             <td style={{ color: 'var(--text-muted)' }}>{vac.modeOfWork}</td>
+                                             <td style={{ color: isExpired ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{vac.lastDate} {isExpired && '(Expired)'}</td>
+                                             <td style={{ textAlign: 'center' }}>
+                                                 {isApplied ? (
+                                                     <button className="btn-action" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid #22c55e', cursor: 'default' }} disabled><i className="ph-fill ph-check-circle" style={{marginRight: '6px'}}></i> Applied</button>
+                                                 ) : isExpired ? (
+                                                     <button className="btn-action" style={{ background: 'var(--input-border)', color: 'var(--text-muted)', padding: '0.45rem 1rem', fontSize: '0.8rem', cursor: 'not-allowed' }} disabled><i className="ph-fill ph-prohibit" style={{marginRight: '6px'}}></i> Expired</button>
+                                                 ) : (
+                                                     <button className="btn-action" style={{ background: 'var(--accent-blue)', padding: '0.45rem 1rem', fontSize: '0.8rem' }} onClick={(e) => { e.stopPropagation(); setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}>Details</button>
+                                                 )}
+                                             </td>
+                                         </tr>
+                                     )
+                                 })}
+                             </tbody>
+                         </table>
+                     </div>
+                 ))
+              )}
+            </div>
+          )}
+
           {/* Status Tab */}
           {activeTab === 'status' && (
             <div className="animate-fade-in">
