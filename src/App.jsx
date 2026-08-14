@@ -65,7 +65,7 @@ const GlobalStyle = () => {
       .pwd-wrapper { position: relative; display: block; width: 100%; }
       .pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;}
 
-      /* --- LANDING PAGE STYLES --- */
+      /* --- LANDING PAGE (LOGIN) STYLES --- */
       .landing-wrapper { min-height: 100vh; width: 100vw; background: #080c14; display: flex; flex-direction: column; position: relative; overflow: hidden; }
       .landing-wrapper::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(14, 165, 233, 0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
       .landing-nav { position: relative; z-index: 10; display: flex; justify-content: flex-start; align-items: center; padding: 2rem 4rem; }
@@ -79,6 +79,7 @@ const GlobalStyle = () => {
       .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; max-width: 500px; margin-bottom: 2.5rem; }
       .btn-glow { background: linear-gradient(90deg, #0ea5e9, #38bdf8); color: #ffffff; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4); transition: transform 0.2s, box-shadow 0.2s; }
       .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.6); }
+
       .ticker-container { margin-top: 3.5rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; display: flex; align-items: center; gap: 15px; }
       .ticker-icon { width: 36px; height: 36px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.2rem; flex-shrink: 0; }
       @keyframes tickerFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -137,6 +138,52 @@ const GlobalStyle = () => {
       .celebration-content { text-align: center; animation: fadeInUp 0.4s ease; }
       .party-emoji { font-size: 4rem; display: block; margin-bottom: 10px; animation: pulse 1s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1) rotate(5deg); } 100% { transform: scale(1); } }
+
+      /* --- MATERIAL VIEWER RESPONSIVE STYLES --- */
+      .material-viewer-card {
+        max-width: 1000px;
+        width: 95%;
+        height: 88vh;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        animation: fadeInReveal 0.3s ease;
+      }
+      .material-iframe-container {
+        flex: 1;
+        position: relative;
+        background: #1e293b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* --- SIDE DRAWER WITH COVER BANNER --- */
+      .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 99999; display: flex; justify-content: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+      .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+      .drawer-card { width: 100%; max-width: 340px; height: 100%; background: var(--card-bg); color: var(--text-main); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow:-10px 0 40px rgba(0,0,0,0.5); }
+      .drawer-overlay.open .drawer-card { transform: translateX(0); }
+      
+      .drawer-header-cover { position: relative; height: 160px; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.2rem; }
+      .drawer-header-cover::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, rgba(11,15,23,0.2) 0%, rgba(11,15,23,0.95) 100%); }
+      .drawer-close-btn { position: absolute; top: 1rem; right: 1rem; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; color: #fff; z-index: 2; }
+      .drawer-profile-row { position: relative; z-index: 2; display: flex; align-items: center; gap: 1rem; }
+      .drawer-avatar { width: 55px; height: 55px; border-radius: 50%; background: #ffffff; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; overflow: hidden; border: 2px solid #38bdf8; }
+      .drawer-avatar img { width: 100%; height: 100%; object-fit: cover; }
+      
+      .drawer-menu { flex: 1; padding: 1rem 0; overflow-y: auto; }
+      .drawer-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid var(--card-border); color: var(--text-main); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+      .drawer-item:hover { background: var(--hover-bg); color: var(--accent-cyan); }
+      .drawer-item i { width: 22px; text-align: center; color: var(--text-muted); font-size: 1.1rem; }
+      .drawer-footer { padding: 1.5rem; border-top: 1px solid var(--card-border); text-align: center; }
+      .btn-logout-drawer { width: 100%; padding: 0.8rem; background: #3b82f6; color: #ffffff; border: none; border-radius: 30px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-bottom: 1rem; transition: background 0.2s; }
+      .btn-logout-drawer:hover { background: #2563eb; }
 
       /* --- DASHBOARD STYLES --- */
       .app-layout { display: flex; flex-direction: column; width: 100vw; min-height: 100vh; }
@@ -216,27 +263,6 @@ const GlobalStyle = () => {
       .notif-item:last-child { border-bottom: none; }
       .notif-read { opacity: 0.45; }
       .notif-read strong { text-decoration: line-through; }
-
-      /* --- SIDE DRAWER WITH COVER BANNER --- */
-      .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 99999; display: flex; justify-content: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-      .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-      .drawer-card { width: 100%; max-width: 340px; height: 100%; background: var(--card-bg); color: var(--text-main); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow:-10px 0 40px rgba(0,0,0,0.5); }
-      .drawer-overlay.open .drawer-card { transform: translateX(0); }
-      
-      .drawer-header-cover { position: relative; height: 160px; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.2rem; }
-      .drawer-header-cover::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, rgba(11,15,23,0.2) 0%, rgba(11,15,23,0.95) 100%); }
-      .drawer-close-btn { position: absolute; top: 1rem; right: 1rem; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; color: #fff; z-index: 2; }
-      .drawer-profile-row { position: relative; z-index: 2; display: flex; align-items: center; gap: 1rem; }
-      .drawer-avatar { width: 55px; height: 55px; border-radius: 50%; background: #ffffff; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; overflow: hidden; border: 2px solid #38bdf8; }
-      .drawer-avatar img { width: 100%; height: 100%; object-fit: cover; }
-      
-      .drawer-menu { flex: 1; padding: 1rem 0; overflow-y: auto; }
-      .drawer-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid var(--card-border); color: var(--text-main); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-      .drawer-item:hover { background: var(--hover-bg); color: var(--accent-cyan); }
-      .drawer-item i { width: 22px; text-align: center; color: var(--text-muted); font-size: 1.1rem; }
-      .drawer-footer { padding: 1.5rem; border-top: 1px solid var(--card-border); text-align: center; }
-      .btn-logout-drawer { width: 100%; padding: 0.8rem; background: #3b82f6; color: #ffffff; border: none; border-radius: 30px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-bottom: 1rem; transition: background 0.2s; }
-      .btn-logout-drawer:hover { background: #2563eb; }
 
       /* --- TALENTINO --- */
       .talentino-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
@@ -599,14 +625,7 @@ function Login() {
   if (isLoggingIn) {
     return (
       <div className={`video-loader-overlay ${fadeVideo ? 'fade-out' : ''}`}>
-        <video 
-          src={loadingVideo} 
-          autoPlay 
-          muted 
-          playsInline 
-          onCanPlayThrough={() => setIsVideoReady(true)}
-          className={isVideoReady ? 'ready' : ''}
-        />
+        <video src={loadingVideo} autoPlay muted playsInline onCanPlayThrough={() => setIsVideoReady(true)} className={isVideoReady ? 'ready' : ''} />
       </div>
     );
   }
@@ -648,9 +667,7 @@ function Login() {
             <div className="hiring-dashboard-card animate-fade-in">
               <div className="hiring-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  <div style={{ background: '#0284c7', color: '#ffffff', width: '42px', height: '42px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
-                    <i className="ph-fill ph-lightning"></i>
-                  </div>
+                  <div style={{ background: '#0284c7', color: '#ffffff', width: '42px', height: '42px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-lightning"></i></div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff' }}>Hiring Dashboard</h3>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Realtime Campus Intake</span>
@@ -898,7 +915,9 @@ function Signup() {
                 {courseList.map((group, idx) => (
                   <optgroup key={idx} label={group.category}>
                     {group.courses.map((courseItem, cIdx) => (
-                      <option key={cIdx} value={courseItem}>{courseItem}</option>
+                      <option key={cIdx} value={courseItem}>
+                        {courseItem}
+                      </option>
                     ))}
                   </optgroup>
                 ))}
@@ -977,7 +996,9 @@ function Signup() {
             <input 
               type="checkbox" 
               style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: tncScrolled ? 'pointer' : 'not-allowed', opacity: tncScrolled ? 1 : 0.5 }} 
-              checked={tncAccepted} disabled={!tncScrolled} onChange={(e) => setTncAccepted(e.target.checked)} 
+              checked={tncAccepted} 
+              disabled={!tncScrolled}
+              onChange={(e) => setTncAccepted(e.target.checked)} 
             />
             <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: 1.4, opacity: tncScrolled ? 1 : 0.7 }}>
               I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span>
@@ -1601,13 +1622,6 @@ function Dashboard() {
     } catch(e) { setRsvpStatus({ type: 'error', message: 'Failed to record response.' }); }
   };
 
-  const isPastDate = (dateStr) => {
-    if (!dateStr || dateStr.toLowerCase() === 'open') return false;
-    let parts = dateStr.split(/[-/]/);
-    if (parts.length === 3) { let d = new Date(parts[2], parts[1] - 1, parts[0]); let now = new Date(); now.setHours(0,0,0,0); return d < now; }
-    return false;
-  };
-
   const openApplyConfirm = () => {
     if (!user.resume || user.resume === "N/A" || !user.resume.startsWith("http")) { setActionStatus({ type: 'error', message: 'Resume Required! Please upload your PDF Resume document in your Profile before applying.' }); setShowConsent(true); } else { setShowConsent(true); setActionStatus(null); }
   };
@@ -1633,7 +1647,7 @@ function Dashboard() {
 
   const todayDate = new Date(); todayDate.setHours(0,0,0,0);
   const filteredEvents = (data.events || []).filter(ev => { const d = new Date(ev.date); if(isNaN(d)) return true; d.setHours(0,0,0,0); return d >= todayDate; });
-  const processedVacancies = (data.vacancies || []).sort((a, b) => { const aExp = isPastDate(a.lastDate); const bExp = isPastDate(b.lastDate); if (aExp && !bExp) return 1; if (!aExp && bExp) return -1; return 0; });
+  const processedVacancies = (data.vacancies || []).sort((a, b) => { const aExp = isEventExpired(a.lastDate); const bExp = isEventExpired(b.lastDate); if (aExp && !bExp) return 1; if (!aExp && bExp) return -1; return 0; });
   
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
   (data.appliedJobs || []).forEach(job => {
@@ -1772,7 +1786,6 @@ function Dashboard() {
             </>
           )}
 
-          {/* Events Tab */}
           {activeTab === 'events' && (
             <div className="animate-fade-in" style={{ height: '100%' }}>
                <div className="calendar-layout">
@@ -1873,7 +1886,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -1966,7 +1978,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Study Materials Tab */}
           {activeTab === 'materials' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -1994,7 +2005,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Gamified Aptitude Tab */}
           {activeTab === 'aptitude' && (
             <div className="animate-fade-in">
               {aptitudeView === 'lobby' && (
@@ -2089,7 +2099,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Settings Tab */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
@@ -2127,7 +2136,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Guide Tab */}
           {activeTab === 'guide' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}><h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Guide & Resume Resources</h2><p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Explore top platforms and guides to create a professional resume and prepare for placements.</p></div>
@@ -2149,251 +2157,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Talentino Tab */}
-          {activeTab === 'talentino' && (
-            <div className="animate-fade-in">
-              <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Talentino Attendance</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Mark your attendance and track your session participation (Calculated post-joining date)</p>
-              </div>
-              
-              <div className="talentino-summary-grid">
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-check-circle" style={{ color: '#10b981' }}></i> Present Check-ins</div>
-                  <div className="t-stat-num">{data.stats?.attended || 0}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}><span>Progress</span><span>{data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%</span></div>
-                  <div className="progress-bar" style={{ marginTop: '6px' }}><div className="progress-fill" style={{ width: `${data.stats?.totalConducted > 0 ? Math.round((data.stats?.attended / data.stats?.totalConducted) * 100) : 0}%` }}></div></div>
-                </div>
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-calendar-blank" style={{ color: '#3b82f6' }}></i> Total Conducted</div>
-                  <div className="t-stat-num">{data.stats?.totalConducted || 0}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Sessions in your branch since joining</div>
-                </div>
-                <div className="talentino-stat-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}><i className="ph ph-clock" style={{ color: '#f59e0b' }}></i> On Leave</div>
-                  <div className="t-stat-num">{data.stats?.onLeave || 0}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Approved leaves</div>
-                </div>
-              </div>
-
-              <h3 style={{ margin: '0 0 1.2rem 0', fontSize: '1.2rem', color: 'var(--text-main)' }}>Mark Today's Attendance</h3>
-              
-              {data.hasMarkedToday ? (
-                  <div style={{ background: 'rgba(10, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#10b981', fontWeight: 600 }}>
-                     <i className="ph-fill ph-check-circle" style={{ fontSize: '1.4rem' }}></i> You have already marked your attendance for today.
-                  </div>
-              ) : (
-                  <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '20px', padding: '1.8rem', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-                    <div style={{ background: data.isScheduledToday ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${data.isScheduledToday ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, padding: '12px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-main)', fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                      <i className="ph ph-calendar-check" style={{ color: data.isScheduledToday ? '#3b82f6' : '#ef4444', fontSize: '1.2rem' }}></i>
-                      {data.isScheduledToday ? <span>Session active today <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(09:30 AM - 07:00 PM)</span></span> : <span style={{ color: '#ef4444' }}>No Session scheduled for today</span>}
-                    </div>
-                    
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Location Verification</label>
-                      <div onClick={captureGPS} style={{ background: gpsCoords ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-dark)', color: gpsCoords ? '#10b981' : 'var(--text-main)', border: `1px solid ${gpsCoords ? '#10b981' : 'var(--card-border)'}`, padding: '1rem', borderRadius: '12px', textAlign: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
-                        <i className="ph ph-map-pin" style={{ marginRight: '8px' }}></i> {locStatus}
-                      </div>
-                    </div>
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Rate this session</label>
-                      <div className="star-rating">
-                        {[1,2,3,4,5].map(s => (
-                          <span key={s} className={`star ${rating >= s ? 'selected' : ''}`} onClick={() => setRating(s)}>★</span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="form-group" style={{ opacity: data.isScheduledToday ? 1 : 0.5, pointerEvents: data.isScheduledToday ? 'auto' : 'none' }}>
-                      <label>Feedback (optional)</label>
-                      <textarea rows="3" value={feedback} onChange={e => setFeedback(e.target.value)} placeholder="Share your thoughts about today's session..."></textarea>
-                    </div>
-
-                    <button className="btn-action" style={{ width: '100%', opacity: (data.isScheduledToday && gpsCoords && rating > 0) ? 1 : 0.5 }} disabled={!(data.isScheduledToday && gpsCoords && rating > 0)} onClick={submitAttendance}>Mark Attendance</button>
-                    {attStatus && <div className={`alert alert-${attStatus.type}`} style={{marginTop: '10px'}}>{attStatus.message}</div>}
-                  </div>
-              )}
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '2rem 0 1rem 0', color: 'var(--text-main)', fontWeight: 800, fontSize: '1.1rem' }}>
-                <i className="ph ph-trend-up"></i> Attendance History
-              </div>
-              
-              <div id="attendanceHistoryContainer">
-                 {(data.attendanceHistory || []).length === 0 ? (
-                   <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--card-border)' }}>No attendance records yet.</div>
-                 ) : (
-                   (data.attendanceHistory || []).map((hist, idx) => {
-                      let parsedDate = hist.dateStr || "Unknown";
-                      let parsedTime = "";
-                      try {
-                        const d = new Date(hist.timestamp);
-                        if(!isNaN(d)) {
-                           parsedDate = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                           parsedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                        } else {
-                           parsedDate = hist.timestamp.split(' ')[0] || hist.timestamp;
-                           parsedTime = hist.timestamp.split(' ')[1] || "";
-                        }
-                      } catch(e) {}
-                      let statusText = hist.rating >= 4 ? 'Good' : (hist.rating === 3 ? 'Average' : 'Poor');
-
-                      return (
-                        <div key={idx} style={{ background: 'var(--bg-dark)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                              <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}><i className="ph-fill ph-check-circle"></i></div>
-                              <div>
-                                 <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '1.05rem', marginBottom: '2px' }}>{parsedDate}</strong>
-                                 <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{parsedTime} · {statusText}</span>
-                              </div>
-                           </div>
-                           <div style={{ color: '#f59e0b', fontSize: '1.2rem', letterSpacing: '2px' }}>
-                              {'★'.repeat(hist.rating)}{'☆'.repeat(5 - hist.rating)}
-                           </div>
-                        </div>
-                      )
-                   })
-                 )}
-              </div>
-            </div>
-          )}
-
-          {/* Vacancies Tab */}
-          {activeTab === 'vacancies' && (
-            <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
-              <div className="vacancies-hero" style={{ background: 'radial-gradient(circle at center, #1e1b4b 0%, var(--bg-dark) 100%)', borderRadius: '20px', padding: '3rem 1.5rem 2.5rem 1.5rem', marginBottom: '2rem', textAlign: 'center', borderBottom: '1px solid var(--card-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}>
-                <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '2px', color: '#ffffff', margin: '0 0 8px 0', textTransform: 'uppercase' }}>JOB VACANCIES</h1>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500, margin: 0 }}>NewsLetter ID Not Valid After Expiry Date</p>
-              </div>
-              
-              {(!user.vacancyOpen || user.vacancyOpen.toString().trim().toLowerCase() !== 'yes') ? (
-                 <div className="alert alert-error" style={{ margin: '2rem auto', maxWidth: '600px', padding: '2rem' }}>
-                     <i className="ph-fill ph-lock-key" style={{ marginRight: '8px', fontSize: '2rem', display: 'block', marginBottom: '10px' }}></i> 
-                     Your access to view Job Vacancies is currently restricted. Please contact your Placement Officer.
-                 </div>
-              ) : processedVacancies.length === 0 ? (
-                 <div className="alert alert-info" style={{ margin: '2rem auto', maxWidth: '600px' }}><i className="ph-fill ph-info"></i> No active vacancies found after your joining date. Check back later!</div>
-              ) : (
-                 Object.entries(
-                   processedVacancies.reduce((acc, vac) => {
-                     const loc = (vac.state || 'OTHER STATES').toUpperCase().trim();
-                     if(!acc[loc]) acc[loc] = [];
-                     acc[loc].push(vac);
-                     return acc;
-                 }, {})).map(([locationName, vacs], index) => (
-                     <div key={index} className="location-table-card">
-                         <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.2rem' }}>{locationName}</h2>
-                         <table className="vac-table">
-                             <thead>
-                                 <tr>
-                                     <th>NewsLetter ID</th>
-                                     <th>Position</th>
-                                     <th>Opening At</th>
-                                     <th>Mode of Work</th>
-                                     <th>Last Date</th>
-                                     <th style={{ textAlign: 'center' }}>Action</th>
-                                 </tr>
-                             </thead>
-                             <tbody>
-                                 {vacs.map((vac, vIdx) => {
-                                     const isApplied = (data.appliedJobs || []).some(j => j.jobId === vac.newsletterId);
-                                     const isExpired = isPastDate(vac.lastDate);
-                                     return (
-                                         <tr key={vIdx} style={{ cursor: (!isApplied && !isExpired) ? 'pointer' : 'default', opacity: isExpired ? 0.4 : 1 }} onClick={() => { if(!isApplied && !isExpired) { setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}}>
-                                             <td style={{ color: 'var(--accent-purple)', fontWeight: 700 }}>{vac.newsletterId}</td>
-                                             <td style={{ color: 'var(--text-main)', fontWeight: 700 }}>{vac.position}</td>
-                                             <td style={{ color: 'var(--accent-cyan)' }}>{vac.location}</td>
-                                             <td style={{ color: 'var(--text-muted)' }}>{vac.modeOfWork}</td>
-                                             <td style={{ color: isExpired ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{vac.lastDate} {isExpired && '(Expired)'}</td>
-                                             <td style={{ textAlign: 'center' }}>
-                                                 {isApplied ? (
-                                                     <button className="btn-action" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: '1px solid #22c55e', cursor: 'default' }} disabled><i className="ph-fill ph-check-circle" style={{marginRight: '6px'}}></i> Applied</button>
-                                                 ) : isExpired ? (
-                                                     <button className="btn-action" style={{ background: 'var(--input-border)', color: 'var(--text-muted)', padding: '0.45rem 1rem', fontSize: '0.8rem', cursor: 'not-allowed' }} disabled><i className="ph-fill ph-prohibit" style={{marginRight: '6px'}}></i> Expired</button>
-                                                 ) : (
-                                                     <button className="btn-action" style={{ background: 'var(--accent-blue)', padding: '0.45rem 1rem', fontSize: '0.8rem' }} onClick={(e) => { e.stopPropagation(); setJobModal(vac); setActionStatus(null); setShowConsent(false); setQ1(false); setQ2(false); }}>Details</button>
-                                                 )}
-                                             </td>
-                                         </tr>
-                                     )
-                                 })}
-                             </tbody>
-                         </table>
-                     </div>
-                 ))
-              )}
-            </div>
-          )}
-
-          {/* Status Tab */}
-          {activeTab === 'status' && (
-            <div className="animate-fade-in">
-              <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Application Status</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Track the current status of all your applied job openings</p>
-              </div>
-
-              <div className="app-stats-grid">
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Jobs Applied</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{appStats.applied}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Attended</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{appStats.attended}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Offers Got</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>{appStats.offers}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Not Attended</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{appStats.notAttended}</div>
-                 </div>
-                 <div className="talentino-stat-card" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Rejected</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#94a3b8' }}>{appStats.rejected}</div>
-                 </div>
-              </div>
-
-              <div style={{ background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <i className="ph-fill ph-chart-line-up" style={{ fontSize: '2rem', color: 'var(--accent-purple)' }}></i>
-                <div>
-                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Journey Analysis</div>
-                   <div style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.95rem' }}>{journeyText}</div>
-                </div>
-              </div>
-
-              <div className="location-table-card">
-                <table className="vac-table">
-                  <thead><tr><th>NewsLetter ID</th><th>Company & Position</th><th>Applied Date & Time</th><th>Current Status</th><th>Remarks</th></tr></thead>
-                  <tbody>
-                    {(data.appliedJobs || []).length === 0 ? <tr><td colSpan="5" style={{textAlign:'center'}}>No applications yet.</td></tr> : 
-                      (data.appliedJobs || []).map((job, idx) => {
-                        const statusVal = job.status || job.Status || 'Applied';
-                        const style = getStatusStyle(statusVal);
-                        const jobIdVal = job.jobId || job['Job ID'] || job.id;
-                        const companyVal = job.company || job.companyName || job['Company Name'] || 'Company N/A';
-                        const positionVal = job.position || job.Position || 'Position N/A';
-                        const dateVal = job.date || job.TimeStamp || job.Timestamp || job.time || 'N/A';
-                        const remarksVal = job.remarks || job.Remarks || '-';
-
-                        return(
-                        <tr key={idx}>
-                          <td style={{color:'var(--accent-purple)', fontWeight:700}}>{jobIdVal}</td>
-                          <td>
-                             <div style={{fontWeight:600}}>{companyVal}</div>
-                             <div style={{fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px'}}>{positionVal}</div>
-                          </td>
-                          <td style={{color:'var(--text-muted)', fontSize:'0.8rem'}}>{dateVal}</td>
-                          <td><span className="status-badge" style={{ background: style.bg, color: style.color, border: style.border }}>{statusVal}</span></td>
-                          <td style={{color:'var(--text-muted)', fontSize:'0.85rem'}}>{remarksVal}</td>
-                        </tr>
-                      )})}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
+          {/* Talentino / Vacancy / Status Modals UI */}
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
             <div className="report-modal-overlay material-modal-overlay" style={{ zIndex: 99999 }}>
@@ -2750,6 +2514,41 @@ function Dashboard() {
             </div>
           )}
 
+        </div>
+      </div>
+
+      <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
+        <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
+          <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
+            <div className="drawer-close-btn" onClick={() => setDrawerOpen(false)}><i className="ph ph-x"></i></div>
+            <div className="drawer-profile-row">
+              <div className="drawer-avatar">
+                 {user?.photo && user.photo.includes('http') ? <img src={getDriveImageUrl(user.photo)} alt="Profile" /> : user?.name?.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <strong style={{ display:'block', fontSize:'1.1rem', fontWeight:700, color: '#fff' }}>{user?.name}</strong>
+                <span style={{ fontSize:'0.8rem', color: '#38bdf8', fontWeight: 600 }}>{user?.rollNo}</span>
+              </div>
+            </div>
+          </div>
+          <div className="drawer-menu">
+            <div className="drawer-item" onClick={() => changeTab('dashboard')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-house"></i> Dashboard</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('talentino')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('materials')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-books"></i> Study Material</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('events')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-calendar-blank"></i> Events & Drives</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('aptitude')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-brain"></i> Aptitude & Assessment</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('profile')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('status')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('vacancies')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('guide')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-book-open"></i> Guide</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setTpoModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-address-book"></i> Contact TPO</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => { setHelpModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-info"></i> Request Help</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('settings')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-gear"></i> Settings</div><span>&rsaquo;</span></div>
+          </div>
+          <div className="drawer-footer">
+            <button className="btn-logout-drawer" onClick={handleLogout}>Log Out</button>
+            <div style={{ fontSize:'0.72rem', color:'var(--text-muted)' }}>Copyright &copy; 2026 Talentino IPCS Global</div>
+          </div>
         </div>
       </div>
     </div>
