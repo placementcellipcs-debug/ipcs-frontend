@@ -569,6 +569,25 @@ function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState(null);
   
+  const [courseList, setCourseList] = useState([]);
+  const [isFetchingCourses, setIsFetchingCourses] = useState(true);
+
+  useEffect(() => {
+    const fetchDynamicCourses = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/auth/courses`);
+        if (res.data.success) {
+          setCourseList(res.data.groupedCourses);
+        }
+      } catch (err) {
+        console.error("Failed to fetch dynamic courses:", err);
+      } finally {
+        setIsFetchingCourses(false);
+      }
+    };
+    fetchDynamicCourses();
+  }, []);
+
   const [showTncModal, setShowTncModal] = useState(false);
   const [tncScrolled, setTncScrolled] = useState(false);
   const [tncAccepted, setTncAccepted] = useState(false);
@@ -727,19 +746,23 @@ function Signup() {
 
           <div className="section-title" style={{ color: '#4ade80', marginTop: '2rem' }}><i className="ph ph-graduation-cap" style={{ fontSize: '1.2rem' }}></i> ACADEMIC & COURSE DETAILS</div>
           <div className="grid-3col">
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Course Category *</label>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Course Category *</label>
               <select name="course" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Course Category</option>
-                <option value="Industrial Automation">Industrial Automation</option>
-                <option value="BMS & CCTV">BMS & CCTV</option>
-                <option value="Embedded and IOT">Embedded and IOT</option>
-                <option value="Python and Data Science">Python and Data Science</option>
-                <option value="Artificial Intelligence">Artificial Intelligence</option>
-                <option value="Python Full Stack">Python Full Stack</option>
-                <option value="Java Full Stack">Java Full Stack</option>
-                <option value="MERN Stack">MERN Stack</option>
-                <option value="Software Testing">Software Testing</option>
-                <option value="Digital Marketing">Digital Marketing</option>
+                <option value="" disabled>
+                  {isFetchingCourses ? "Loading Courses..." : "Select Course Category"}
+                </option>
+                
+                {/* Dynamically map through the data fetched from Google Sheets */}
+                {courseList.map((group, idx) => (
+                  <optgroup key={idx} label={group.category}>
+                    {group.courses.map((courseItem, cIdx) => (
+                      <option key={cIdx} value={courseItem}>
+                        {courseItem}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
               </select>
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Joining Date *</label><input type="date" name="joiningDate" onChange={handleChange} required /></div>
