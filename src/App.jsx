@@ -1,4 +1,3 @@
-/* STREAMING_CHUNK: Imports and Setup */
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -23,7 +22,6 @@ const setSafeLocalStorage = (key, value) => {
   }
 };
 
-/* STREAMING_CHUNK: Global CSS Styles */
 const GlobalStyle = () => {
   useEffect(() => {
     if (!document.getElementById('phosphor-icons')) {
@@ -186,6 +184,85 @@ const GlobalStyle = () => {
       .drawer-footer { padding: 1.5rem; border-top: 1px solid var(--card-border); text-align: center; }
       .btn-logout-drawer { width: 100%; padding: 0.8rem; background: #3b82f6; color: #ffffff; border: none; border-radius: 30px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-bottom: 1rem; transition: background 0.2s; }
       .btn-logout-drawer:hover { background: #2563eb; }
+
+      /* --- DASHBOARD STYLES --- */
+      .app-layout { display: flex; flex-direction: column; width: 100vw; min-height: 100vh; }
+      .main-body { flex: 1; display: flex; flex-direction: column; width: 100%; }
+      .top-header { height: 65px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; transition: background 0.3s; z-index: 50; position: relative;}
+      .header-left { display: flex; align-items: center; gap: 12px; }
+      .header-logo-img { height: 35px; width: auto; object-fit: contain; }
+      .header-right { display: flex; align-items: center; gap: 18px; }
+      .header-icon-btn { position: relative; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; background: none; border: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; }
+      .header-icon-btn:hover { color: var(--accent-cyan); background: var(--hover-bg); }
+      .user-profile-badge { display: flex; align-items: center; cursor: pointer; }
+      .avatar-circle { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; border: 2px solid rgba(56, 189, 248, 0.4); overflow: hidden;}
+      .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+      
+      .dashboard-content { padding: 2rem; max-width: 1300px; width: 100%; margin: 0 auto; animation: fadeInUp 0.3s ease; }
+      .dash-top-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+      
+      .hero-banner { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; align-items: center; gap: 1.8rem; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
+      .hero-banner::after { content: ''; position: absolute; right: -5%; top: 0; height: 100%; width: 50%; background: url('https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6') no-repeat right center; background-size: contain; opacity: 0.1; mask-image: linear-gradient(to right, transparent, black); -webkit-mask-image: linear-gradient(to right, transparent, black); pointer-events: none; z-index: 0; }
+      .hero-banner-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); padding: 3px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(56,189,248,0.3); position: relative; z-index: 2; }
+      .hero-banner-avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--bg-dark); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
+      .hero-banner-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+      .greeting-subtitle { color: var(--accent-cyan); font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; position: relative; z-index: 2; }
+      .hero-banner h2 { margin: 0 0 6px 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; position: relative; z-index: 2;}
+      .full-date-subtext { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; position: relative; z-index: 2;}
+      
+      .vacancy-quick-banner { background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%); border: 1px solid #6366f1; border-radius: 16px; padding: 1.2rem 1.8rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;}
+      .vacancy-quick-banner:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); }
+      
+      .quick-actions-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+      .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+      .qa-btn { background: var(--bg-dark); border: 1px solid var(--card-border); padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 12px; color: var(--text-main); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+      .qa-btn:hover { border-color: var(--accent-cyan); transform: translateY(-2px); }
+      .qa-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+      
+      .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+      .stat-card-new { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem; transition: transform 0.2s; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+      .stat-card-new:hover { transform: translateY(-2px); }
+      .stat-icon-wrapper { width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
+      .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px; line-height: 1.1; }
+      .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+
+      /* --- CALENDAR UI --- */
+      .calendar-layout { display: flex; gap: 20px; align-items: stretch; }
+      .cal-sidebar { width: 260px; display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
+      .cal-main-area { flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
+      .cal-top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+      .cal-view-toggles { display: flex; background: var(--bg-dark); border-radius: 8px; padding: 4px; border: 1px solid var(--card-border); }
+      .cal-toggle-btn { padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); transition: 0.2s; }
+      .cal-toggle-btn.active { background: var(--card-border); color: var(--text-main); }
+      .cal-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; }
+      .cal-grid-body { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--card-border); border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; flex: 1; }
+      .cal-day-cell { background: var(--bg-dark); min-height: 100px; padding: 8px; transition: background 0.2s; }
+      .cal-day-cell:hover { background: var(--hover-bg); }
+      .cal-day-number { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+      .cal-day-cell.today .cal-day-number { color: #fff; background: var(--accent-blue); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+      .cal-event-pill { font-size: 0.75rem; font-weight: 600; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+      .pill-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+      .mini-cal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 15px; }
+
+      /* --- EVENTS --- */
+      .upcoming-wrapper { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+      .event-row-card { display: flex; align-items: center; background: var(--bg-dark); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; transition: border-color 0.2s; }
+      .event-row-card:hover { border-color: var(--accent-cyan); }
+      .event-date-box { width: 85px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 2px solid var(--input-border); padding-right: 1.2rem; margin-right: 1.2rem; }
+      .ev-month { font-size: 0.75rem; font-weight: 800; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+      .ev-day { font-size: 1.6rem; font-weight: 800; color: var(--text-main); line-height: 1; margin-bottom: 2px;}
+      .ev-year { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); }
+      .event-body { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+      .ev-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+      .ev-meta { display: flex; align-items: center; gap: 15px; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+      .ev-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+      
+      .notif-dropdown { position: absolute; top: 55px; right: 0; width: 340px; background: rgba(19, 25, 36, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); z-index: 1000; overflow: hidden; transform-origin: top right; animation: fadeInUp 0.2s ease; }
+      .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; gap: 4px; }
+      .notif-item:hover { background: rgba(255,255,255,0.1); }
+      .notif-item:last-child { border-bottom: none; }
+      .notif-read { opacity: 0.45; }
+      .notif-read strong { text-decoration: line-through; }
 
       /* --- TALENTINO --- */
       .talentino-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
@@ -476,12 +553,10 @@ const GlobalStyle = () => {
   );
 };
 
-/* STREAMING_CHUNK: Constants and URLs */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-placement.ipcsglobal.info';
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
-/* STREAMING_CHUNK: Login Component */
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -560,7 +635,6 @@ function Login() {
       <div className="landing-nav">
         <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
       </div>
-      
       <div className="landing-grid">
         <div className="hero-section">
           <div className="hero-badge">
@@ -570,12 +644,9 @@ function Login() {
               <span className="hero-badge-subtitle">Connecting Talent with Opportunity</span>
             </div>
           </div>
-          
           <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: '#38bdf8' }}>Careers with IPCS</span></h1>
           <p className="hero-desc">IPCS Global connects future-ready talent in Industrial Automation, Embedded Systems, IoT, and Digital Tech with leading blue-chip global firms. Experience zero-barrier career transitions.</p>
-
           <button className="btn-glow" onClick={() => setShowAuthForm(true)}>Login / Signup <i className="ph-bold ph-caret-right"></i></button>
-
           <div className="ticker-container">
             <div className="ticker-icon"><i className="ph-fill ph-lightning"></i></div>
             <div>
@@ -604,7 +675,6 @@ function Login() {
                 </div>
                 <div style={{ border: '1px solid rgba(34, 197, 94, 0.3)', color: '#4ade80', padding: '6px 14px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px' }}>ACTIVE STAGE</div>
               </div>
-
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className="hiring-stat-box">
                   <div style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-users"></i></div>
@@ -613,7 +683,6 @@ function Login() {
                     <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>1.5 M +</div>
                   </div>
                 </div>
-                
                 <div className="hiring-stat-box">
                   <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-buildings"></i></div>
                   <div>
@@ -621,7 +690,6 @@ function Login() {
                     <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>25 K +</div>
                   </div>
                 </div>
-                
                 <div className="hiring-stat-box">
                   <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-medal"></i></div>
                   <div>
@@ -636,7 +704,6 @@ function Login() {
               <div className="brand-logo-container"><img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" /></div>
               <h2 style={{ textAlign: 'center', margin: '0 0 6px 0', color: '#ffffff' }}>Welcome back</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
-
               <form onSubmit={handleLogin}>
                 <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
                 <div className="form-group"><label>Password</label>
@@ -647,9 +714,7 @@ function Login() {
                 </div>
                 <button type="submit" className="btn-action" style={{ width: '100%', marginTop: '0.8rem', padding: '1rem', borderRadius: '10px' }}>Sign in &rarr;</button>
               </form>
-
               {status && <div className={`alert alert-${status.type}`}>{status.message}</div>}
-
               <div className="switch-mode">Don't have an account? <span onClick={() => navigate('/signup')}>Create account</span></div>
             </div>
           )}
@@ -659,7 +724,6 @@ function Login() {
   );
 }
 
-/* STREAMING_CHUNK: Signup Component */
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -1019,7 +1083,6 @@ function Signup() {
   );
 }
 
-/* STREAMING_CHUNK: Dashboard Component Start */
 const isEventExpired = (dateStr) => {
   if (!dateStr || dateStr === "TBA") return false;
   const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
@@ -1105,7 +1168,6 @@ function Dashboard() {
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
 
-  /* STREAMING_CHUNK: Dashboard Effects & Functions */
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
@@ -1615,7 +1677,6 @@ function Dashboard() {
   const tpoPhone = tpo.phone || tpo.contactNumber || tpo['Contact Number'] || "N/A";
   const tpoAssigned = tpo.assignedBranches || tpo.assignedRegions || tpo['Assigned Branches'] || "N/A";
 
-  /* STREAMING_CHUNK: Dashboard UI Render */
   return (
     <div className="app-layout">
       <div className="top-header">
@@ -1725,7 +1786,6 @@ function Dashboard() {
             </>
           )}
 
-          {/* Events Tab */}
           {activeTab === 'events' && (
             <div className="animate-fade-in" style={{ height: '100%' }}>
                <div className="calendar-layout">
@@ -1826,7 +1886,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -1919,7 +1978,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Study Materials Tab */}
           {activeTab === 'materials' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}>
@@ -1947,7 +2005,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Gamified Aptitude Tab */}
           {activeTab === 'aptitude' && (
             <div className="animate-fade-in">
               {aptitudeView === 'lobby' && (
@@ -2042,7 +2099,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Settings Tab */}
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
               <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '2rem' }}>Settings</h2>
@@ -2080,7 +2136,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Guide Tab */}
           {activeTab === 'guide' && (
             <div className="animate-fade-in">
               <div style={{ marginBottom: '2rem' }}><h2 style={{ margin: '0 0 5px 0', fontSize: '1.6rem', fontWeight: 800 }}>Guide & Resume Resources</h2><p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Explore top platforms and guides to create a professional resume and prepare for placements.</p></div>
@@ -2102,6 +2157,7 @@ function Dashboard() {
             </div>
           )}
 
+          {/* Talentino / Vacancy / Status Modals UI */}
           {/* Talentino Tab */}
           {activeTab === 'talentino' && (
             <div className="animate-fade-in">
@@ -2347,7 +2403,8 @@ function Dashboard() {
             </div>
           )}
 
-/* STREAMING_CHUNK: Modals & Overlays */
+
+
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
             <div className="report-modal-overlay material-modal-overlay" style={{ zIndex: 99999 }}>
@@ -2707,7 +2764,6 @@ function Dashboard() {
         </div>
       </div>
 
-/* STREAMING_CHUNK: Side Drawer and End Components */
       <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={(e) => { if(e.target.className.includes('drawer-overlay')) setDrawerOpen(false); }}>
         <div className="drawer-card" style={{ position: 'absolute', right: 0 }}>
           <div className="drawer-header-cover" style={{ backgroundImage: `url(${COVER_BANNER_URL})` }}>
@@ -2727,10 +2783,10 @@ function Dashboard() {
             <div className="drawer-item" onClick={() => changeTab('talentino')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user-check"></i> Talentino</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('materials')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-books"></i> Study Material</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('events')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-calendar-blank"></i> Events & Drives</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('aptitude')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-brain"></i> Aptitude Test</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('aptitude')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-brain"></i> Aptitude & Assessment</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('profile')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-user"></i> Profile</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('status')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-list-checks"></i> Application Status</div><span>&rsaquo;</span></div>
-            <div className="drawer-item" onClick={() => changeTab('vacancies')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Job Vacancies</div><span>&rsaquo;</span></div>
+            <div className="drawer-item" onClick={() => changeTab('vacancies')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-briefcase"></i> Current Job Vacancies</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => changeTab('guide')}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-book-open"></i> Guide</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => { setTpoModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-address-book"></i> Contact TPO</div><span>&rsaquo;</span></div>
             <div className="drawer-item" onClick={() => { setHelpModal(true); setDrawerOpen(false); }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="ph ph-info"></i> Request Help</div><span>&rsaquo;</span></div>
