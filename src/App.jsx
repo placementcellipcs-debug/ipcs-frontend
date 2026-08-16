@@ -2430,7 +2430,7 @@ function Dashboard() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     <a href={materialModal.oneDriveLink} target="_blank" rel="noreferrer" className="btn-action" style={{ background: '#3b82f6', color: '#fff', textDecoration: 'none', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                      <i className="ph-bold ph-arrow-square-out" style={{ marginRight: '5px' }}></i> Full View
+                      <i className="ph-bold ph-arrow-square-out" style={{ marginRight: '5px' }}></i> Full Player
                     </a>
                     <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
                   </div>
@@ -2453,9 +2453,9 @@ function Dashboard() {
                       <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
                       
                       {/* Non-intrusive Helper Overlay */}
-                      <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 20, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', padding: '10px 20px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '15px', border: '1px solid rgba(255,255,255,0.1)', pointerEvents: 'none' }}>
-                         <i className="ph-fill ph-info" style={{ color: 'var(--accent-cyan)', fontSize: '1.2rem' }}></i>
-                         <span style={{ fontSize: '0.8rem', color: '#fff', fontWeight: 600, letterSpacing: '0.5px' }}>Tap top-right "Full View" for Back/Forward buttons</span>
+                      <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 20, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', padding: '10px 20px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid rgba(255,255,255,0.1)', pointerEvents: 'none' }}>
+                         <i className="ph-fill ph-info" style={{ color: 'var(--accent-cyan)', fontSize: '1.1rem' }}></i>
+                         <span style={{ fontSize: '0.8rem', color: '#fff', fontWeight: 600, letterSpacing: '0.5px' }}>Tap "Full Player" above for Back/Forward buttons</span>
                       </div>
 
                       <iframe
@@ -2469,7 +2469,7 @@ function Dashboard() {
                 </div>
               </div>
             </div>
-          )}  
+          )}
 
           {/* PLACEMENT JOB MODAL */}
           {jobModal && (
