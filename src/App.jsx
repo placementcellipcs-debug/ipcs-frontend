@@ -1083,11 +1083,22 @@ function Signup() {
   );
 }
 
+const parseSafeDate = (dateStr) => {
+  if (!dateStr || dateStr === "N/A" || dateStr === "undefined" || String(dateStr).toUpperCase() === "TBA") return null;
+  let cleanStr = String(dateStr).replace(/,/g, '').replace(/\s+/g, ' ').trim();
+  let parts = cleanStr.split(/[-/]/);
+  if (parts.length === 3) {
+     if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
+     return new Date(parts[2], parts[1]-1, parts[0]);
+  }
+  let d = new Date(cleanStr);
+  return isNaN(d) ? null : d;
+};
+
 const isEventExpired = (dateStr) => {
-  if (!dateStr || dateStr === "TBA") return false;
-  const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
-  const eventDate = new Date(cleanStr);
-  if (isNaN(eventDate.getTime())) return false;
+  if (!dateStr || String(dateStr).toUpperCase() === "TBA") return false;
+  const eventDate = parseSafeDate(dateStr);
+  if (!eventDate) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return eventDate < today;
@@ -1649,7 +1660,7 @@ function Dashboard() {
   
   const filteredEvents = (data.events || []).filter(ev => { 
     const d = parseSafeDate(ev.date); 
-    if(!d) return true; // Keeps TBA dates visible instead of hiding them
+    if(!d) return true; 
     d.setHours(0,0,0,0); 
     return d >= todayDate; 
   });
@@ -2436,7 +2447,7 @@ function Dashboard() {
                   </div>
                 </div>
 
-                <div className="material-iframe-container" style={{ position: 'relative' }}>
+                <div className="material-iframe-container">
                   {isPdfLoading && (
                     <div style={{ textAlign: 'center', color: 'var(--accent-cyan)' }}>
                       <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
@@ -2452,12 +2463,6 @@ function Dashboard() {
                     <>
                       <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
                       
-                      {/* Non-intrusive Helper Overlay */}
-                      <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 20, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', padding: '10px 20px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid rgba(255,255,255,0.1)', pointerEvents: 'none' }}>
-                         <i className="ph-fill ph-info" style={{ color: 'var(--accent-cyan)', fontSize: '1.1rem' }}></i>
-                         <span style={{ fontSize: '0.8rem', color: '#fff', fontWeight: 600, letterSpacing: '0.5px' }}>Tap "Full Player" above for Back/Forward buttons</span>
-                      </div>
-
                       <iframe
                         src={pdfBlobUrl}
                         title={materialModal.title}
@@ -2469,7 +2474,7 @@ function Dashboard() {
                 </div>
               </div>
             </div>
-          )}
+          )}  
 
           {/* PLACEMENT JOB MODAL */}
           {jobModal && (
