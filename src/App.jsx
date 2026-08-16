@@ -1646,7 +1646,14 @@ function Dashboard() {
   const nextMonth = () => setCalDate(new Date(calYear, calMonth + 1, 1));
 
   const todayDate = new Date(); todayDate.setHours(0,0,0,0);
-  const filteredEvents = (data.events || []).filter(ev => { const d = new Date(ev.date); if(isNaN(d)) return true; d.setHours(0,0,0,0); return d >= todayDate; });
+  
+  const filteredEvents = (data.events || []).filter(ev => { 
+    const d = parseSafeDate(ev.date); 
+    if(!d) return true; // Keeps TBA dates visible instead of hiding them
+    d.setHours(0,0,0,0); 
+    return d >= todayDate; 
+  });
+  
   const processedVacancies = (data.vacancies || []).sort((a, b) => { const aExp = isEventExpired(a.lastDate); const bExp = isEventExpired(b.lastDate); if (aExp && !bExp) return 1; if (!aExp && bExp) return -1; return 0; });
   
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
@@ -1858,7 +1865,9 @@ function Dashboard() {
                               {blanks.map(b => <div key={`blank-${b}`} className="cal-day-cell" style={{opacity: 0.3}}></div>)}
                               {days.map(d => {
                                   const dayEvents = (data.events || []).filter(ev => {
-                                      if(!ev.date || ev.date === 'TBA') return false; const ed = new Date(ev.date); if(isNaN(ed)) return false; return ed.getDate() === d && ed.getMonth() === calMonth && ed.getFullYear() === calYear;
+                                      const ed = parseSafeDate(ev.date); 
+                                      if(!ed) return false; 
+                                      return ed.getDate() === d && ed.getMonth() === calMonth && ed.getFullYear() === calYear;
                                   });
                                   const isToday = new Date().getDate() === d && new Date().getMonth() === calMonth && new Date().getFullYear() === calYear;
 
@@ -2415,14 +2424,19 @@ function Dashboard() {
               <div className="material-viewer-card" onContextMenu={(e) => e.preventDefault()}>
                 
                 <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
+                  <div style={{ flex: 1, paddingRight: '15px' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic} ({materialModal.course})</div>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>{materialModal.title}</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{materialModal.title}</h3>
                   </div>
-                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <a href={materialModal.oneDriveLink} target="_blank" rel="noreferrer" className="btn-action" style={{ background: '#3b82f6', color: '#fff', textDecoration: 'none', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                      <i className="ph-bold ph-arrow-square-out" style={{ marginRight: '5px' }}></i> Full View
+                    </a>
+                    <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
+                  </div>
                 </div>
 
-                <div className="material-iframe-container">
+                <div className="material-iframe-container" style={{ position: 'relative' }}>
                   {isPdfLoading && (
                     <div style={{ textAlign: 'center', color: 'var(--accent-cyan)' }}>
                       <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
@@ -2438,6 +2452,12 @@ function Dashboard() {
                     <>
                       <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
                       
+                      {/* Non-intrusive Helper Overlay */}
+                      <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 20, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', padding: '10px 20px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '15px', border: '1px solid rgba(255,255,255,0.1)', pointerEvents: 'none' }}>
+                         <i className="ph-fill ph-info" style={{ color: 'var(--accent-cyan)', fontSize: '1.2rem' }}></i>
+                         <span style={{ fontSize: '0.8rem', color: '#fff', fontWeight: 600, letterSpacing: '0.5px' }}>Tap top-right "Full View" for Back/Forward buttons</span>
+                      </div>
+
                       <iframe
                         src={pdfBlobUrl}
                         title={materialModal.title}
