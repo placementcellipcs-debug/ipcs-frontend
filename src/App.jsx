@@ -1083,22 +1083,11 @@ function Signup() {
   );
 }
 
-const parseSafeDate = (dateStr) => {
-  if (!dateStr || dateStr === "N/A" || dateStr === "undefined" || String(dateStr).toUpperCase() === "TBA") return null;
-  let cleanStr = String(dateStr).replace(/,/g, '').replace(/\s+/g, ' ').trim();
-  let parts = cleanStr.split(/[-/]/);
-  if (parts.length === 3) {
-     if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
-     return new Date(parts[2], parts[1]-1, parts[0]);
-  }
-  let d = new Date(cleanStr);
-  return isNaN(d) ? null : d;
-};
-
 const isEventExpired = (dateStr) => {
-  if (!dateStr || String(dateStr).toUpperCase() === "TBA") return false;
-  const eventDate = parseSafeDate(dateStr);
-  if (!eventDate) return false;
+  if (!dateStr || dateStr === "TBA") return false;
+  const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+  const eventDate = new Date(cleanStr);
+  if (isNaN(eventDate.getTime())) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return eventDate < today;
@@ -1657,14 +1646,7 @@ function Dashboard() {
   const nextMonth = () => setCalDate(new Date(calYear, calMonth + 1, 1));
 
   const todayDate = new Date(); todayDate.setHours(0,0,0,0);
-  
-  const filteredEvents = (data.events || []).filter(ev => { 
-    const d = parseSafeDate(ev.date); 
-    if(!d) return true; 
-    d.setHours(0,0,0,0); 
-    return d >= todayDate; 
-  });
-  
+  const filteredEvents = (data.events || []).filter(ev => { const d = new Date(ev.date); if(isNaN(d)) return true; d.setHours(0,0,0,0); return d >= todayDate; });
   const processedVacancies = (data.vacancies || []).sort((a, b) => { const aExp = isEventExpired(a.lastDate); const bExp = isEventExpired(b.lastDate); if (aExp && !bExp) return 1; if (!aExp && bExp) return -1; return 0; });
   
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
@@ -2435,16 +2417,11 @@ function Dashboard() {
               <div className="material-viewer-card" onContextMenu={(e) => e.preventDefault()}>
                 
                 <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ flex: 1, paddingRight: '15px' }}>
+                  <div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic} ({materialModal.course})</div>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{materialModal.title}</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>{materialModal.title}</h3>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <a href={materialModal.oneDriveLink} target="_blank" rel="noreferrer" className="btn-action" style={{ background: '#3b82f6', color: '#fff', textDecoration: 'none', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                      <i className="ph-bold ph-arrow-square-out" style={{ marginRight: '5px' }}></i> Full Player
-                    </a>
-                    <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
-                  </div>
+                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
                 </div>
 
                 <div className="material-iframe-container">
