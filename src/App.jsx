@@ -536,24 +536,17 @@ const GlobalStyle = () => {
         .notif-dropdown { position: fixed; top: 65px; left: 5%; right: 5%; width: 90%; }
         .doc-box { flex-direction: column; align-items: flex-start; gap: 1rem; }
         
-        /* FORCE FULL SCREEN FOR MATERIAL VIEWER ON MOBILE */
-        .report-modal-overlay.material-modal-overlay { 
-          padding: 0 !important; 
-          background: #000 !important; 
-          display: block !important; 
-        }
+        .report-modal-overlay.material-modal-overlay { padding: 0 !important; }
         .material-viewer-card {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          width: 100vw !important;
-          max-width: 100vw !important;
-          height: 100dvh !important;
-          max-height: 100dvh !important;
+          width: 100% !important;
+          height: 100% !important;
+          max-width: none !important;
+          max-height: none !important;
           border-radius: 0 !important;
           border: none !important;
           margin: 0 !important;
         }
+
       @media (min-width: 1800px) {
         .dashboard-content, .landing-grid { max-width: 1600px; }
         body { font-size: 17px; }
@@ -2193,6 +2186,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                         })}
                       </div>
                       <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel, true)}>Surrender / End Test</button>
+                  </div>
                 </div>
               )}
 
@@ -2274,44 +2268,6 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
 
                     <div style={{ marginBottom: '2rem' }}>
                         {(levelData[selectedTestNum] || []).map((q, i) => (
-                            <div key={q.id} style={{ background: 'var(--bg-dark)', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.2rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                                <div style={{ fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                                    Q{i + 1}. {q.question}
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '1rem' }}>
-                                    {Object.entries(q.options || {}).map(([k, v]) => {
-                                        let bg = 'var(--input-bg)'; let color = 'var(--text-muted)'; let border = '1px solid var(--input-border)';
-                                        if (k === q.answer) { bg = 'rgba(16, 185, 129, 0.1)'; color = '#10b981'; border = '1px solid #10b981'; }
-                                        return (
-                                            <div key={k} style={{ padding: '10px', borderRadius: '8px', background: bg, color: color, border: border, fontSize: '0.85rem', fontWeight: 600 }}>
-                                                {k}) {v}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                {q.explanation && (
-                                    <div style={{ background: 'rgba(56, 189, 248, 0.05)', padding: '12px', borderRadius: '8px', borderLeft: '3px solid var(--accent-cyan)', fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
-                                        <strong style={{ color: 'var(--accent-cyan)', display: 'block', marginBottom: '4px' }}>Explanation:</strong> {q.explanation}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-
-                    <button className="btn-action" onClick={() => setAptitudeView('hub')} style={{ width: '100%', padding: '1.2rem', fontSize: '1rem' }}>Return to Assessment Center</button>
-                </div>
-              )}
-
-              {/* NEW STUDY SHEET VIEW (Answer Key from Hub) */}
-              {aptitudeView === 'review' && (
-                <div className="test-main-card" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', animation: 'fadeInUp 0.5s ease forwards' }}>
-                    <div style={{ textAlign: 'center', borderBottom: '1px solid var(--card-border)', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
-                        <h2 style={{ color: 'var(--accent-cyan)', margin: '0 0 10px 0', fontSize: '2rem' }}>Study Sheet & Answer Key</h2>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', margin: 0 }}>Review the correct answers and explanations for this module.</p>
-                    </div>
-
-                    <div style={{ marginBottom: '2rem' }}>
-                        {(levelData[1] || []).map((q, i) => (
                             <div key={q.id} style={{ background: 'var(--bg-dark)', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.2rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
                                 <div style={{ fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem', fontSize: '0.95rem', lineHeight: 1.5 }}>
                                     Q{i + 1}. {q.question}
