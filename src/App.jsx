@@ -1283,9 +1283,9 @@ function Dashboard() {
       axios.get(`${API_BASE_URL}/api/dashboard/aptitude/leaderboard`).then(res => { if (res.data.success) setLeaderboard(res.data.leaderboard); }).catch(() => {});
       axios.post(`${API_BASE_URL}/api/dashboard/aptitude/history`, { email: user.email }).then(res => { 
           if (res.data.success) {
-              setTestHistoryList(res.data.history.filter(h => !h.levelReached?.includes("Test")));
-              setTalHistory(res.data.history.filter(h => h.levelReached?.includes("Test")));
-              setTechHistory(res.data.history.filter(h => h.levelReached === user.course));
+              setTestHistoryList(res.data.history.filter(h => h.type === 'aptitude' || (!h.type && !h.levelReached?.includes("Test") && h.levelReached !== user.course)));
+              setTalHistory(res.data.history.filter(h => h.type === 'talentino' || (!h.type && h.levelReached?.includes("Test"))));
+              setTechHistory(res.data.history.filter(h => h.type === 'technical' || (!h.type && h.levelReached === user.course)));
           }
       }).catch(() => {});
     }
@@ -2164,15 +2164,23 @@ function Dashboard() {
               )}
 
               {aptitudeView === 'result' && (
-                <div className="level-transition-screen">
-                    <div style={{ fontSize: '5rem', marginBottom: '10px' }}>{currentLevel >= 3 ? '🏆' : '💀'}</div>
-                    <div className="level-badge-large" style={{ fontSize: '3rem' }}>{currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER'}</div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</p>
-                    <button className="btn-action" onClick={() => setAptitudeView('lobby')}>Return to Lobby</button>
+            <div className="level-transition-screen">
+                <div style={{ fontSize: '5rem', marginBottom: '10px' }}>
+                    {activeExamType === 'aptitude' ? (currentLevel >= 3 ? '🏆' : '💀') : '🏆'}
                 </div>
-              )}
+                <div className="level-badge-large" style={{ fontSize: '3rem' }}>
+                    {activeExamType === 'aptitude' ? (currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER') : 'EXAM COMPLETED'}
+                </div>
+                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
+                    {activeExamType === 'aptitude' 
+                        ? <span>You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>
+                        : <span>You successfully completed the exam in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>}
+                </p>
+                <button className="btn-action" onClick={() => setAptitudeView('hub')}>Return to Assessment Center</button>
             </div>
           )}
+        </div>
+      )}
 
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
