@@ -1184,6 +1184,7 @@ function Dashboard() {
   const [materialModal, setMaterialModal] = useState(null);
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const [presentationSlide, setPresentationSlide] = useState(1);
 
   useEffect(() => {
     try {
@@ -1278,6 +1279,7 @@ function Dashboard() {
   const closeMaterialModal = () => {
     setMaterialModal(null);
     setPdfBlobUrl(null);
+    setPresentationSlide(1); // <--- ADD THIS LINE
   };
 
   const fetchHubData = useCallback(() => {
@@ -2651,48 +2653,79 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
             <div className="report-modal-overlay material-modal-overlay" style={{ zIndex: 99999 }}>
-              <div 
-                className="material-viewer-card" 
-                onContextMenu={(e) => e.preventDefault()} 
-                style={{ 
-                    WebkitTouchCallout: 'none', /* iOS Safari long-press */
-                    WebkitUserSelect: 'none', /* Safari text selection */
-                    userSelect: 'none' /* Standard text selection */
-                }}
-              >
+              <div className="material-viewer-card">
                 
-                <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic} ({materialModal.course})</div>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>{materialModal.title}</h3>
+                <div style={{ padding: '12px 16px', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ overflow: 'hidden', paddingRight: '10px' }}>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase' }}>{materialModal.topic}</div>
+                    <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{materialModal.title}</h3>
                   </div>
-                  <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem' }} onClick={closeMaterialModal}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button className="btn-action" style={{ padding: '6px 12px', fontSize: '0.8rem', background: '#3b82f6' }} onClick={() => window.open(pdfBlobUrl, '_blank')}>Open Native</button>
+                    <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.4rem', flexShrink: 0 }} onClick={closeMaterialModal}></i>
+                  </div>
                 </div>
 
-                <div className="material-iframe-container">
-                  {isPdfLoading && (
-                    <div style={{ textAlign: 'center', color: 'var(--accent-cyan)' }}>
-                      <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
-                      <div style={{ fontWeight: 600 }}>Encrypting & Loading Document...</div>
-                    </div>
-                  )}
+                <div className="material-iframe-container" style={{ display: 'flex', flexDirection: 'column', background: '#0b0f17' }}>
+                  
+                  <div style={{ flex: 1, position: 'relative', width: '100%', height: '100%' }}>
+                      {isPdfLoading && (
+                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', color: 'var(--accent-cyan)', zIndex: 20 }}>
+                          <i className="ph ph-spinner" style={{ fontSize: '3rem', animation: 'spin 1s linear infinite', marginBottom: '10px' }}></i>
+                          <div style={{ fontWeight: 600 }}>Loading Document...</div>
+                        </div>
+                      )}
 
-                  {materialModal.error && (
-                    <div className="alert alert-error">{materialModal.error}</div>
-                  )}
+                      {materialModal.error && (
+                        <div className="alert alert-error" style={{ margin: '20px', position: 'relative', zIndex: 20 }}>{materialModal.error}</div>
+                      )}
 
+                      {pdfBlobUrl && !isPdfLoading && (
+                         <>
+                           {/* THE INVISIBLE SHIELD - BLOCKS TAPS AND RIGHT CLICKS */}
+                           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10, background: 'transparent' }} onContextMenu={(e) => e.preventDefault()}></div>
+                           
+                           {/* THE PRESENTATION */}
+                           <iframe
+                             src={`${pdfBlobUrl}&wdStartOn=${presentationSlide}`}
+                             title={materialModal.title}
+                             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', zIndex: 1 }}
+                             allowFullScreen={true}
+                           ></iframe>
+                         </>
+                      )}
+                  </div>
+
+                  {/* CUSTOM PREV / NEXT CONTROLS */}
                   {pdfBlobUrl && !isPdfLoading && (
-                      <iframe
-                        src={pdfBlobUrl}
-                        title={materialModal.title}
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                        allowFullScreen={true}
-                      ></iframe>
+                      <div style={{ width: '100%', padding: '12px 16px', background: 'var(--card-bg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--card-border)', zIndex: 15 }}>
+                         <button 
+                            className="btn-cancel" 
+                            disabled={presentationSlide <= 1} 
+                            onClick={() => setPresentationSlide(p => Math.max(1, p - 1))}
+                            style={{ padding: '8px 16px', opacity: presentationSlide <= 1 ? 0.4 : 1 }}
+                         >
+                            <i className="ph-bold ph-caret-left"></i> Prev
+                         </button>
+                         
+                         <div style={{ fontWeight: 800, color: 'var(--accent-cyan)', fontSize: '0.95rem' }}>
+                            Slide {presentationSlide}
+                         </div>
+                         
+                         <button 
+                            className="btn-action" 
+                            onClick={() => setPresentationSlide(p => p + 1)}
+                            style={{ padding: '8px 16px' }}
+                         >
+                            Next <i className="ph-bold ph-caret-right"></i>
+                         </button>
+                      </div>
                   )}
+
                 </div>
               </div>
             </div>
-          )}  
+          )} 
 
           {/* PLACEMENT JOB MODAL */}
           {jobModal && (
