@@ -1176,6 +1176,7 @@ function Dashboard() {
   const [totalQuestionsAsked, setTotalQuestionsAsked] = useState(0);
   const [leaderboard, setLeaderboard] = useState([]);
   const [testHistoryList, setTestHistoryList] = useState([]);
+  const [viewingResult, setViewingResult] = useState(null);
 
   const [studyMaterials, setStudyMaterials] = useState([]);
   const [studyMatStatus, setStudyMatStatus] = useState(null);
@@ -1364,7 +1365,19 @@ function Dashboard() {
   const submitFinalScore = async (finalLevel) => {
     try {
       setAptitudeView('result');
-      let score = Object.keys(userAnswers).length * currentLevel * 2; 
+      
+      // Calculate exact score based on CORRECT answers
+      let correctAnswers = 0;
+      Object.keys(levelData).forEach(lvl => {
+          if (parseInt(lvl) <= finalLevel) {
+              levelData[lvl].forEach(q => {
+                  if (userAnswers[q.id] === q.answer) correctAnswers++;
+              });
+          }
+      });
+      
+      // 2 points for Aptitude, 1 point for Tech/Talentino
+      let score = correctAnswers * (activeExamType === 'aptitude' ? 2 : 1); 
 
       if (activeExamType === 'aptitude') {
           await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, { email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, totalScore: score, totalQuestions: totalQuestionsAsked, finalLevel: finalLevel, totalTimeSeconds: globalTimeSpent });
@@ -2068,7 +2081,7 @@ function Dashboard() {
                                 const isUnlocked = num === 1 || talHistory.find(h => h.levelReached === `Test ${num - 1}`);
                                 
                                 if (result) {
-                                   return <div key={num} style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '12px', borderRadius: '10px', color: '#10b981', display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}><span>Test {num}</span> <span>✅ {result.score} pts</span></div>
+                                   return <button key={num} className="btn-action" style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#10b981', justifyContent: 'space-between' }} onClick={() => setViewingResult(result)}><span>Test {num}</span> <span>✅ View Result</span></button>
                                 } else if (isUnlocked) {
                                    return <button key={num} className="btn-action" style={{ background: 'var(--hover-bg)', color: '#fff', border: '1px solid var(--accent-cyan)', justifyContent: 'space-between' }} onClick={() => handleStartExam('talentino', num)}><span>Test {num}</span> <span>Start &rarr;</span></button>
                                 } else {
@@ -2087,15 +2100,13 @@ function Dashboard() {
                           {(!user.techExamAccess || user.techExamAccess.toString().trim().toLowerCase() !== 'yes') ? (
                               <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '12px', borderRadius: '10px', color: '#f87171', textAlign: 'center', fontSize: '0.85rem' }}><i className="ph-fill ph-lock-key"></i> Access Denied by Admin</div>
                           ) : techHistory.length > 0 ? (
-                              <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '12px', borderRadius: '10px', color: '#f59e0b', textAlign: 'center', fontWeight: 700 }}>✅ Completed: {techHistory[0].score} pts</div>
+                              <button className="btn-action" style={{ width: '100%', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#f59e0b' }} onClick={() => setViewingResult(techHistory[0])}>✅ Completed: View Result</button>
                           ) : (
                               <button className="btn-action" style={{ width: '100%', background: '#f59e0b' }} onClick={() => handleStartExam('technical')}><i className="ph-bold ph-pencil-simple"></i> Start Technical Exam</button>
                           )}
                       </div>
-
                    </div>
 
-                   {/* Keep Leaderboard visible for Aptitude */}
                    <div className="leaderboard-card" style={{ maxWidth: '800px', margin: '0 auto' }}>
                       <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b' }}><i className="ph-fill ph-trophy"></i> Aptitude Hall of Fame</h3>
                       {leaderboard.length === 0 ? ( <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Arena is empty. Be the first to play!</div> ) : (
@@ -2115,9 +2126,17 @@ function Dashboard() {
 
               {aptitudeView === 'transition' && (
                 <div className="level-transition-screen">
-                    <div style={{ fontSize: '1.2rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '10px' }}>Preparing Next Stage</div>
-                    <div className="level-badge-large">LEVEL {currentLevel}</div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>{currentLevel === 1 ? "Warming up... Basic Concepts." : currentLevel === 2 ? "Things are heating up... Intermediate Concepts." : "Final Boss... Advanced Concepts."}</p>
+                    <div style={{ fontSize: '1.2rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '10px' }}>Preparing Exam Engine</div>
+                    <div className="level-badge-large">
+                        {activeExamType === 'aptitude' ? `LEVEL ${currentLevel}` : activeExamType === 'talentino' ? `TEST ${selectedTestNum}` : `FINAL ASSESSMENT`}
+                    </div>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
+                        {activeExamType === 'aptitude' 
+                            ? (currentLevel === 1 ? "Warming up... Basic Concepts." : currentLevel === 2 ? "Things are heating up... Intermediate Concepts." : "Final Boss... Advanced Concepts.")
+                            : activeExamType === 'talentino' 
+                                ? `Welcome to Test ${selectedTestNum}. Good luck!` 
+                                : `Welcome to your Final Technical Assessment.`}
+                    </p>
                     <div style={{ marginTop: '2rem', width: '60px', height: '60px', borderRadius: '50%', borderTop: '4px solid var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></div>
                 </div>
               )}
@@ -2126,7 +2145,9 @@ function Dashboard() {
                 <div className="test-layout-grid">
                   <div className="test-main-card" style={{ animation: 'borderPulse 3s infinite' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                      <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>Level {currentLevel} • {levelData[currentLevel][currentQIndex]?.category}</span>
+                      <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>
+                          {activeExamType === 'aptitude' ? `Level ${currentLevel}` : activeExamType === 'talentino' ? `Test ${selectedTestNum}` : 'Final Exam'} • {levelData[currentLevel][currentQIndex]?.category}
+                      </span>
                       <div className={`test-timer-badge ${testTimeLeft <= 60 ? 'warning' : ''}`}><i className="ph-bold ph-timer"></i>{Math.floor(testTimeLeft / 60).toString().padStart(2, '0')}:{(testTimeLeft % 60).toString().padStart(2, '0')}</div>
                     </div>
                     <div className="game-progress-container"><div className="game-progress-fill" style={{ width: `${((currentQIndex + 1) / levelData[currentLevel].length) * 100}%` }}></div></div>
@@ -2146,12 +2167,12 @@ function Dashboard() {
                       {currentQIndex < levelData[currentLevel].length - 1 ? (
                         <button className="btn-action" onClick={() => setCurrentQIndex(prev => prev + 1)}>Next &rarr;</button>
                       ) : (
-                        <button className="btn-action" style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)' }} onClick={handleLevelComplete}>{currentLevel < 3 ? 'Evaluate & Advance 🚀' : 'Finish Final Level 🏆'}</button>
+                        <button className="btn-action" style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)' }} onClick={handleLevelComplete}>{activeExamType === 'aptitude' && currentLevel < 3 ? 'Evaluate & Advance 🚀' : 'Finish Final Exam 🏆'}</button>
                       )}
                     </div>
                   </div>
                   <div className="test-main-card">
-                      <h4 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Level Map</h4>
+                      <h4 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Exam Map</h4>
                       <div className="palette-grid">
                         {levelData[currentLevel].map((q, idx) => {
                           const isAnswered = !!userAnswers[q.id];
@@ -2164,23 +2185,44 @@ function Dashboard() {
               )}
 
               {aptitudeView === 'result' && (
-            <div className="level-transition-screen">
-                <div style={{ fontSize: '5rem', marginBottom: '10px' }}>
-                    {activeExamType === 'aptitude' ? (currentLevel >= 3 ? '🏆' : '💀') : '🏆'}
+                <div className="level-transition-screen">
+                    <div style={{ fontSize: '5rem', marginBottom: '10px' }}>
+                        {activeExamType === 'aptitude' ? (currentLevel >= 3 ? '🏆' : '💀') : '🏆'}
+                    </div>
+                    <div className="level-badge-large" style={{ fontSize: '3rem' }}>
+                        {activeExamType === 'aptitude' ? (currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER') : 'EXAM COMPLETED'}
+                    </div>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
+                        {activeExamType === 'aptitude' 
+                            ? <span>You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>
+                            : <span>You successfully completed the exam in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>}
+                    </p>
+                    <button className="btn-action" onClick={() => { setAptitudeView('hub'); setTestHistoryList([]); setTalHistory([]); setTechHistory([]); }}>Return to Assessment Center</button>
                 </div>
-                <div className="level-badge-large" style={{ fontSize: '3rem' }}>
-                    {activeExamType === 'aptitude' ? (currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER') : 'EXAM COMPLETED'}
+              )}
+
+              {viewingResult && (
+                <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
+                  <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
+                     <div className="modal-header-border" style={{ borderBottom: 'none' }}>
+                        <h3 style={{ margin: 0, color: 'var(--text-main)' }}>Exam Result</h3>
+                        <i className="ph ph-x" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setViewingResult(null)}></i>
+                     </div>
+                     <div style={{ fontSize: '4rem', marginBottom: '10px' }}>🏆</div>
+                     <h2 style={{ color: 'var(--accent-cyan)', margin: '0 0 5px 0', fontSize: '1.8rem' }}>{viewingResult.levelReached}</h2>
+                     <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '20px' }}>{viewingResult.date}</div>
+                     
+                     <div style={{ background: 'var(--input-bg)', padding: '15px', borderRadius: '12px', border: '1px solid var(--input-border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', textAlign: 'left' }}>
+                        <div><strong style={{ display:'block', fontSize:'0.75rem', color:'var(--text-muted)', textTransform:'uppercase' }}>Score</strong><span style={{ fontSize:'1.2rem', fontWeight:800, color:'#fff' }}>{viewingResult.score}</span></div>
+                        <div><strong style={{ display:'block', fontSize:'0.75rem', color:'var(--text-muted)', textTransform:'uppercase' }}>Percentage</strong><span style={{ fontSize:'1.2rem', fontWeight:800, color:'#10b981' }}>{viewingResult.percentage || 'N/A'}</span></div>
+                        <div style={{ gridColumn: '1 / -1' }}><strong style={{ display:'block', fontSize:'0.75rem', color:'var(--text-muted)', textTransform:'uppercase' }}>Time Taken</strong><span style={{ fontSize:'1.1rem', fontWeight:700, color:'#fff' }}>{viewingResult.timeTaken}</span></div>
+                     </div>
+                     <button className="btn-action" style={{ width: '100%', marginTop: '20px' }} onClick={() => setViewingResult(null)}>Close</button>
+                  </div>
                 </div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
-                    {activeExamType === 'aptitude' 
-                        ? <span>You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>
-                        : <span>You successfully completed the exam in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>}
-                </p>
-                <button className="btn-action" onClick={() => setAptitudeView('hub')}>Return to Assessment Center</button>
+              )}
             </div>
           )}
-        </div>
-      )}
 
           {activeTab === 'settings' && (
             <div className="animate-fade-in">
