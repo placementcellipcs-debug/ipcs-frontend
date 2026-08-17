@@ -1150,6 +1150,7 @@ function Dashboard() {
   const [pwdData, setPwdData] = useState({ current: '', newPwd: '', confirm: '' });
   const [pwdStatus, setPwdStatus] = useState(null);
   const [issueText, setIssueText] = useState('');
+  const [showSettingsPwd, setShowSettingsPwd] = useState(false);
   const [issueStatus, setIssueStatus] = useState(null);
 
   const [activeDrives, setActiveDrives] = useState([]);
@@ -2353,6 +2354,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                                </div>
                              </div>
                           </div>
+                          
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Use at least 8 characters with a mix of letters, numbers & symbols.</p>
                           <div style={{ display: 'flex', justifyContent: 'flex-end' }}><button className="btn-action" onClick={handlePasswordUpdate}>Update Password</button></div>
                           {pwdStatus && <div className={`alert alert-${pwdStatus.type}`} style={{marginTop: '10px'}}>{pwdStatus.message}</div>}
@@ -2649,7 +2651,15 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
           {/* SECURE MATERIAL VIEWER MODAL */}
           {materialModal && (
             <div className="report-modal-overlay material-modal-overlay" style={{ zIndex: 99999 }}>
-              <div className="material-viewer-card" onContextMenu={(e) => e.preventDefault()}>
+              <div 
+                className="material-viewer-card" 
+                onContextMenu={(e) => e.preventDefault()} 
+                style={{ 
+                    WebkitTouchCallout: 'none', /* iOS Safari long-press */
+                    WebkitUserSelect: 'none', /* Safari text selection */
+                    userSelect: 'none' /* Standard text selection */
+                }}
+              >
                 
                 <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-dark)', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
