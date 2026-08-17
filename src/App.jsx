@@ -1783,7 +1783,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     <div className="qa-btn" onClick={() => changeTab('events')}><div className="qa-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-calendar-blank"></i></div><div>Events & Drives</div></div>
                     <div className="qa-btn" onClick={() => setTpoModal(true)}><div className="qa-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><i className="ph-fill ph-address-book"></i></div><div>Contact TPO</div></div>
                     <div className="qa-btn" onClick={() => changeTab('profile')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-user"></i></div><div>Profile</div></div>
-                    <div className="qa-btn" onClick={() => changeTab('aptitude')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-brain"></i></div><div>Aptitude Test</div></div>
+                    <div className="qa-btn" onClick={() => changeTab('aptitude')}><div className="qa-icon" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-brain"></i></div><div>Assessment Center</div></div>
                   </div>
                 </div>
               </div>
