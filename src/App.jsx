@@ -1297,7 +1297,7 @@ function Dashboard() {
     }
   }, [activeTab, aptitudeView, fetchHubData]);
 
-  const handleStartExam = async (type, testNum = 1) => {
+const handleStartExam = async (type, testNum = 1, isReview = false) => {
     try {
       setActiveExamType(type);
       setSelectedTestNum(testNum);
@@ -1308,14 +1308,21 @@ function Dashboard() {
           res = await axios.post(`${API_BASE_URL}/api/dashboard/exam/start`, { type, course: user.course, testNum });
       }
 
-      if (res.data.success && res.data.levels && res.data.levels[1] && res.data.levels[1].length > 0) {
+      if (res.data.success && res.data.levels && res.data.levels[testNum] && res.data.levels[testNum].length > 0) {
         setLevelData(res.data.levels);
+        
+        if (isReview) {
+           setAptitudeView('review');
+           setViewingResult(null);
+           return;
+        }
+
         setTimeLimits(res.data.timeLimits);
-        setCurrentLevel(1);
+        setCurrentLevel(testNum); // Directly jump into Easy(1), Medium(2), or Hard(3)
         setCumulativeScore(0);
         setTotalQuestionsAsked(0);
         setGlobalTimeSpent(0);
-        triggerLevelTransition(1, res.data.timeLimits[1]);
+        triggerLevelTransition(testNum, res.data.timeLimits[testNum] || 15);
       } else {
         alert("Exam questions not configured for this selection yet.");
       }
@@ -1344,7 +1351,7 @@ function Dashboard() {
 
   const handleOptionSelect = (qId, optionKey) => {
     setUserAnswers({ ...userAnswers, [qId]: optionKey });
-    if (currentQIndex < levelData[currentLevel].length - 1) {
+    if (currentQIndex < (levelData[currentLevel]?.length || 1) - 1) {
         setTimeout(() => setCurrentQIndex(prev => prev + 1), 300);
     }
   };
@@ -1352,18 +1359,7 @@ function Dashboard() {
   const handleLevelComplete = () => {
     const currentQuestions = levelData[currentLevel] || [];
     if (currentQuestions.length === 0) return;
-    const answeredCount = Object.keys(userAnswers).length;
     setTotalQuestionsAsked(prev => prev + currentQuestions.length);
-    
-    if (activeExamType === 'aptitude') {
-        const passThreshold = Math.ceil(currentQuestions.length * 0.6);
-        if (answeredCount >= passThreshold && currentLevel < 3) {
-            const nextLevel = currentLevel + 1;
-            setCurrentLevel(nextLevel);
-            triggerLevelTransition(nextLevel, timeLimits[nextLevel]);
-            return;
-        }
-    }
     submitFinalScore(currentLevel);
   };
 
@@ -1371,27 +1367,22 @@ function Dashboard() {
     try {
       setAptitudeView('result');
       
-      // Calculate exact score based on CORRECT answers
       let correctAnswers = 0;
-      Object.keys(levelData).forEach(lvl => {
-          if (parseInt(lvl) <= finalLevel) {
-              levelData[lvl].forEach(q => {
-                  if (userAnswers[q.id] === q.answer) correctAnswers++;
-              });
-          }
-      });
+      if (levelData[finalLevel]) {
+          levelData[finalLevel].forEach(q => {
+              if (userAnswers[q.id] === q.answer) correctAnswers++;
+          });
+      }
       
-      // 2 points for Aptitude, 1 point for Tech/Talentino
       let score = correctAnswers * (activeExamType === 'aptitude' ? 2 : 1); 
 
       if (activeExamType === 'aptitude') {
-          await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, { email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, totalScore: score, totalQuestions: totalQuestionsAsked, finalLevel: finalLevel, totalTimeSeconds: globalTimeSpent });
+          let difficulty = finalLevel === 1 ? '1 (Easy)' : (finalLevel === 2 ? '2 (Medium)' : '3 (Hard)');
+          await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, { email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, totalScore: score, totalQuestions: totalQuestionsAsked, finalLevel: difficulty, totalTimeSeconds: globalTimeSpent });
       } else {
           await axios.post(`${API_BASE_URL}/api/dashboard/exam/submit`, { type: activeExamType, email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, course: user.course, totalScore: score, totalQuestions: totalQuestionsAsked, totalTimeSeconds: globalTimeSpent, testNum: selectedTestNum });
       }
-    } catch (e) {
-      console.log("Submit error", e);
-    }
+    } catch (e) { console.log("Submit error", e); }
   };
 
   useEffect(() => {
@@ -2068,10 +2059,14 @@ function Dashboard() {
                       
                       {/* 1. APTITUDE CARD */}
                       <div className="aptitude-lobby-card" style={{ background: 'radial-gradient(circle at top left, #1e1b4b, var(--card-bg))', display: 'flex', flexDirection: 'column' }}>
-                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Infinite Mode</div>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Select Difficulty</div>
                           <h2 style={{ margin: '10px 0', fontSize: '1.8rem', color: '#fff' }}>Aptitude Engine</h2>
-                          <p style={{ color: '#a5b4fc', margin: '0 0 2rem 0', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>Survive 3 increasingly difficult levels. Compete against students across all branches for the Leaderboard.</p>
-                          <button className="btn-action" style={{ width: '100%', background: 'linear-gradient(90deg, #3b82f6, #38bdf8)' }} onClick={() => handleStartExam('aptitude')}><i className="ph-bold ph-play"></i> Enter Arena</button>
+                          <p style={{ color: '#a5b4fc', margin: '0 0 1.5rem 0', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>Choose your challenge level. Compete against students across all branches for the Leaderboard.</p>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                              <button className="btn-action" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid #38bdf8' }} onClick={() => handleStartExam('aptitude', 1)}>Easy Mode</button>
+                              <button className="btn-action" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid #f59e0b' }} onClick={() => handleStartExam('aptitude', 2)}>Medium Mode</button>
+                              <button className="btn-action" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid #ef4444' }} onClick={() => handleStartExam('aptitude', 3)}>Hard Mode</button>
+                          </div>
                       </div>
 
                       {/* 2. TALENTINO TESTS CARD */}
@@ -2107,7 +2102,7 @@ function Dashboard() {
                           ) : techHistory.length > 0 ? (
                               <button className="btn-action" style={{ width: '100%', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#f59e0b' }} onClick={() => setViewingResult(techHistory[0])}>✅ Completed: View Result</button>
                           ) : (
-                              <button className="btn-action" style={{ width: '100%', background: '#f59e0b' }} onClick={() => handleStartExam('technical')}><i className="ph-bold ph-pencil-simple"></i> Start Technical Exam</button>
+                              <button className="btn-action" style={{ width: '100%', background: '#f59e0b' }} onClick={() => handleStartExam('technical', 1)}><i className="ph-bold ph-pencil-simple"></i> Start Technical Exam</button>
                           )}
                       </div>
                    </div>
@@ -2129,21 +2124,63 @@ function Dashboard() {
                 </div>
               )}
 
-              // ... existing code ...
               {aptitudeView === 'transition' && (
                 <div className="level-transition-screen">
                     <div style={{ fontSize: '1.2rem', color: 'var(--accent-cyan)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '10px' }}>Preparing Exam Engine</div>
                     <div className="level-badge-large">
-                        {activeExamType === 'aptitude' ? `LEVEL ${currentLevel}` : activeExamType === 'talentino' ? `TEST ${selectedTestNum}` : `FINAL ASSESSMENT`}
+                        {activeExamType === 'aptitude' ? (currentLevel === 1 ? 'EASY MODE' : currentLevel === 2 ? 'MEDIUM MODE' : 'HARD MODE') : activeExamType === 'talentino' ? `TEST ${selectedTestNum}` : `FINAL ASSESSMENT`}
                     </div>
                     <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
                         {activeExamType === 'aptitude' 
-                            ? (currentLevel === 1 ? "Warming up... Basic Concepts." : currentLevel === 2 ? "Things are heating up... Intermediate Concepts." : "Final Boss... Advanced Concepts.")
+                            ? "Compete for the highest score on the Leaderboard!"
                             : activeExamType === 'talentino' 
                                 ? `Welcome to Talentino Test ${selectedTestNum}. Good luck!` 
                                 : `Welcome to your Final Technical Assessment.`}
                     </p>
                     <div style={{ marginTop: '2rem', width: '60px', height: '60px', borderRadius: '50%', borderTop: '4px solid var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></div>
+                </div>
+              )}
+
+              {aptitudeView === 'live' && levelData[currentLevel] && (
+                <div className="test-layout-grid">
+                  <div className="test-main-card" style={{ animation: 'borderPulse 3s infinite' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                      <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>
+                          {activeExamType === 'aptitude' ? (currentLevel === 1 ? 'EASY' : currentLevel === 2 ? 'MEDIUM' : 'HARD') : activeExamType === 'talentino' ? `Test ${selectedTestNum}` : 'Final Exam'} • {levelData[currentLevel][currentQIndex]?.category}
+                      </span>
+                      <div className={`test-timer-badge ${testTimeLeft <= 60 ? 'warning' : ''}`}><i className="ph-bold ph-timer"></i>{Math.floor(testTimeLeft / 60).toString().padStart(2, '0')}:{(testTimeLeft % 60).toString().padStart(2, '0')}</div>
+                    </div>
+                    <div className="game-progress-container"><div className="game-progress-fill" style={{ width: `${((currentQIndex + 1) / levelData[currentLevel].length) * 100}%` }}></div></div>
+                    <h3 style={{ fontSize: '1.3rem', lineHeight: 1.5, marginBottom: '2rem', color: 'var(--text-main)' }}>{levelData[currentLevel][currentQIndex]?.question}</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {Object.entries(levelData[currentLevel][currentQIndex]?.options || {}).map(([optKey, optText]) => {
+                        const isSelected = userAnswers[levelData[currentLevel][currentQIndex].id] === optKey;
+                        return (
+                          <div key={optKey} className={`option-select-box ${isSelected ? 'selected' : ''}`} onClick={() => handleOptionSelect(levelData[currentLevel][currentQIndex].id, optKey)}>
+                            <div className="option-circle">{optKey}</div><span style={{ fontSize: '1rem', fontWeight: 600 }}>{optText}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--card-border)' }}>
+                      <button className="btn-cancel" disabled={currentQIndex === 0} onClick={() => setCurrentQIndex(prev => prev - 1)}>&larr; Prev</button>
+                      {currentQIndex < levelData[currentLevel].length - 1 ? (
+                        <button className="btn-action" onClick={() => setCurrentQIndex(prev => prev + 1)}>Next &rarr;</button>
+                      ) : (
+                        <button className="btn-action" style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)' }} onClick={handleLevelComplete}>Finish Exam 🏆</button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="test-main-card">
+                      <h4 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Exam Map</h4>
+                      <div className="palette-grid">
+                        {levelData[currentLevel].map((q, idx) => {
+                          const isAnswered = !!userAnswers[q.id];
+                          return ( <div key={q.id} className={`palette-btn ${currentQIndex === idx ? 'active' : ''} ${isAnswered ? 'answered' : ''}`} onClick={() => setCurrentQIndex(idx)}>{idx + 1}</div> );
+                        })}
+                      </div>
+                      <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel)}>Surrender / End Test</button>
+                  </div>
                 </div>
               )}
 
@@ -2205,7 +2242,6 @@ function Dashboard() {
                                 : <span>You successfully completed the exam in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>}
                         </p>
                         
-                        {/* Calculate Immediate Score */}
                         {(() => {
                             let correct = 0;
                             (levelData[1] || []).forEach(q => { if(userAnswers[q.id] === q.answer) correct++; });
@@ -2217,7 +2253,6 @@ function Dashboard() {
                         })()}
                     </div>
 
-                    {/* DETAILED REVIEW FOR TALENTINO & TECHNICAL ONLY */}
                     {activeExamType !== 'aptitude' && (
                         <div style={{ marginBottom: '2rem' }}>
                             <h3 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="ph-fill ph-list-checks" style={{color: 'var(--accent-cyan)'}}></i> Detailed Performance Review</h3>
@@ -2257,6 +2292,44 @@ function Dashboard() {
                 </div>
               )}
 
+              {/* NEW STUDY SHEET VIEW (Answer Key from Hub) */}
+              {aptitudeView === 'review' && (
+                <div className="test-main-card" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', animation: 'fadeInUp 0.5s ease forwards' }}>
+                    <div style={{ textAlign: 'center', borderBottom: '1px solid var(--card-border)', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
+                        <h2 style={{ color: 'var(--accent-cyan)', margin: '0 0 10px 0', fontSize: '2rem' }}>Study Sheet & Answer Key</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', margin: 0 }}>Review the correct answers and explanations for this module.</p>
+                    </div>
+
+                    <div style={{ marginBottom: '2rem' }}>
+                        {(levelData[1] || []).map((q, i) => (
+                            <div key={q.id} style={{ background: 'var(--bg-dark)', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.2rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                                <div style={{ fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                                    Q{i + 1}. {q.question}
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '1rem' }}>
+                                    {Object.entries(q.options || {}).map(([k, v]) => {
+                                        let bg = 'var(--input-bg)'; let color = 'var(--text-muted)'; let border = '1px solid var(--input-border)';
+                                        if (k === q.answer) { bg = 'rgba(16, 185, 129, 0.1)'; color = '#10b981'; border = '1px solid #10b981'; }
+                                        return (
+                                            <div key={k} style={{ padding: '10px', borderRadius: '8px', background: bg, color: color, border: border, fontSize: '0.85rem', fontWeight: 600 }}>
+                                                {k}) {v}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                {q.explanation && (
+                                    <div style={{ background: 'rgba(56, 189, 248, 0.05)', padding: '12px', borderRadius: '8px', borderLeft: '3px solid var(--accent-cyan)', fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
+                                        <strong style={{ color: 'var(--accent-cyan)', display: 'block', marginBottom: '4px' }}>Explanation:</strong> {q.explanation}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <button className="btn-action" onClick={() => setAptitudeView('hub')} style={{ width: '100%', padding: '1.2rem', fontSize: '1rem' }}>Return to Assessment Center</button>
+                </div>
+              )}
+
               {viewingResult && (
                 <div className="report-modal-overlay" style={{ zIndex: 99999 }}>
                   <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
@@ -2273,7 +2346,18 @@ function Dashboard() {
                         <div><strong style={{ display:'block', fontSize:'0.75rem', color:'var(--text-muted)', textTransform:'uppercase' }}>Percentage</strong><span style={{ fontSize:'1.2rem', fontWeight:800, color:'#10b981' }}>{viewingResult.percentage || 'N/A'}</span></div>
                         <div style={{ gridColumn: '1 / -1' }}><strong style={{ display:'block', fontSize:'0.75rem', color:'var(--text-muted)', textTransform:'uppercase' }}>Time Taken</strong><span style={{ fontSize:'1.1rem', fontWeight:700, color:'#fff' }}>{viewingResult.timeTaken}</span></div>
                      </div>
-                     <button className="btn-action" style={{ width: '100%', marginTop: '20px' }} onClick={() => setViewingResult(null)}>Close</button>
+                     
+                     {(viewingResult.type === 'talentino' || viewingResult.type === 'technical') && (
+                         <button className="btn-action" style={{ width: '100%', marginTop: '20px', background: '#3b82f6' }} 
+                            onClick={() => {
+                                const tNum = viewingResult.levelReached.includes('Test') ? parseInt(viewingResult.levelReached.replace('Test ', '')) : 1;
+                                handleStartExam(viewingResult.type, tNum, true);
+                            }}>
+                            <i className="ph-bold ph-book-open"></i> Review Questions & Answers
+                         </button>
+                     )}
+                     
+                     <button className="btn-action" style={{ width: '100%', marginTop: '10px', background: '#334155', color: '#fff' }} onClick={() => setViewingResult(null)}>Close</button>
                   </div>
                 </div>
               )}
