@@ -2682,26 +2682,12 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                   )}
 
                   {pdfBlobUrl && !isPdfLoading && (
-                    <>
-                      <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
-                      
-                      {/* Left Arrow */}
-                      <div style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', background: 'rgba(0,0,0,0.5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10, pointerEvents: 'none' }}>
-                         <i className="ph ph-caret-left" style={{ color: '#fff', fontSize: '1.5rem' }}></i>
-                      </div>
-
                       <iframe
                         src={pdfBlobUrl}
                         title={materialModal.title}
-                        style={{ width: '100%', height: '100%', border: 'none' }}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
                         allowFullScreen={true}
                       ></iframe>
-
-                      {/* Right Arrow */}
-                      <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', background: 'rgba(0,0,0,0.5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10, pointerEvents: 'none' }}>
-                         <i className="ph ph-caret-right" style={{ color: '#fff', fontSize: '1.5rem' }}></i>
-                      </div>
-                    </>
                   )}
                 </div>
               </div>
