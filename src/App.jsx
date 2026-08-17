@@ -2140,50 +2140,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     <div style={{ marginTop: '2rem', width: '60px', height: '60px', borderRadius: '50%', borderTop: '4px solid var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></div>
                 </div>
               )}
-
-              {aptitudeView === 'live' && levelData[currentLevel] && (
-                <div className="test-layout-grid">
-                  <div className="test-main-card" style={{ animation: 'borderPulse 3s infinite' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                      <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>
-                          {activeExamType === 'aptitude' ? (currentLevel === 1 ? 'EASY' : currentLevel === 2 ? 'MEDIUM' : 'HARD') : activeExamType === 'talentino' ? `Test ${selectedTestNum}` : 'Final Exam'} • {levelData[currentLevel][currentQIndex]?.category}
-                      </span>
-                      <div className={`test-timer-badge ${testTimeLeft <= 60 ? 'warning' : ''}`}><i className="ph-bold ph-timer"></i>{Math.floor(testTimeLeft / 60).toString().padStart(2, '0')}:{(testTimeLeft % 60).toString().padStart(2, '0')}</div>
-                    </div>
-                    <div className="game-progress-container"><div className="game-progress-fill" style={{ width: `${((currentQIndex + 1) / levelData[currentLevel].length) * 100}%` }}></div></div>
-                    <h3 style={{ fontSize: '1.3rem', lineHeight: 1.5, marginBottom: '2rem', color: 'var(--text-main)' }}>{levelData[currentLevel][currentQIndex]?.question}</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      {Object.entries(levelData[currentLevel][currentQIndex]?.options || {}).map(([optKey, optText]) => {
-                        const isSelected = userAnswers[levelData[currentLevel][currentQIndex].id] === optKey;
-                        return (
-                          <div key={optKey} className={`option-select-box ${isSelected ? 'selected' : ''}`} onClick={() => handleOptionSelect(levelData[currentLevel][currentQIndex].id, optKey)}>
-                            <div className="option-circle">{optKey}</div><span style={{ fontSize: '1rem', fontWeight: 600 }}>{optText}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--card-border)' }}>
-                      <button className="btn-cancel" disabled={currentQIndex === 0} onClick={() => setCurrentQIndex(prev => prev - 1)}>&larr; Prev</button>
-                      {currentQIndex < levelData[currentLevel].length - 1 ? (
-                        <button className="btn-action" onClick={() => setCurrentQIndex(prev => prev + 1)}>Next &rarr;</button>
-                      ) : (
-                        <button className="btn-action" style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)' }} onClick={handleLevelComplete}>Finish Exam 🏆</button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="test-main-card">
-                      <h4 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Exam Map</h4>
-                      <div className="palette-grid">
-                        {levelData[currentLevel].map((q, idx) => {
-                          const isAnswered = !!userAnswers[q.id];
-                          return ( <div key={q.id} className={`palette-btn ${currentQIndex === idx ? 'active' : ''} ${isAnswered ? 'answered' : ''}`} onClick={() => setCurrentQIndex(idx)}>{idx + 1}</div> );
-                        })}
-                      </div>
-                      <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel)}>Surrender / End Test</button>
-                  </div>
-                </div>
-              )}
-
+              
               {aptitudeView === 'live' && levelData[currentLevel] && (
                 <div className="test-layout-grid">
                   <div className="test-main-card" style={{ animation: 'borderPulse 3s infinite' }}>
