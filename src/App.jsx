@@ -1083,11 +1083,22 @@ function Signup() {
   );
 }
 
+const parseSafeDate = (dateStr) => {
+  if (!dateStr || dateStr === "N/A" || dateStr === "undefined" || String(dateStr).toUpperCase() === "TBA") return null;
+  let cleanStr = String(dateStr).replace(/,/g, '').replace(/\s+/g, ' ').trim();
+  let parts = cleanStr.split(/[-/]/);
+  if (parts.length === 3) {
+     if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
+     return new Date(parts[2], parts[1]-1, parts[0]);
+  }
+  let d = new Date(cleanStr);
+  return isNaN(d) ? null : d;
+};
+
 const isEventExpired = (dateStr) => {
-  if (!dateStr || dateStr === "TBA") return false;
-  const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
-  const eventDate = new Date(cleanStr);
-  if (isNaN(eventDate.getTime())) return false;
+  if (!dateStr || String(dateStr).toUpperCase() === "TBA") return false;
+  const eventDate = parseSafeDate(dateStr);
+  if (!eventDate) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return eventDate < today;
@@ -1264,20 +1275,30 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    if (activeTab === 'aptitude' && aptitudeView === 'lobby' && user?.email) {
-      axios.get(`${API_BASE_URL}/api/dashboard/aptitude/leaderboard`)
-        .then(res => { if (res.data.success) setLeaderboard(res.data.leaderboard); })
-        .catch(() => {});
-      axios.post(`${API_BASE_URL}/api/dashboard/aptitude/history`, { email: user.email })
-        .then(res => { if (res.data.success) setTestHistoryList(res.data.history); })
-        .catch(() => {});
+    if (activeTab === 'aptitude' && aptitudeView === 'hub' && user?.email) {
+      axios.get(`${API_BASE_URL}/api/dashboard/aptitude/leaderboard`).then(res => { if (res.data.success) setLeaderboard(res.data.leaderboard); }).catch(() => {});
+      axios.post(`${API_BASE_URL}/api/dashboard/aptitude/history`, { email: user.email }).then(res => { 
+          if (res.data.success) {
+              setTestHistoryList(res.data.history.filter(h => !h.levelReached?.includes("Test")));
+              setTalHistory(res.data.history.filter(h => h.levelReached?.includes("Test")));
+              setTechHistory(res.data.history.filter(h => h.levelReached === user.course));
+          }
+      }).catch(() => {});
     }
   }, [activeTab, aptitudeView, user?.email]);
 
-  const handleStartAptitude = async () => {
+  const handleStartExam = async (type, testNum = 1) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/start`);
-      if (res.data.success) {
+      setActiveExamType(type);
+      setSelectedTestNum(testNum);
+      let res;
+      if (type === 'aptitude') {
+          res = await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/start`);
+      } else {
+          res = await axios.post(`${API_BASE_URL}/api/dashboard/exam/start`, { type, course: user.course, testNum });
+      }
+
+      if (res.data.success && res.data.levels[1].length > 0) {
         setLevelData(res.data.levels);
         setTimeLimits(res.data.timeLimits);
         setCurrentLevel(1);
@@ -1286,7 +1307,7 @@ function Dashboard() {
         setGlobalTimeSpent(0);
         triggerLevelTransition(1, res.data.timeLimits[1]);
       } else {
-        alert("Failed to load questions.");
+        alert("Exam questions not configured for this selection yet.");
       }
     } catch (err) {
       alert("Error contacting the test engine.");
@@ -1323,24 +1344,30 @@ function Dashboard() {
     if (currentQuestions.length === 0) return;
     const answeredCount = Object.keys(userAnswers).length;
     setTotalQuestionsAsked(prev => prev + currentQuestions.length);
-    const passThreshold = Math.ceil(currentQuestions.length * 0.6);
-    if (answeredCount >= passThreshold && currentLevel < 3) {
-        const nextLevel = currentLevel + 1;
-        setCurrentLevel(nextLevel);
-        triggerLevelTransition(nextLevel, timeLimits[nextLevel]);
-    } else {
-        submitFinalScore(currentLevel);
+    
+    // For Aptitude, requires 60% to move to level 2 or 3. Talentino and Tech are only 1 Level.
+    if (activeExamType === 'aptitude') {
+        const passThreshold = Math.ceil(currentQuestions.length * 0.6);
+        if (answeredCount >= passThreshold && currentLevel < 3) {
+            const nextLevel = currentLevel + 1;
+            setCurrentLevel(nextLevel);
+            triggerLevelTransition(nextLevel, timeLimits[nextLevel]);
+            return;
+        }
     }
+    submitFinalScore(currentLevel);
   };
 
   const submitFinalScore = async (finalLevel) => {
     try {
       setAptitudeView('result');
-      await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, {
-        email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch,
-        totalScore: Object.keys(userAnswers).length * currentLevel * 2, 
-        totalQuestions: totalQuestionsAsked, finalLevel: finalLevel, totalTimeSeconds: globalTimeSpent
-      });
+      let score = Object.keys(userAnswers).length * currentLevel * 2; // Simple scoring
+
+      if (activeExamType === 'aptitude') {
+          await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, { email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, totalScore: score, totalQuestions: totalQuestionsAsked, finalLevel: finalLevel, totalTimeSeconds: globalTimeSpent });
+      } else {
+          await axios.post(`${API_BASE_URL}/api/dashboard/exam/submit`, { type: activeExamType, email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, course: user.course, totalScore: score, totalQuestions: totalQuestionsAsked, totalTimeSeconds: globalTimeSpent, testNum: selectedTestNum });
+      }
     } catch (e) {
       console.log("Submit error", e);
     }
@@ -2009,22 +2036,65 @@ function Dashboard() {
 
           {activeTab === 'aptitude' && (
             <div className="animate-fade-in">
-              {aptitudeView === 'lobby' && (
-                <div className="test-layout-grid">
-                  <div>
-                      <div className="aptitude-lobby-card" style={{ marginBottom: '1.5rem', background: 'radial-gradient(circle at top left, #1e1b4b, var(--card-bg))' }}>
-                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Pro Assessment Engine</div>
-                          <h2 style={{ margin: '10px 0', fontSize: '2.5rem', color: '#fff', textShadow: '0 4px 15px rgba(0,0,0,0.5)' }}>Level Up Your Skills.</h2>
-                          <p style={{ color: '#a5b4fc', margin: '0 0 2rem 0', fontSize: '1rem', lineHeight: '1.6' }}>Survive 3 increasingly difficult levels. Compete against students across all branches and secure your spot on the Leaderboard.</p>
-                          <button className="btn-action" style={{ padding: '1.2rem 2.5rem', fontSize: '1.1rem', background: 'linear-gradient(90deg, #3b82f6, #38bdf8)', boxShadow: '0 10px 25px rgba(56, 189, 248, 0.4)', borderRadius: '30px' }} onClick={handleStartAptitude}><i className="ph-bold ph-play"></i> Enter the Arena</button>
+              {aptitudeView === 'hub' && (
+                <div>
+                   <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                     <h2 style={{ margin: '0 0 5px 0', fontSize: '2rem', fontWeight: 800 }}>Assessment Center</h2>
+                     <p style={{ color: 'var(--text-muted)', fontSize: '1rem', margin: 0 }}>Select an exam module below to begin.</p>
+                   </div>
+
+                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+                      
+                      {/* 1. APTITUDE CARD */}
+                      <div className="aptitude-lobby-card" style={{ background: 'radial-gradient(circle at top left, #1e1b4b, var(--card-bg))', display: 'flex', flexDirection: 'column' }}>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Infinite Mode</div>
+                          <h2 style={{ margin: '10px 0', fontSize: '1.8rem', color: '#fff' }}>Aptitude Engine</h2>
+                          <p style={{ color: '#a5b4fc', margin: '0 0 2rem 0', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>Survive 3 increasingly difficult levels. Compete against students across all branches for the Leaderboard.</p>
+                          <button className="btn-action" style={{ width: '100%', background: 'linear-gradient(90deg, #3b82f6, #38bdf8)' }} onClick={() => handleStartExam('aptitude')}><i className="ph-bold ph-play"></i> Enter Arena</button>
                       </div>
-                      <div className="stats-row">
-                          <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}><i className="ph-fill ph-sword"></i></div><div><div className="stat-num">3</div><div className="stat-label">Levels</div></div></div>
-                          <div className="stat-card-new"><div className="stat-icon-wrapper" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}><i className="ph-fill ph-percent"></i></div><div><div className="stat-num">60%</div><div className="stat-label">To Advance</div></div></div>
+
+                      {/* 2. TALENTINO TESTS CARD */}
+                      <div className="aptitude-lobby-card" style={{ borderTop: '4px solid #10b981', display: 'flex', flexDirection: 'column' }}>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#10b981', letterSpacing: '1px', textTransform: 'uppercase' }}>Sequential Exams</div>
+                          <h2 style={{ margin: '10px 0', fontSize: '1.8rem', color: '#fff' }}>Talentino Tests</h2>
+                          <p style={{ color: 'var(--text-muted)', margin: '0 0 1.5rem 0', fontSize: '0.9rem', lineHeight: '1.6' }}>Complete these 3 tests progressively. Once finished, they will lock permanently.</p>
+                          
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                             {[1, 2, 3].map(num => {
+                                const result = talHistory.find(h => h.levelReached === `Test ${num}`);
+                                const isUnlocked = num === 1 || talHistory.find(h => h.levelReached === `Test ${num - 1}`);
+                                
+                                if (result) {
+                                   return <div key={num} style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '12px', borderRadius: '10px', color: '#10b981', display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}><span>Test {num}</span> <span>✅ {result.score} pts</span></div>
+                                } else if (isUnlocked) {
+                                   return <button key={num} className="btn-action" style={{ background: 'var(--hover-bg)', color: '#fff', border: '1px solid var(--accent-cyan)', justifyContent: 'space-between' }} onClick={() => handleStartExam('talentino', num)}><span>Test {num}</span> <span>Start &rarr;</span></button>
+                                } else {
+                                   return <div key={num} style={{ background: 'var(--bg-dark)', padding: '12px', borderRadius: '10px', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', opacity: 0.6 }}><span>Test {num}</span> <span><i className="ph-fill ph-lock-key"></i> Locked</span></div>
+                                }
+                             })}
+                          </div>
                       </div>
-                  </div>
-                  <div className="leaderboard-card">
-                      <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b' }}><i className="ph-fill ph-trophy"></i> Top 10 Hall of Fame</h3>
+
+                      {/* 3. TECHNICAL EXAM CARD */}
+                      <div className="aptitude-lobby-card" style={{ borderTop: '4px solid #f59e0b', display: 'flex', flexDirection: 'column' }}>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#f59e0b', letterSpacing: '1px', textTransform: 'uppercase' }}>Final Assessment</div>
+                          <h2 style={{ margin: '10px 0', fontSize: '1.8rem', color: '#fff' }}>Technical Exam</h2>
+                          <p style={{ color: 'var(--text-muted)', margin: '0 0 1.5rem 0', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>Domain-specific test for <strong>{user.course}</strong>.</p>
+                          
+                          {(!user.techExamAccess || user.techExamAccess.toString().trim().toLowerCase() !== 'yes') ? (
+                              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '12px', borderRadius: '10px', color: '#f87171', textAlign: 'center', fontSize: '0.85rem' }}><i className="ph-fill ph-lock-key"></i> Access Denied by Admin</div>
+                          ) : techHistory.length > 0 ? (
+                              <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '12px', borderRadius: '10px', color: '#f59e0b', textAlign: 'center', fontWeight: 700 }}>✅ Completed: {techHistory[0].score} pts</div>
+                          ) : (
+                              <button className="btn-action" style={{ width: '100%', background: '#f59e0b' }} onClick={() => handleStartExam('technical')}><i className="ph-bold ph-pencil-simple"></i> Start Technical Exam</button>
+                          )}
+                      </div>
+
+                   </div>
+
+                   {/* Keep Leaderboard visible for Aptitude */}
+                   <div className="leaderboard-card" style={{ maxWidth: '800px', margin: '0 auto' }}>
+                      <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b' }}><i className="ph-fill ph-trophy"></i> Aptitude Hall of Fame</h3>
                       {leaderboard.length === 0 ? ( <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Arena is empty. Be the first to play!</div> ) : (
                           leaderboard.map((player, idx) => {
                               let rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'rank-other';
@@ -2036,7 +2106,7 @@ function Dashboard() {
                               );
                           })
                       )}
-                  </div>
+                   </div>
                 </div>
               )}
 
