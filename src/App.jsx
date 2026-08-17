@@ -1084,9 +1084,10 @@ function Signup() {
 }
 
 const isEventExpired = (dateStr) => {
-  if (!dateStr || String(dateStr).toUpperCase() === "TBA") return false;
-  const eventDate = parseSafeDate(dateStr);
-  if (!eventDate) return false;
+  if (!dateStr || dateStr === "TBA") return false;
+  const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+  const eventDate = new Date(cleanStr);
+  if (isNaN(eventDate.getTime())) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return eventDate < today;
