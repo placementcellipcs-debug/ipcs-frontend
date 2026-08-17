@@ -121,11 +121,11 @@ const GlobalStyle = () => {
       .form-footer-bar { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid var(--card-border); }
       
       @keyframes spin { 100% { transform: rotate(360deg); } }
-      @keyframes fadeInReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeInReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+      @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: none; } }
 
       /* --- MODAL STYLES --- */
-      .report-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(6px); z-index: 1100; display: flex; justify-content: center; align-items: center; padding: 20px; transition: opacity 0.3s; }
+      .report-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px); z-index: 999999; display: flex; justify-content: center; align-items: center; padding: 20px; transition: opacity 0.3s; }
       .report-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; animation: fadeInReveal 0.3s ease;}
       .modal-header-border { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.8rem; }
       .tnc-content-box { height: 350px; overflow-y: auto; font-size: 0.85rem; color: var(--text-main); background: var(--input-bg); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--input-border); line-height: 1.7; position: relative; }
@@ -538,11 +538,13 @@ const GlobalStyle = () => {
         
         .report-modal-overlay.material-modal-overlay { padding: 0 !important; }
         .material-viewer-card {
-          width: 100vw !important;
-          height: 100dvh !important;
-          max-height: 100dvh !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          height: 100% !important;
+          max-height: 100% !important;
           border-radius: 0 !important;
           border: none !important;
+          margin: 0 !important;
         }
       }
       @media (min-width: 1800px) {
