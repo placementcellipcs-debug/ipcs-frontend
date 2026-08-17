@@ -536,17 +536,24 @@ const GlobalStyle = () => {
         .notif-dropdown { position: fixed; top: 65px; left: 5%; right: 5%; width: 90%; }
         .doc-box { flex-direction: column; align-items: flex-start; gap: 1rem; }
         
-        .report-modal-overlay.material-modal-overlay { padding: 0 !important; }
+        /* FORCE FULL SCREEN FOR MATERIAL VIEWER ON MOBILE */
+        .report-modal-overlay.material-modal-overlay { 
+          padding: 0 !important; 
+          background: #000 !important; 
+          display: block !important; 
+        }
         .material-viewer-card {
-          width: 100% !important;
-          max-width: 100% !important;
-          height: 100% !important;
-          max-height: 100% !important;
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          max-width: 100vw !important;
+          height: 100dvh !important;
+          max-height: 100dvh !important;
           border-radius: 0 !important;
           border: none !important;
           margin: 0 !important;
         }
-      }
       @media (min-width: 1800px) {
         .dashboard-content, .landing-grid { max-width: 1600px; }
         body { font-size: 17px; }
@@ -1186,6 +1193,7 @@ function Dashboard() {
   const [materialModal, setMaterialModal] = useState(null);
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const [isSurrendered, setIsSurrendered] = useState(false);
   const [presentationSlide, setPresentationSlide] = useState(1);
 
   useEffect(() => {
@@ -1340,6 +1348,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
     setUserAnswers({});
     setCurrentQIndex(0);
     setTestTimeLeft(timeMins * 60);
+    setIsSurrendered(false); // Reset surrender flag
     setAptitudeView('transition');
     setTimeout(() => { setAptitudeView('live'); }, 3000);
   };
@@ -1362,30 +1371,29 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
   };
 
   const handleLevelComplete = () => {
-    const currentQuestions = levelData[currentLevel] || [];
-    if (currentQuestions.length === 0) return;
-    setTotalQuestionsAsked(prev => prev + currentQuestions.length);
-    submitFinalScore(currentLevel);
+    submitFinalScore(currentLevel, false);
   };
 
-  const submitFinalScore = async (finalLevel) => {
+  const submitFinalScore = async (finalLevel, surrenderFlag = false) => {
     try {
+      setIsSurrendered(surrenderFlag); // Flag if they quit early
       setAptitudeView('result');
       
+      const currentQuestions = levelData[finalLevel] || [];
+      const totalQs = currentQuestions.length;
+      
       let correctAnswers = 0;
-      if (levelData[finalLevel]) {
-          levelData[finalLevel].forEach(q => {
-              if (userAnswers[q.id] === q.answer) correctAnswers++;
-          });
-      }
+      currentQuestions.forEach(q => {
+          if (userAnswers[q.id] === q.answer) correctAnswers++;
+      });
       
       let score = correctAnswers * (activeExamType === 'aptitude' ? 2 : 1); 
 
       if (activeExamType === 'aptitude') {
           let difficulty = finalLevel === 1 ? '1 (Easy)' : (finalLevel === 2 ? '2 (Medium)' : '3 (Hard)');
-          await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, { email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, totalScore: score, totalQuestions: totalQuestionsAsked, finalLevel: difficulty, totalTimeSeconds: globalTimeSpent });
+          await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, { email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, totalScore: score, totalQuestions: totalQs, finalLevel: difficulty, totalTimeSeconds: globalTimeSpent });
       } else {
-          await axios.post(`${API_BASE_URL}/api/dashboard/exam/submit`, { type: activeExamType, email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, course: user.course, totalScore: score, totalQuestions: totalQuestionsAsked, totalTimeSeconds: globalTimeSpent, testNum: selectedTestNum });
+          await axios.post(`${API_BASE_URL}/api/dashboard/exam/submit`, { type: activeExamType, email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, course: user.course, totalScore: score, totalQuestions: totalQs, totalTimeSeconds: globalTimeSpent, testNum: selectedTestNum });
       }
     } catch (e) { console.log("Submit error", e); }
   };
@@ -2184,8 +2192,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                           return ( <div key={q.id} className={`palette-btn ${currentQIndex === idx ? 'active' : ''} ${isAnswered ? 'answered' : ''}`} onClick={() => setCurrentQIndex(idx)}>{idx + 1}</div> );
                         })}
                       </div>
-                      <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel)}>Surrender / End Test</button>
-                  </div>
+                      <button className="btn-action" style={{ width: '100%', marginTop: '1.5rem', background: '#ef4444' }} onClick={() => submitFinalScore(currentLevel, true)}>Surrender / End Test</button>
                 </div>
               )}
 
@@ -2193,23 +2200,26 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                 <div className="test-main-card" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', animation: 'fadeInUp 0.5s ease forwards' }}>
                     <div style={{ textAlign: 'center', borderBottom: '1px solid var(--card-border)', paddingBottom: '2rem', marginBottom: '2rem' }}>
                         <div style={{ fontSize: '5rem', marginBottom: '10px' }}>
-                            {activeExamType === 'aptitude' ? (currentLevel >= 3 ? '🏆' : '💀') : '🏆'}
+                            {isSurrendered ? '🏳️' : (activeExamType === 'aptitude' ? (currentLevel >= 3 ? '🏆' : '💀') : '🏆')}
                         </div>
-                        <div className="level-badge-large" style={{ fontSize: '2.8rem' }}>
-                            {activeExamType === 'aptitude' ? (currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER') : 'EXAM COMPLETED'}
+                        <div className="level-badge-large" style={{ fontSize: '2.8rem', background: isSurrendered ? 'linear-gradient(135deg, #94a3b8, #cbd5e1)' : '' }}>
+                            {isSurrendered ? 'TEST TERMINATED' : (activeExamType === 'aptitude' ? (currentLevel >= 3 ? 'VICTORY!' : 'GAME OVER') : 'EXAM COMPLETED')}
                         </div>
                         <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', margin: '10px 0' }}>
                             {activeExamType === 'aptitude' 
                                 ? <span>You reached <strong style={{color: 'var(--accent-cyan)'}}>Level {currentLevel}</strong> in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>
-                                : <span>You successfully completed the exam in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>}
+                                : <span>You completed the exam in {Math.floor(globalTimeSpent/60)}m {globalTimeSpent%60}s.</span>}
                         </p>
                         
                         {(() => {
+                            const currentQuestions = levelData[currentLevel] || [];
                             let correct = 0;
-                            (levelData[1] || []).forEach(q => { if(userAnswers[q.id] === q.answer) correct++; });
+                            currentQuestions.forEach(q => { if(userAnswers[q.id] === q.answer) correct++; });
+                            const multiplier = activeExamType === 'aptitude' ? 2 : 1;
+                            
                             return (
                                 <div style={{ display: 'inline-block', background: 'var(--input-bg)', padding: '10px 20px', borderRadius: '10px', fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent-cyan)', border: '1px solid var(--input-border)' }}>
-                                    Final Score: {correct} / {(levelData[1] || []).length}
+                                    Final Score: {correct * multiplier} / {currentQuestions.length * multiplier}
                                 </div>
                             );
                         })()}
@@ -2218,7 +2228,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     {activeExamType !== 'aptitude' && (
                         <div style={{ marginBottom: '2rem' }}>
                             <h3 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="ph-fill ph-list-checks" style={{color: 'var(--accent-cyan)'}}></i> Detailed Performance Review</h3>
-                            {(levelData[1] || []).map((q, i) => {
+                            {(levelData[currentLevel] || []).map((q, i) => {
                                 const uAns = userAnswers[q.id];
                                 const isCorrect = uAns === q.answer;
                                 return (
@@ -2251,6 +2261,44 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     )}
 
                     <button className="btn-action" onClick={() => { setAptitudeView('hub'); fetchHubData(); }} style={{ width: '100%', padding: '1.2rem', fontSize: '1rem' }}>Return to Assessment Center</button>
+                </div>
+              )}
+
+              {/* NEW STUDY SHEET VIEW (Answer Key from Hub) */}
+              {aptitudeView === 'review' && (
+                <div className="test-main-card" style={{ maxWidth: '900px', margin: '0 auto', width: '100%', animation: 'fadeInUp 0.5s ease forwards' }}>
+                    <div style={{ textAlign: 'center', borderBottom: '1px solid var(--card-border)', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
+                        <h2 style={{ color: 'var(--accent-cyan)', margin: '0 0 10px 0', fontSize: '2rem' }}>Study Sheet & Answer Key</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', margin: 0 }}>Review the correct answers and explanations for this module.</p>
+                    </div>
+
+                    <div style={{ marginBottom: '2rem' }}>
+                        {(levelData[selectedTestNum] || []).map((q, i) => (
+                            <div key={q.id} style={{ background: 'var(--bg-dark)', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.2rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                                <div style={{ fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                                    Q{i + 1}. {q.question}
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '1rem' }}>
+                                    {Object.entries(q.options || {}).map(([k, v]) => {
+                                        let bg = 'var(--input-bg)'; let color = 'var(--text-muted)'; let border = '1px solid var(--input-border)';
+                                        if (k === q.answer) { bg = 'rgba(16, 185, 129, 0.1)'; color = '#10b981'; border = '1px solid #10b981'; }
+                                        return (
+                                            <div key={k} style={{ padding: '10px', borderRadius: '8px', background: bg, color: color, border: border, fontSize: '0.85rem', fontWeight: 600 }}>
+                                                {k}) {v}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                {q.explanation && (
+                                    <div style={{ background: 'rgba(56, 189, 248, 0.05)', padding: '12px', borderRadius: '8px', borderLeft: '3px solid var(--accent-cyan)', fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
+                                        <strong style={{ color: 'var(--accent-cyan)', display: 'block', marginBottom: '4px' }}>Explanation:</strong> {q.explanation}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <button className="btn-action" onClick={() => setAptitudeView('hub')} style={{ width: '100%', padding: '1.2rem', fontSize: '1rem' }}>Return to Assessment Center</button>
                 </div>
               )}
 
