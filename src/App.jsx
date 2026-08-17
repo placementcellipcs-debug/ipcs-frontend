@@ -811,7 +811,7 @@ function Signup() {
     const resolvedStream = formData.stream === 'Other' ? formData.customStream : formData.stream;
 
     if (!resolvedQualification.trim()) { setStatus({ type: 'error', message: 'Please specify your qualification.' }); return; }
-    if (!resolvedStream.trim()) { setStatus({ type: 'error', message: 'Please specify your stream/branch.' }); return; }
+    if (!finalPhotoBase64) { setStatus({ type: 'error', message: 'Profile Photo is mandatory. Please upload a photo.' }); return; }
 
     setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
     const payload = { ...formData, qualification: resolvedQualification, stream: resolvedStream, photoBase64: finalPhotoBase64 };
@@ -2333,10 +2333,25 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     {settingsTab === 'security' && (
                        <div>
                           <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1.1rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '1rem' }}>Change Password</h3>
-                          <div className="form-group"><label>Current Password</label><input type="password" value={pwdData.current} onChange={(e) => setPwdData({...pwdData, current: e.target.value})} placeholder="Enter current password" /></div>
+                          
+                          <div className="form-group"><label>Current Password</label>
+                            <div className="pwd-wrapper">
+                              <input type={showSettingsPwd ? "text" : "password"} value={pwdData.current} onChange={(e) => setPwdData({...pwdData, current: e.target.value})} placeholder="Enter current password" style={{ paddingRight: '40px' }} />
+                              <span className="pwd-toggle" onClick={() => setShowSettingsPwd(!showSettingsPwd)}><i className={`ph ${showSettingsPwd ? 'ph-eye-slash' : 'ph-eye'}`}></i></span>
+                            </div>
+                          </div>
+                          
                           <div className="grid-2col">
-                             <div className="form-group"><label>New Password</label><input type="password" value={pwdData.newPwd} onChange={(e) => setPwdData({...pwdData, newPwd: e.target.value})} placeholder="Enter new password" /></div>
-                             <div className="form-group"><label>Confirm New Password</label><input type="password" value={pwdData.confirm} onChange={(e) => setPwdData({...pwdData, confirm: e.target.value})} placeholder="Re-enter new password" /></div>
+                             <div className="form-group"><label>New Password</label>
+                               <div className="pwd-wrapper">
+                                 <input type={showSettingsPwd ? "text" : "password"} value={pwdData.newPwd} onChange={(e) => setPwdData({...pwdData, newPwd: e.target.value})} placeholder="Enter new password" style={{ paddingRight: '40px' }} />
+                               </div>
+                             </div>
+                             <div className="form-group"><label>Confirm New Password</label>
+                               <div className="pwd-wrapper">
+                                 <input type={showSettingsPwd ? "text" : "password"} value={pwdData.confirm} onChange={(e) => setPwdData({...pwdData, confirm: e.target.value})} placeholder="Re-enter new password" style={{ paddingRight: '40px' }} />
+                               </div>
+                             </div>
                           </div>
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Use at least 8 characters with a mix of letters, numbers & symbols.</p>
                           <div style={{ display: 'flex', justifyContent: 'flex-end' }}><button className="btn-action" onClick={handlePasswordUpdate}>Update Password</button></div>
@@ -2660,12 +2675,22 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     <>
                       <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '60px', zIndex: 10, background: 'transparent' }}></div>
                       
+                      {/* Left Arrow */}
+                      <div style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', background: 'rgba(0,0,0,0.5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10, pointerEvents: 'none' }}>
+                         <i className="ph ph-caret-left" style={{ color: '#fff', fontSize: '1.5rem' }}></i>
+                      </div>
+
                       <iframe
                         src={pdfBlobUrl}
                         title={materialModal.title}
                         style={{ width: '100%', height: '100%', border: 'none' }}
                         allowFullScreen={true}
                       ></iframe>
+
+                      {/* Right Arrow */}
+                      <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '40px', height: '40px', background: 'rgba(0,0,0,0.5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10, pointerEvents: 'none' }}>
+                         <i className="ph ph-caret-right" style={{ color: '#fff', fontSize: '1.5rem' }}></i>
+                      </div>
                     </>
                   )}
                 </div>
@@ -2830,12 +2855,15 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                           );
                       }
 
-                      return (
-                          <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
-                              <button className="btn-action" style={{ flex: 1, background: '#10b981', padding: '1rem' }} onClick={() => handleEventRSVP('Registered')}><i className="ph-bold ph-check-circle"></i> Register</button>
-                              <button className="btn-action" style={{ flex: 1, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '1rem' }} onClick={() => handleEventRSVP('Not Interested')}><i className="ph-bold ph-x-circle"></i> Not Interested</button>
-                          </div>
-                      );
+                      if (eventModal.type === 'Placement Drive') {
+                          return (
+                              <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
+                                  <button className="btn-action" style={{ flex: 1, background: '#10b981', padding: '1rem' }} onClick={() => handleEventRSVP('Registered')}><i className="ph-bold ph-check-circle"></i> Register</button>
+                                  <button className="btn-action" style={{ flex: 1, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '1rem' }} onClick={() => handleEventRSVP('Not Interested')}><i className="ph-bold ph-x-circle"></i> Not Interested</button>
+                              </div>
+                          );
+                      }
+                      return null; // Hides buttons for Talentino & General events
                   })()}
                   
                   {rsvpStatus && <div className={`alert alert-${rsvpStatus.type}`} style={{marginTop: '15px'}}>{rsvpStatus.message}</div>}
