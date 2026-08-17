@@ -1518,7 +1518,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
       case 'settings': return '› Settings';
       case 'events': return '› Events & Drives';
       case 'materials': return '› Study Material';
-      case 'aptitude': return '› Aptitude Engine';
+      case 'aptitude': return '› Assessment Center';
       default: return '';
     }
   };
@@ -2060,7 +2060,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                       {/* 1. APTITUDE CARD */}
                       <div className="aptitude-lobby-card" style={{ background: 'radial-gradient(circle at top left, #1e1b4b, var(--card-bg))', display: 'flex', flexDirection: 'column' }}>
                           <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Select Difficulty</div>
-                          <h2 style={{ margin: '10px 0', fontSize: '1.8rem', color: '#fff' }}>Aptitude Engine</h2>
+                          <h2 style={{ margin: '10px 0', fontSize: '1.8rem', color: '#fff' }}>Assessment Center</h2>
                           <p style={{ color: '#a5b4fc', margin: '0 0 1.5rem 0', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>Choose your challenge level. Compete against students across all branches for the Leaderboard.</p>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                               <button className="btn-action" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid #38bdf8' }} onClick={() => handleStartExam('aptitude', 1)}>Easy Mode</button>
