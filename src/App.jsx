@@ -1160,7 +1160,11 @@ function Dashboard() {
     return (typeof window !== 'undefined' && 'Notification' in window) ? Notification.permission : 'denied';
   });
 
-  const [aptitudeView, setAptitudeView] = useState('lobby'); 
+  const [aptitudeView, setAptitudeView] = useState('hub'); 
+  const [activeExamType, setActiveExamType] = useState('aptitude'); 
+  const [selectedTestNum, setSelectedTestNum] = useState(1);
+  const [talHistory, setTalHistory] = useState([]);
+  const [techHistory, setTechHistory] = useState([]);
   const [levelData, setLevelData] = useState({ 1: [], 2: [], 3: [] });
   const [timeLimits, setTimeLimits] = useState({ 1: 10, 2: 15, 3: 20 });
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -1298,7 +1302,7 @@ function Dashboard() {
           res = await axios.post(`${API_BASE_URL}/api/dashboard/exam/start`, { type, course: user.course, testNum });
       }
 
-      if (res.data.success && res.data.levels[1].length > 0) {
+      if (res.data.success && res.data.levels && res.data.levels[1] && res.data.levels[1].length > 0) {
         setLevelData(res.data.levels);
         setTimeLimits(res.data.timeLimits);
         setCurrentLevel(1);
@@ -1345,7 +1349,6 @@ function Dashboard() {
     const answeredCount = Object.keys(userAnswers).length;
     setTotalQuestionsAsked(prev => prev + currentQuestions.length);
     
-    // For Aptitude, requires 60% to move to level 2 or 3. Talentino and Tech are only 1 Level.
     if (activeExamType === 'aptitude') {
         const passThreshold = Math.ceil(currentQuestions.length * 0.6);
         if (answeredCount >= passThreshold && currentLevel < 3) {
@@ -1361,7 +1364,7 @@ function Dashboard() {
   const submitFinalScore = async (finalLevel) => {
     try {
       setAptitudeView('result');
-      let score = Object.keys(userAnswers).length * currentLevel * 2; // Simple scoring
+      let score = Object.keys(userAnswers).length * currentLevel * 2; 
 
       if (activeExamType === 'aptitude') {
           await axios.post(`${API_BASE_URL}/api/dashboard/aptitude/submit`, { email: user.email, name: user.name, rollNo: user.rollNo, branch: user.branch, totalScore: score, totalQuestions: totalQuestionsAsked, finalLevel: finalLevel, totalTimeSeconds: globalTimeSpent });
