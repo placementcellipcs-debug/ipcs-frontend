@@ -702,7 +702,7 @@ function Login() {
           ) : (
             <div className="auth-card animate-fade-in">
               <div className="brand-logo-container"><img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" className="auth-logo-img" /></div>
-              <h2 style={{ textAlign: 'center', margin: '0 0 6px 0', color: '#ffffff' }}>Welcome back</h2>
+              <h2 style={{ textAlign: 'center', margin: '0 0 6px 0', color: '#ffffff' }}>Welcome</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.8rem' }}>Sign in to continue to your student portal</p>
               <form onSubmit={handleLogin}>
                 <div className="form-group"><label>Email ID</label><input type="email" placeholder="student@ipcsglobal.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
@@ -1084,10 +1084,9 @@ function Signup() {
 }
 
 const isEventExpired = (dateStr) => {
-  if (!dateStr || dateStr === "TBA") return false;
-  const cleanStr = dateStr.replace(/,/g, '').replace(/\s+/g, ' ').trim();
-  const eventDate = new Date(cleanStr);
-  if (isNaN(eventDate.getTime())) return false;
+  if (!dateStr || String(dateStr).toUpperCase() === "TBA") return false;
+  const eventDate = parseSafeDate(dateStr);
+  if (!eventDate) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return eventDate < today;
