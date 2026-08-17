@@ -2140,7 +2140,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     <div style={{ marginTop: '2rem', width: '60px', height: '60px', borderRadius: '50%', borderTop: '4px solid var(--accent-cyan)', animation: 'spin 1s linear infinite' }}></div>
                 </div>
               )}
-              
+
               {aptitudeView === 'live' && levelData[currentLevel] && (
                 <div className="test-layout-grid">
                   <div className="test-main-card" style={{ animation: 'borderPulse 3s infinite' }}>
@@ -2856,8 +2856,13 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                 </div>
 
                 <div style={{ width: '100%', height: '280px', background: 'var(--bg-dark)' }}>
-                  {currentDrivePopup['Poster Link'] ? (
-                    <img src={getDriveImageUrl(currentDrivePopup['Poster Link'])} alt="Drive Poster" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {/* FIX: Checking both possible property names for the Poster Link */}
+                  {(currentDrivePopup?.posterLink || currentDrivePopup['Poster Link']) ? (
+                    <img 
+                       src={getDriveImageUrl(currentDrivePopup?.posterLink || currentDrivePopup['Poster Link'])} 
+                       alt="Drive Poster" 
+                       style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e1b4b, #311042)', color: '#fff', fontSize: '1.5rem', fontWeight: 800 }}>
                       Placement Drive
