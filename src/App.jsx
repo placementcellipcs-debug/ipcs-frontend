@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-ro
 import axios from 'axios';
 import Cropper from 'react-easy-crop';
 import loadingVideo from './assets/video.mp4';
+import talenzoLogo from './assets/TALENZO111.png';
 
 // Helper for safe localStorage access across restrictive mobile browsers
 const getSafeLocalStorage = (key, fallback) => {
@@ -676,16 +677,19 @@ export function Login() {
       <div className="landing-grid">
         <div className="hero-section">
           
-          {/* 🔴 3. PING LIVE INDICATOR */}
-          <div className="hero-badge">
+          {/* 🔴 PING LIVE INDICATOR WITH NEW LOGO */}
+          <div className="hero-badge" style={{ padding: '8px 16px' }}>
             <span style={{ position: 'relative', display: 'flex', width: '10px', height: '10px' }}>
               <span className="animate-ping" style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', background: '#38bdf8', opacity: 0.75 }}></span>
               <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '10px', width: '10px', background: '#38bdf8' }}></span>
             </span>
-            <div className="hero-badge-text">
-              <span className="hero-badge-title">TALENZO</span>
-              <span className="hero-badge-subtitle">Connecting Talent with Opportunity</span>
-            </div>
+            
+            {/* New Logo Image */}
+            <img 
+              src={talenzoLogo} 
+              alt="Talenzo: Connecting Talent with Opportunity" 
+              style={{ height: '32px', objectFit: 'contain', marginLeft: '4px' }} 
+            />
           </div>
           
           <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: '#38bdf8' }}>Careers with IPCS</span></h1>
