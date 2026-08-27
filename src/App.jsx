@@ -677,18 +677,22 @@ export function Login() {
       <div className="landing-grid">
         <div className="hero-section">
           
-          {/* 🔴 PING LIVE INDICATOR WITH NEW LOGO */}
-          <div className="hero-badge" style={{ padding: '8px 16px' }}>
-            <span style={{ position: 'relative', display: 'flex', width: '10px', height: '10px' }}>
+          {/* 🔴 PING LIVE INDICATOR WITH LARGER LOGO */}
+          <div className="hero-badge" style={{ padding: '12px 24px', display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ position: 'relative', display: 'flex', width: '12px', height: '12px', flexShrink: 0 }}>
               <span className="animate-ping" style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', background: '#38bdf8', opacity: 0.75 }}></span>
-              <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '10px', width: '10px', background: '#38bdf8' }}></span>
+              <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '12px', width: '12px', background: '#38bdf8' }}></span>
             </span>
             
-            {/* New Logo Image */}
             <img 
               src={talenzoLogo} 
               alt="Talenzo: Connecting Talent with Opportunity" 
-              style={{ height: '32px', objectFit: 'contain', marginLeft: '4px' }} 
+              style={{ 
+                height: '70px', /* Massively increased size */
+                objectFit: 'contain',
+                /* This turns the dark text and logo completely white so it pops perfectly on the dark background! */
+                filter: 'brightness(0) invert(1)' 
+              }} 
             />
           </div>
           
