@@ -686,15 +686,13 @@ export function Login() {
               <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '14px', width: '14px', background: '#38bdf8' }}></span>
             </span>
             
-            {/* Clean Logo - Increased Size & Fixed Overflow Blur */}
+            {/* Raw Original Logo - No Filters */}
             <img 
               src={talenzoLogo} 
               alt="Talenzo: Connecting Talent with Opportunity" 
               style={{ 
                 height: '110px', 
-                objectFit: 'contain',
-                /* Creates a clean, sharp 1px white stroke around the dark text instead of a fuzzy blob */
-                filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.7)) drop-shadow(-1px -1px 0px rgba(255,255,255,0.7))' 
+                objectFit: 'contain'
               }} 
             />
           </div>
