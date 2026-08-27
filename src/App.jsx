@@ -677,21 +677,23 @@ export function Login() {
       <div className="landing-grid">
         <div className="hero-section">
           
-          {/* 🔴 PING LIVE INDICATOR WITH LARGER LOGO */}
-          <div className="hero-badge" style={{ padding: '12px 24px', display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
-            <span style={{ position: 'relative', display: 'flex', width: '12px', height: '12px', flexShrink: 0 }}>
+          {/* 🔴 PING LIVE INDICATOR & BRAND LOGO */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', marginBottom: '1.5rem' }}>
+            
+            {/* Live Blinking Dot */}
+            <span style={{ position: 'relative', display: 'flex', width: '12px', height: '12px', flexShrink: 0, marginTop: '-12px' }}>
               <span className="animate-ping" style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', background: '#38bdf8', opacity: 0.75 }}></span>
               <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '12px', width: '12px', background: '#38bdf8' }}></span>
             </span>
             
+            {/* Clean Logo with Glowing Text Shadow */}
             <img 
               src={talenzoLogo} 
               alt="Talenzo: Connecting Talent with Opportunity" 
               style={{ 
-                height: '70px', /* Massively increased size */
+                height: '80px', 
                 objectFit: 'contain',
-                /* This turns the dark text and logo completely white so it pops perfectly on the dark background! */
-                filter: 'brightness(0) invert(1)' 
+                filter: 'drop-shadow(0px 2px 6px rgba(255, 255, 255, 0.6))' 
               }} 
             />
           </div>
