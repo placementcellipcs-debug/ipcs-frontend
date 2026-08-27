@@ -678,22 +678,23 @@ export function Login() {
         <div className="hero-section">
           
           {/* 🔴 PING LIVE INDICATOR & BRAND LOGO */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '1.5rem' }}>
             
             {/* Live Blinking Dot */}
-            <span style={{ position: 'relative', display: 'flex', width: '12px', height: '12px', flexShrink: 0, marginTop: '-12px' }}>
+            <span style={{ position: 'relative', display: 'flex', width: '14px', height: '14px', flexShrink: 0, marginTop: '-20px' }}>
               <span className="animate-ping" style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', background: '#38bdf8', opacity: 0.75 }}></span>
-              <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '12px', width: '12px', background: '#38bdf8' }}></span>
+              <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '14px', width: '14px', background: '#38bdf8' }}></span>
             </span>
             
-            {/* Clean Logo with Glowing Text Shadow */}
+            {/* Clean Logo - Increased Size & Fixed Overflow Blur */}
             <img 
               src={talenzoLogo} 
               alt="Talenzo: Connecting Talent with Opportunity" 
               style={{ 
-                height: '80px', 
+                height: '110px', 
                 objectFit: 'contain',
-                filter: 'drop-shadow(0px 2px 6px rgba(255, 255, 255, 0.6))' 
+                /* Creates a clean, sharp 1px white stroke around the dark text instead of a fuzzy blob */
+                filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.7)) drop-shadow(-1px -1px 0px rgba(255,255,255,0.7))' 
               }} 
             />
           </div>
