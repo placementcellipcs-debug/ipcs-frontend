@@ -559,7 +559,38 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-placement.ipcs
 const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
-function Login() {
+// ==========================================
+// COUNTER COMPONENT (For Statistics)
+// ==========================================
+const Counter = ({ target, suffix = '', isDecimal = false }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const duration = 1500;
+    const increment = target / (duration / 16);
+
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        start = target;
+        clearInterval(timer);
+      }
+      setCount(start);
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [target]);
+
+  const displayCount = isDecimal ? count.toFixed(1) : Math.floor(count);
+
+  return <span>{displayCount}{suffix}</span>;
+};
+
+// ==========================================
+// 2. LOGIN / LANDING PAGE COMPONENT
+// ==========================================
+export function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -633,24 +664,37 @@ function Login() {
   }
 
   return (
-    <div className="landing-wrapper">
+    <div className="landing-wrapper" style={{ position: 'relative' }}>
+      
+      {/* 🔴 1. PULSE GLOW ORB (Background) */}
+      <div className="animate-pulse-glow" style={{ position: 'absolute', top: '25%', left: '5%', width: '380px', height: '380px', background: 'rgba(56, 189, 248, 0.08)', borderRadius: '50%', filter: 'blur(80px)', zIndex: 0, pointerEvents: 'none' }}></div>
+
       <div className="landing-nav">
         <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
       </div>
+      
       <div className="landing-grid">
         <div className="hero-section">
+          
+          {/* 🔴 3. PING LIVE INDICATOR */}
           <div className="hero-badge">
-            <i className="ph-fill ph-seal-check"></i>
+            <span style={{ position: 'relative', display: 'flex', width: '10px', height: '10px' }}>
+              <span className="animate-ping" style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', background: '#38bdf8', opacity: 0.75 }}></span>
+              <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '10px', width: '10px', background: '#38bdf8' }}></span>
+            </span>
             <div className="hero-badge-text">
               <span className="hero-badge-title">TALENZO</span>
               <span className="hero-badge-subtitle">Connecting Talent with Opportunity</span>
             </div>
           </div>
+          
           <h1 className="hero-title">Unlock Global Tech<br/><span style={{ color: '#38bdf8' }}>Careers with IPCS</span></h1>
           <p className="hero-desc">IPCS Global connects future-ready talent in Industrial Automation, Embedded Systems, IoT, and Digital Tech with leading blue-chip global firms. Experience zero-barrier career transitions.</p>
           <button className="btn-glow" onClick={() => setShowAuthForm(true)}>Login / Signup <i className="ph-bold ph-caret-right"></i></button>
+          
           <div className="ticker-container">
-            <div className="ticker-icon"><i className="ph-fill ph-lightning"></i></div>
+            {/* 🔴 4. BOUNCE ICON */}
+            <div className="ticker-icon animate-bounce"><i className="ph-fill ph-lightning"></i></div>
             <div>
               <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '2px' }}>Live Hiring Updates</div>
               <div key={tickerIndex} className="ticker-animate" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
@@ -666,37 +710,52 @@ function Login() {
 
         <div className="right-panel-wrapper">
           {!showAuthForm ? (
-            <div className="hiring-dashboard-card animate-fade-in">
+            /* 🔴 2. FLOAT ANIMATION ON CARD */
+            <div className="hiring-dashboard-card animate-fade-in animate-float">
               <div className="hiring-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  <div style={{ background: '#0284c7', color: '#ffffff', width: '42px', height: '42px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-lightning"></i></div>
+                  {/* 🟡 7. HOVER SCALE ICON */}
+                  <div className="hover-scale" style={{ background: '#0284c7', color: '#ffffff', width: '42px', height: '42px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
+                    <i className="ph-fill ph-lightning"></i>
+                  </div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff' }}>Hiring Dashboard</h3>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Realtime Campus Intake</span>
                   </div>
                 </div>
-                <div style={{ border: '1px solid rgba(34, 197, 94, 0.3)', color: '#4ade80', padding: '6px 14px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px' }}>ACTIVE STAGE</div>
+                {/* 🔴 5. ACTIVE STAGE OPACITY PULSE */}
+                <div className="animate-opacity-pulse" style={{ border: '1px solid rgba(34, 197, 94, 0.3)', color: '#4ade80', padding: '6px 14px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px' }}>
+                  ACTIVE STAGE
+                </div>
               </div>
+              
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className="hiring-stat-box">
-                  <div style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-users"></i></div>
+                  <div className="hover-scale" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-users"></i></div>
                   <div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Total Students Hired</div>
-                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>1.5 M +</div>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+                      {/* 🔴 8. COUNTERS */}
+                      <Counter target={1.5} suffix=" M +" isDecimal={true} />
+                    </div>
                   </div>
                 </div>
                 <div className="hiring-stat-box">
-                  <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-buildings"></i></div>
+                  <div className="hover-scale" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-buildings"></i></div>
                   <div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Enterprise Recruiters</div>
-                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>25 K +</div>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+                      <Counter target={25} suffix=" K +" />
+                    </div>
                   </div>
                 </div>
                 <div className="hiring-stat-box">
-                  <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-medal"></i></div>
+                  <div className="hover-scale" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}><i className="ph-fill ph-medal"></i></div>
                   <div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Presence Across Countries</div>
-                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>50 +</div>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+                      <Counter target={50} suffix=" +" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2066,7 +2125,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                       {/* 1. APTITUDE CARD */}
                       <div className="aptitude-lobby-card" style={{ background: 'radial-gradient(circle at top left, #1e1b4b, var(--card-bg))', display: 'flex', flexDirection: 'column' }}>
                           <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#a855f7', letterSpacing: '1px', textTransform: 'uppercase' }}>Select Difficulty</div>
-                          <h2 style={{ margin: '10px 0', fontSize: '1.8rem', color: '#fff' }}>Assessment Center</h2>
+                          <h2 style={{ margin: '10px 0', fontSize: '1.8rem', color: '#fff' }}>Aptitude Test</h2>
                           <p style={{ color: '#a5b4fc', margin: '0 0 1.5rem 0', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>Choose your challenge level. Compete against students across all branches for the Leaderboard.</p>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                               <button className="btn-action" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid #38bdf8' }} onClick={() => handleStartExam('aptitude', 1)}>Easy Mode</button>
@@ -2254,7 +2313,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                         </div>
                     )}
 
-                    <button className="btn-action" onClick={() => { setAptitudeView('hub'); fetchHubData(); }} style={{ width: '100%', padding: '1.2rem', fontSize: '1rem' }}>Return to Assessment Center</button>
+                    <button className="btn-action" onClick={() => { setAptitudeView('hub'); fetchHubData(); }} style={{ width: '100%', padding: '1.2rem', fontSize: '1rem' }}>Return to Aptitude Test</button>
                 </div>
               )}
 
@@ -2292,7 +2351,7 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                         ))}
                     </div>
 
-                    <button className="btn-action" onClick={() => setAptitudeView('hub')} style={{ width: '100%', padding: '1.2rem', fontSize: '1rem' }}>Return to Assessment Center</button>
+                    <button className="btn-action" onClick={() => setAptitudeView('hub')} style={{ width: '100%', padding: '1.2rem', fontSize: '1rem' }}>Return to Aptitude Test</button>
                 </div>
               )}
 
