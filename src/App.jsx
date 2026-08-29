@@ -883,12 +883,11 @@ function Signup() {
     if (!resolvedQualification.trim()) { setStatus({ type: 'error', message: 'Please specify your qualification.' }); return; }
     if (!finalPhotoBase64) { setStatus({ type: 'error', message: 'Profile Photo is mandatory. Please upload a photo.' }); return; }
 
-    // Merge the IPCS Prefix with the user input
     const finalRollNo = `IPCS - ${formData.rollNo.trim()}`;
 
     setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
     const payload = { ...formData, rollNo: finalRollNo, qualification: resolvedQualification, stream: resolvedStream, photoBase64: finalPhotoBase64 };
-    
+
     try {
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
       if (response.data.success) {
@@ -1143,14 +1142,13 @@ function Signup() {
   );
 }
 
-// DATE PARSER THAT CORRECTLY READS DD/MM/YYYY
 const parseSafeDate = (dateStr) => {
   if (!dateStr || dateStr === "N/A" || dateStr === "undefined" || String(dateStr).toUpperCase() === "TBA") return null;
   let cleanStr = String(dateStr).replace(/,/g, '').replace(/\s+/g, ' ').trim();
   let parts = cleanStr.split(/[-/]/);
   if (parts.length === 3) {
      if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]); // YYYY/MM/DD
-     return new Date(parts[2], parts[1]-1, parts[0]); // DD/MM/YYYY (Indian format fixing the bug)
+     return new Date(parts[2], parts[1]-1, parts[0]); // DD/MM/YYYY (Indian format fix)
   }
   let d = new Date(cleanStr);
   return isNaN(d) ? null : d;
@@ -1492,7 +1490,8 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
         if (ev.type && ev.type !== 'Placement Drive' && ev.Event !== 'Placement Drive') return false; 
         const driveDateStr = ev.date || ev['Date of the Event'];
         if (!driveDateStr) return false;
-        const driveDate = new Date(driveDateStr);
+        const driveDate = parseSafeDate(driveDateStr);
+        if (!driveDate) return false;
         return driveDate >= today;
       });
       setActiveDrives(drives);
@@ -1751,7 +1750,6 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
 
   const todayDate = new Date(); todayDate.setHours(0,0,0,0);
   
-  // DATE PARSER FIX IMPLEMENTED FOR DASHBOARD EVENTS
   const filteredEvents = (data.events || []).filter(ev => { 
       const d = parseSafeDate(ev.date); 
       if(!d) return true; // Keep TBA events
