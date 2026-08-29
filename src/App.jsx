@@ -794,7 +794,7 @@ export function Login() {
   );
 }
 
-function Signup() {
+export function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState(null);
@@ -806,67 +806,31 @@ function Signup() {
   useEffect(() => {
     const fetchDynamicData = async () => {
       try {
-        const [courseRes, branchRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}/api/auth/courses`),
-          axios.get(`${API_BASE_URL}/api/auth/branches`)
-        ]);
-        if (courseRes.data.success) setCourseList(courseRes.data.groupedCourses);
-        if (branchRes.data.success) setBranchList(branchRes.data.groupedBranches);
+        const [courseRes, branchRes] = await Promise.all([ axios.get(`${API_BASE_URL}/api/auth/courses`), axios.get(`${API_BASE_URL}/api/auth/branches`) ]);
+        if (courseRes.data && courseRes.data.success && Array.isArray(courseRes.data.groupedCourses)) { setCourseList(courseRes.data.groupedCourses); }
+        if (branchRes.data && branchRes.data.success && Array.isArray(branchRes.data.groupedBranches)) { setBranchList(branchRes.data.groupedBranches); }
       } catch (err) { console.error("Failed to fetch dynamic dropdowns:", err); } 
       finally { setIsFetchingData(false); }
     };
     fetchDynamicData();
   }, []);
 
-  const [showTncModal, setShowTncModal] = useState(false);
-  const [tncScrolled, setTncScrolled] = useState(false);
-  const [tncAccepted, setTncAccepted] = useState(false);
+  const [showTncModal, setShowTncModal] = useState(false); const [tncScrolled, setTncScrolled] = useState(false); const [tncAccepted, setTncAccepted] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false); const [imageSrc, setImageSrc] = useState(null); const [crop, setCrop] = useState({ x: 0, y: 0 }); const [zoom, setZoom] = useState(1); const [croppedAreaPixels, setCroppedAreaPixels] = useState(null); const [finalPhotoBase64, setFinalPhotoBase64] = useState('');
 
-  const [showCropModal, setShowCropModal] = useState(false);
-  const [imageSrc, setImageSrc] = useState(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [finalPhotoBase64, setFinalPhotoBase64] = useState('');
-
-  const [formData, setFormData] = useState({
-    rollNo: '', name: '', phone: '', email: '', age: '', gender: '', branch: '', 
-    course: '', joiningDate: '', fresherStatus: '', homeTown: '',
-    linkedin: '', instagram: '', placementReq: '', parentName: '', parentContact: '', 
-    friend1Name: '', friend1Phone: '', friend2Name: '', friend2Phone: '', password: '', confirmPassword: '',
-    qualification: '', customQualification: '', stream: '', customStream: ''
-  });
+  const [formData, setFormData] = useState({ rollNo: '', name: '', phone: '', email: '', age: '', gender: '', branch: '', course: '', joiningDate: '', fresherStatus: '', homeTown: '', linkedin: '', instagram: '', placementReq: '', parentName: '', parentContact: '', friend1Name: '', friend1Phone: '', friend2Name: '', friend2Phone: '', password: '', confirmPassword: '', qualification: '', customQualification: '', stream: '', customStream: '' });
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onFileChange = async (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.addEventListener('load', () => { setImageSrc(reader.result); setShowCropModal(true); });
-      reader.readAsDataURL(file);
-    }
-  };
-
+  const onFileChange = async (e) => { if (e.target.files && e.target.files.length > 0) { const file = e.target.files[0]; const reader = new FileReader(); reader.addEventListener('load', () => { setImageSrc(reader.result); setShowCropModal(true); }); reader.readAsDataURL(file); } };
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => { setCroppedAreaPixels(croppedAreaPixels); }, []);
 
   const generateCroppedImage = () => {
-    const canvas = document.createElement('canvas');
-    const image = new Image();
-    image.src = imageSrc;
-    image.onload = () => {
-      canvas.width = 250; canvas.height = 250;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage( image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, 250, 250 );
-      setFinalPhotoBase64(canvas.toDataURL('image/jpeg'));
-      setShowCropModal(false);
-    };
+    const canvas = document.createElement('canvas'); const image = new Image(); image.src = imageSrc;
+    image.onload = () => { canvas.width = 250; canvas.height = 250; const ctx = canvas.getContext('2d'); ctx.drawImage( image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, 250, 250 ); setFinalPhotoBase64(canvas.toDataURL('image/jpeg')); setShowCropModal(false); };
   };
 
-  const handleTncScroll = (e) => {
-    const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 25;
-    if (bottom) setTncScrolled(true);
-  };
+  const handleTncScroll = (e) => { const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 25; if (bottom) setTncScrolled(true); };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -890,13 +854,8 @@ function Signup() {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
-      if (response.data.success) {
-        setStatus({ type: 'success', message: 'Account created! Redirecting to login...' });
-        setTimeout(() => navigate('/'), 2500); 
-      }
-    } catch (error) {
-      setStatus({ type: 'error', message: error.response?.data?.message || 'Server Error.' });
-    }
+      if (response.data.success) { setStatus({ type: 'success', message: 'Account created! Redirecting to login...' }); setTimeout(() => navigate('/'), 2500); }
+    } catch (error) { setStatus({ type: 'error', message: error.response?.data?.message || 'Server Error.' }); }
   };
 
   return (
@@ -904,9 +863,7 @@ function Signup() {
       <div className="profile-reg-card">
         <div className="reg-header">
           <div><h2 style={{ margin: '0 0 4px 0' }}>Create Student Profile</h2><p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>Register records, course details, and placement preferences</p></div>
-          <div className="brand-logo-container" style={{ marginBottom: 0 }}>
-            <img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" style={{ height: '38px' }} />
-          </div>
+          <div className="brand-logo-container" style={{ marginBottom: 0 }}><img src={GLOBAL_LOGO_URL} alt="IPCS Global Logo" style={{ height: '38px' }} /></div>
         </div>
 
         <form onSubmit={handleSignup}>
@@ -939,17 +896,15 @@ function Signup() {
           <div className="grid-3col" style={{ marginTop: '1.1rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Age</label><input type="number" name="age" placeholder="e.g. 22" onChange={handleChange} /></div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Gender</label>
-              <select name="gender" onChange={handleChange} defaultValue="">
-                <option value="" disabled>Select</option><option value="Male">Male</option><option value="Female">Female</option>
-              </select>
+              <select name="gender" onChange={handleChange} defaultValue=""><option value="" disabled>Select</option><option value="Male">Male</option><option value="Female">Female</option></select>
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Branch Campus *</label>
               <select name="branch" onChange={handleChange} defaultValue="" required>
                 <option value="" disabled>{isFetchingData ? "Loading Branches..." : "Select Branch"}</option>
-                {branchList.map((group, idx) => (
-                  <optgroup key={idx} label={group.region}>
-                    {group.branches.map((bName, bIdx) => (
+                {branchList?.map((group, idx) => (
+                  <optgroup key={idx} label={group?.region || "Region"}>
+                    {group?.branches?.map((bName, bIdx) => (
                       <option key={bIdx} value={bName}>{bName}</option>
                     ))}
                   </optgroup>
@@ -968,22 +923,15 @@ function Signup() {
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Course Category *</label>
               <select name="course" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>
-                  {isFetchingCourses ? "Loading Courses..." : "Select Course Category"}
-                </option>
-                {courseList.map((group, idx) => (
-                  <optgroup key={idx} label={group.category}>
-                    {group.courses.map((courseItem, cIdx) => (
-                      <option key={cIdx} value={courseItem}>
-                        {courseItem}
-                      </option>
-                    ))}
+                <option value="" disabled>{isFetchingData ? "Loading Courses..." : "Select Course Category"}</option>
+                {courseList?.map((group, idx) => (
+                  <optgroup key={idx} label={group?.category || "Category"}>
+                    {group?.courses?.map((cName, cIdx) => (<option key={cIdx} value={cName}>{cName}</option>))}
                   </optgroup>
                 ))}
               </select>
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Joining Date *</label><input type="date" name="joiningDate" onChange={handleChange} required /></div>
-            
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Qualification *</label>
               <select name="qualification" onChange={handleChange} defaultValue="" required>
@@ -992,9 +940,7 @@ function Signup() {
                 <option value="Diploma">Diploma</option><option value="B.Tech">B.Tech</option><option value="Bsc">Bsc</option>
                 <option value="PG">PG</option><option value="Other">Other</option>
               </select>
-              {formData.qualification === 'Other' && (
-                <input type="text" name="customQualification" placeholder="Specify Qualification" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />
-              )}
+              {formData.qualification === 'Other' && (<input type="text" name="customQualification" placeholder="Specify Qualification" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />)}
             </div>
           </div>
 
@@ -1006,16 +952,9 @@ function Signup() {
                 <option value="IT">IT</option><option value="EEE">EEE</option><option value="EC">EC</option>
                 <option value="Mechanical">Mechanical</option><option value="Science">Science</option><option value="Other">Other</option>
               </select>
-              {formData.stream === 'Other' && (
-                <input type="text" name="customStream" placeholder="Specify Stream / Branch" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />
-              )}
+              {formData.stream === 'Other' && (<input type="text" name="customStream" placeholder="Specify Stream / Branch" onChange={handleChange} required style={{ marginTop: '0.6rem' }} />)}
             </div>
-
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Experience Status *</label>
-              <select name="fresherStatus" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Status</option><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option>
-              </select>
-            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}><label>Experience Status *</label><select name="fresherStatus" onChange={handleChange} defaultValue="" required><option value="" disabled>Select Status</option><option value="Fresher">Fresher</option><option value="Experienced">Experienced</option></select></div>
             <div className="form-group" style={{ marginBottom: 0 }}><label>Home Town *</label><input type="text" name="homeTown" placeholder="e.g. Kozhikode" onChange={handleChange} required /></div>
           </div>
 
@@ -1052,13 +991,7 @@ function Signup() {
           </div>
 
           <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '20px' }}>
-            <input 
-              type="checkbox" 
-              style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: tncScrolled ? 'pointer' : 'not-allowed', opacity: tncScrolled ? 1 : 0.5 }} 
-              checked={tncAccepted} 
-              disabled={!tncScrolled}
-              onChange={(e) => setTncAccepted(e.target.checked)} 
-            />
+            <input type="checkbox" style={{ width: '22px', height: '22px', flexShrink: 0, marginTop: '3px', cursor: tncScrolled ? 'pointer' : 'not-allowed', opacity: tncScrolled ? 1 : 0.5 }} checked={tncAccepted} disabled={!tncScrolled} onChange={(e) => setTncAccepted(e.target.checked)} />
             <label style={{ margin: 0, fontSize: '0.85rem', textTransform: 'none', lineHeight: 1.4, opacity: tncScrolled ? 1 : 0.7 }}>
               I have read and accepted the <span className="tnc-link" onClick={() => setShowTncModal(true)}>Terms & Conditions</span>
               {!tncScrolled && <span style={{display: 'block', fontSize: '0.75rem', color: '#f59e0b', marginTop: '2px'}}>(Please open and read the terms to enable this checkbox)</span>}
@@ -1073,7 +1006,6 @@ function Signup() {
           </div>
         </form>
       </div>
-
       {showCropModal && (
         <div className="report-modal-overlay">
           <div className="report-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
@@ -1101,38 +1033,16 @@ function Signup() {
             </div>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: 0, marginBottom: '1.5rem' }}>Below mentioned are the Rules to be followed by students for getting Placement Support from IPCS. Please scroll to the bottom to accept.</p>
             <div className="tnc-content-box" onScroll={handleTncScroll}>
-              <h4>ELIGIBILITY CRITERIA FOR ATTENDING THE INTERVIEWS</h4>
-              <ul>
-                <li>Students who have completed at least 90% of the course.</li>
-                <li>Students who have paid the full fees.</li>
-                <li>Students who have passion for working & take their career seriously.</li>
-                <li>Candidates should be ready for any location.</li>
-              </ul>
-              <h4>DOS & DON’TS FOR THE CANDIDATES</h4>
-              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Job applications & Interview:</strong>
-              <ul>
-                <li>Check all criteria mentioned in the employment news, if everything suits to you then only APPLY.</li>
-                <li>Students should attend the interview on the date and time as allotted.</li>
-                <li>It is mandatory for Students to update the placement coordinator of their attendance.</li>
-                <li>Students not attending 3 interviews will be barred from Placement Support.</li>
-                <li>Students not applying for more than 15 days with a valid reason will be removed.</li>
-              </ul>
-              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Joining:</strong>
-              <ul>
-                <li>Students after being selected & given a date to join should adhere to that.</li>
-                <li>2 times after accepting the offer and not joining will be considered a Black Mark.</li>
-                <li>1 year commitment to the company getting recruited is mandatory.</li>
-              </ul>
-              <h4>DECLARATION</h4>
-              <p>I hereby declare that I have read & understood the terms & conditions of IPCS Placement Cell. I adhere to follow the rules & incase of any failure to do so; I understand that I won’t be eligible for Placement Support.</p>
+              <h4>ELIGIBILITY CRITERIA FOR ATTENDING THE INTERVIEWS</h4><ul><li>Students who have completed at least 90% of the course.</li><li>Students who have paid the full fees.</li><li>Students who have passion for working & take their career seriously.</li><li>Candidates should be ready for any location.</li></ul>
+              <h4>DOS & DON’TS FOR THE CANDIDATES</h4><strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Job applications & Interview:</strong><ul><li>Check all criteria mentioned in the employment news, if everything suits to you then only APPLY.</li><li>Students should attend the interview on the date and time as allotted.</li><li>It is mandatory for Students to update the placement coordinator of their attendance.</li><li>Students not attending 3 interviews will be barred from Placement Support.</li><li>Students not applying for more than 15 days with a valid reason will be removed.</li></ul>
+              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>During Joining:</strong><ul><li>Students after being selected & given a date to join should adhere to that.</li><li>2 times after accepting the offer and not joining will be considered a Black Mark.</li><li>1 year commitment to the company getting recruited is mandatory.</li></ul>
+              <h4>DECLARATION</h4><p>I hereby declare that I have read & understood the terms & conditions of IPCS Placement Cell. I adhere to follow the rules & incase of any failure to do so; I understand that I won’t be eligible for Placement Support.</p>
             </div>
             {!tncScrolled ? (
               <div style={{ textAlign: 'center', color: '#f59e0b', fontSize: '0.88rem', fontWeight: 700, marginTop: '15px' }}>↓ Please scroll to the end of the rules to Accept ↓</div>
             ) : (
               <div style={{ display: 'flex', marginTop: '20px' }}>
-                <button type="button" className="btn-action" style={{ width: '100%', background: '#22c55e' }} onClick={() => { setTncScrolled(true); setTncAccepted(true); setShowTncModal(false); }}>
-                  Accept & Enable Checkbox
-                </button>
+                <button type="button" className="btn-action" style={{ width: '100%', background: '#22c55e' }} onClick={() => { setTncScrolled(true); setTncAccepted(true); setShowTncModal(false); }}>Accept & Enable Checkbox</button>
               </div>
             )}
           </div>
@@ -1146,12 +1056,14 @@ const parseSafeDate = (dateStr) => {
   if (!dateStr || dateStr === "N/A" || dateStr === "undefined" || String(dateStr).toUpperCase() === "TBA") return null;
   let cleanStr = String(dateStr).replace(/,/g, '').replace(/\s+/g, ' ').trim();
   let parts = cleanStr.split(/[-/]/);
+  let parsedDate;
   if (parts.length === 3) {
-     if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]); // YYYY/MM/DD
-     return new Date(parts[2], parts[1]-1, parts[0]); // DD/MM/YYYY (Indian format fix)
+      if (parts[0].length <= 2) parsedDate = new Date(parts[2], parts[1] - 1, parts[0]); // Fixes DD/MM/YYYY
+      else parsedDate = new Date(parts[0], parts[1] - 1, parts[2]); // Fixes YYYY/MM/DD
+  } else {
+      parsedDate = new Date(cleanStr);
   }
-  let d = new Date(cleanStr);
-  return isNaN(d) ? null : d;
+  return isNaN(parsedDate.getTime()) ? null : parsedDate;
 };
 
 const isEventExpired = (dateStr) => {
@@ -1484,20 +1396,20 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
 
   useEffect(() => {
     if (data.events && data.events.length > 0) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const today = new Date(); today.setHours(0, 0, 0, 0);
       const drives = data.events.filter(ev => {
         if (ev.type && ev.type !== 'Placement Drive' && ev.Event !== 'Placement Drive') return false; 
         const driveDateStr = ev.date || ev['Date of the Event'];
         if (!driveDateStr) return false;
         const driveDate = parseSafeDate(driveDateStr);
         if (!driveDate) return false;
+        driveDate.setHours(0,0,0,0);
         return driveDate >= today;
       });
       setActiveDrives(drives);
     }
   }, [data.events]);
-
+  
   useEffect(() => {
     const checkDrives = setInterval(() => {
       if (activeDrives.length === 0 || currentDrivePopup) return;
@@ -1754,10 +1666,13 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
       const d = parseSafeDate(ev.date); 
       if(!d) return true; // Keep TBA events
       d.setHours(0,0,0,0); 
-      return d >= todayDate; 
+      // Ensure we compare it directly against a clean "today" variable
+      const safeToday = new Date(); safeToday.setHours(0,0,0,0);
+      return d >= safeToday; 
   });
-  const processedVacancies = (data.vacancies || []).sort((a, b) => { const aExp = isEventExpired(a.lastDate); const bExp = isEventExpired(b.lastDate); if (aExp && !bExp) return 1; if (!aExp && bExp) return -1; return 0; });
   
+  const processedVacancies = (data.vacancies || []).sort((a, b) => { const aExp = isEventExpired(a.lastDate); const bExp = isEventExpired(b.lastDate); if (aExp && !bExp) return 1; if (!aExp && bExp) return -1; return 0; });
+
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
   (data.appliedJobs || []).forEach(job => {
     const s = (job.status || job.Status || '').toLowerCase();
