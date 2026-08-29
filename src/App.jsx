@@ -800,22 +800,22 @@ function Signup() {
   const [status, setStatus] = useState(null);
   
   const [courseList, setCourseList] = useState([]);
-  const [isFetchingCourses, setIsFetchingCourses] = useState(true);
+  const [branchList, setBranchList] = useState([]);
+  const [isFetchingData, setIsFetchingData] = useState(true);
 
   useEffect(() => {
-    const fetchDynamicCourses = async () => {
+    const fetchDynamicData = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/auth/courses`);
-        if (res.data.success) {
-          setCourseList(res.data.groupedCourses);
-        }
-      } catch (err) {
-        console.error("Failed to fetch dynamic courses:", err);
-      } finally {
-        setIsFetchingCourses(false);
-      }
+        const [courseRes, branchRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}/api/auth/courses`),
+          axios.get(`${API_BASE_URL}/api/auth/branches`)
+        ]);
+        if (courseRes.data.success) setCourseList(courseRes.data.groupedCourses);
+        if (branchRes.data.success) setBranchList(branchRes.data.groupedBranches);
+      } catch (err) { console.error("Failed to fetch dynamic dropdowns:", err); } 
+      finally { setIsFetchingData(false); }
     };
-    fetchDynamicCourses();
+    fetchDynamicData();
   }, []);
 
   const [showTncModal, setShowTncModal] = useState(false);
@@ -883,9 +883,12 @@ function Signup() {
     if (!resolvedQualification.trim()) { setStatus({ type: 'error', message: 'Please specify your qualification.' }); return; }
     if (!finalPhotoBase64) { setStatus({ type: 'error', message: 'Profile Photo is mandatory. Please upload a photo.' }); return; }
 
-    setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
-    const payload = { ...formData, qualification: resolvedQualification, stream: resolvedStream, photoBase64: finalPhotoBase64 };
+    // Merge the IPCS Prefix with the user input
+    const finalRollNo = `IPCS - ${formData.rollNo.trim()}`;
 
+    setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
+    const payload = { ...formData, rollNo: finalRollNo, qualification: resolvedQualification, stream: resolvedStream, photoBase64: finalPhotoBase64 };
+    
     try {
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
       if (response.data.success) {
@@ -918,7 +921,13 @@ function Signup() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="grid-2col">
-                <div className="form-group" style={{ marginBottom: 0 }}><label>IPCS Roll Number *</label><input type="text" name="rollNo" placeholder="IPCS XXXXXX" onChange={handleChange} required /></div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label>IPCS Roll Number *</label>
+                  <div style={{ display: 'flex', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '10px', overflow: 'hidden' }}>
+                    <span style={{ padding: '0.8rem 1rem', background: 'rgba(255,255,255,0.05)', borderRight: '1px solid var(--input-border)', color: 'var(--text-muted)', fontWeight: 700 }}>IPCS -</span>
+                    <input type="text" name="rollNo" placeholder="XXXXXX" onChange={handleChange} required style={{ border: 'none', borderRadius: 0, backgroundColor: 'transparent' }} />
+                  </div>
+                </div>
                 <div className="form-group" style={{ marginBottom: 0 }}><label>Full Name *</label><input type="text" name="name" placeholder="e.g. Vishnu Kumar" onChange={handleChange} required /></div>
               </div>
               <div className="grid-2col">
@@ -935,36 +944,17 @@ function Signup() {
                 <option value="" disabled>Select</option><option value="Male">Male</option><option value="Female">Female</option>
               </select>
             </div>
-            <div className="form-group" style={{ marginBottom: 0 }}><label>Branch Campus *</label>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Branch Campus *</label>
               <select name="branch" onChange={handleChange} defaultValue="" required>
-                <option value="" disabled>Select Branch</option>
-                <optgroup label="Kerala">
-                  <option value="Kochi">Kochi</option><option value="Calicut">Calicut</option><option value="Trivandrum">Trivandrum</option>
-                  <option value="Attingal">Attingal</option><option value="Kollam">Kollam</option><option value="Kannur">Kannur</option>
-                  <option value="Thrissur">Thrissur</option><option value="Perinthalmanna">Perinthalmanna</option><option value="Kottayam">Kottayam</option>
-                  <option value="Pathanamthitta">Pathanamthitta</option><option value="Palakkad">Palakkad</option>
-                </optgroup>
-                <optgroup label="Tamil Nadu">
-                  <option value="Coimbatore">Coimbatore</option><option value="Chennai">Chennai</option><option value="Tambaram">Tambaram</option>
-                  <option value="Trichy">Trichy</option><option value="Salem">Salem</option><option value="Madurai">Madurai</option>
-                  <option value="Erode">Erode</option><option value="Tirunelveli">Tirunelveli</option>
-                </optgroup>
-                <optgroup label="Karnataka">
-                  <option value="Bangalore">Bangalore</option><option value="Mangalore">Mangalore</option><option value="Mysore">Mysore</option>
-                </optgroup>
-                <optgroup label="Maharashtra">
-                  <option value="Mumbai">Mumbai</option><option value="Pune">Pune</option><option value="Nagpur">Nagpur</option>
-                </optgroup>
-                <optgroup label="West Bengal">
-                  <option value="Kolkata">Kolkata</option><option value="Siliguri">Siliguri</option>
-                </optgroup>
-                <optgroup label="Other States in India">
-                  <option value="Hyderabad (Telangana)">Hyderabad (Telangana)</option><option value="Ranchi (Jharkhand)">Ranchi (Jharkhand)</option>
-                  <option value="Raipur (Chhattisgarh)">Raipur (Chhattisgarh)</option><option value="Bhopal (Madhya Pradesh)">Bhopal (Madhya Pradesh)</option>
-                </optgroup>
-                <optgroup label="International (GCC)">
-                  <option value="Dubai (UAE)">Dubai (UAE)</option><option value="Riyadh (Saudi Arabia)">Riyadh (Saudi Arabia)</option>
-                </optgroup>
+                <option value="" disabled>{isFetchingData ? "Loading Branches..." : "Select Branch"}</option>
+                {branchList.map((group, idx) => (
+                  <optgroup key={idx} label={group.region}>
+                    {group.branches.map((bName, bIdx) => (
+                      <option key={bIdx} value={bName}>{bName}</option>
+                    ))}
+                  </optgroup>
+                ))}
               </select>
             </div>
           </div>
@@ -1153,13 +1143,14 @@ function Signup() {
   );
 }
 
+// DATE PARSER THAT CORRECTLY READS DD/MM/YYYY
 const parseSafeDate = (dateStr) => {
   if (!dateStr || dateStr === "N/A" || dateStr === "undefined" || String(dateStr).toUpperCase() === "TBA") return null;
   let cleanStr = String(dateStr).replace(/,/g, '').replace(/\s+/g, ' ').trim();
   let parts = cleanStr.split(/[-/]/);
   if (parts.length === 3) {
-     if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
-     return new Date(parts[2], parts[1]-1, parts[0]);
+     if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]); // YYYY/MM/DD
+     return new Date(parts[2], parts[1]-1, parts[0]); // DD/MM/YYYY (Indian format fixing the bug)
   }
   let d = new Date(cleanStr);
   return isNaN(d) ? null : d;
@@ -1759,7 +1750,14 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
   const nextMonth = () => setCalDate(new Date(calYear, calMonth + 1, 1));
 
   const todayDate = new Date(); todayDate.setHours(0,0,0,0);
-  const filteredEvents = (data.events || []).filter(ev => { const d = new Date(ev.date); if(isNaN(d)) return true; d.setHours(0,0,0,0); return d >= todayDate; });
+  
+  // DATE PARSER FIX IMPLEMENTED FOR DASHBOARD EVENTS
+  const filteredEvents = (data.events || []).filter(ev => { 
+      const d = parseSafeDate(ev.date); 
+      if(!d) return true; // Keep TBA events
+      d.setHours(0,0,0,0); 
+      return d >= todayDate; 
+  });
   const processedVacancies = (data.vacancies || []).sort((a, b) => { const aExp = isEventExpired(a.lastDate); const bExp = isEventExpired(b.lastDate); if (aExp && !bExp) return 1; if (!aExp && bExp) return -1; return 0; });
   
   const appStats = { applied: (data.appliedJobs || []).length, attended: 0, notAttended: 0, offers: 0, rejected: 0 };
