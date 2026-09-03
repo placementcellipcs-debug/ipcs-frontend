@@ -2801,9 +2801,9 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                   {(() => {
                       let isPast = false;
                       if (eventModal.date && eventModal.date.toLowerCase() !== 'tba') {
-                          const cleanDateStr = eventModal.date.replace(/,/g, '').replace(/\s+/g, ' ').trim();
-                          const eventDate = new Date(cleanDateStr);
-                          if (!isNaN(eventDate.getTime())) {
+                          // Fix: Use our custom parser instead of the native Date constructor
+                          const eventDate = parseSafeDate(eventModal.date);
+                          if (eventDate && !isNaN(eventDate.getTime())) {
                               eventDate.setHours(0,0,0,0);
                               const today = new Date();
                               today.setHours(0,0,0,0);
@@ -2855,7 +2855,8 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
           {/* CURRENT DRIVE POPUP MODAL */}
           {currentDrivePopup && (
             <div className="report-modal-overlay" style={{ zIndex: 9999 }}>
-              <div className="report-card" style={{ maxWidth: '500px', padding: '0', overflow: 'hidden', position: 'relative' }}>
+              {/* Fix: Added explicit max-height and flex-direction to the card to enable internal scrolling */}
+              <div className="report-card" style={{ maxWidth: '500px', padding: '0', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
                 
                 <div 
                     style={{ position: 'absolute', top: '15px', right: '15px', width: '32px', height: '32px', background: 'rgba(0,0,0,0.6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
@@ -2864,7 +2865,8 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     <i className="ph ph-x" style={{ color: '#fff', fontSize: '1.2rem' }}></i>
                 </div>
 
-                <div style={{ width: '100%', height: '280px', background: 'var(--bg-dark)' }}>
+                {/* Fix: Prevent the image banner from shrinking */}
+                <div style={{ width: '100%', height: '250px', background: 'var(--bg-dark)', flexShrink: 0 }}>
                   {/* FIX: Checking both possible property names for the Poster Link */}
                   {(currentDrivePopup?.posterLink || currentDrivePopup['Poster Link']) ? (
                     <img 
@@ -2879,7 +2881,8 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                   )}
                 </div>
 
-                <div style={{ padding: '2rem' }}>
+                {/* Fix: Added overflowY auto specifically to the content area so long descriptions scroll */}
+                <div style={{ padding: '2rem', overflowY: 'auto', flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
                      <div>
                         <div style={{ color: 'var(--accent-purple)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>Drive ID: {currentDrivePopup.id || currentDrivePopup['Drive ID']}</div>
