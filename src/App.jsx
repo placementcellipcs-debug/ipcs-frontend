@@ -557,7 +557,7 @@ const GlobalStyle = () => {
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-placement.ipcsglobal.info';
-const GLOBAL_LOGO_URL = talenzoLogo; // Master Talenzo Logo Override
+const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
 // 🛡️ SECURE API INTERCEPTOR: Automatically attaches the JWT token to every request
@@ -815,17 +815,35 @@ export function Signup() {
   const [branchList, setBranchList] = useState([]);
   const [isFetchingData, setIsFetchingData] = useState(true);
 
+  // Fallback Data to prevent blank dropdowns during mass signups
+  const FALLBACK_COURSES = [
+    { category: "Industrial Automation", courses: ["Automation Engineer", "PLC & SCADA Programming", "Robotics & Motion Control"] },
+    { category: "Embedded Systems & IoT", courses: ["Embedded Systems", "IoT & Robotics", "Embedded Linux & ARM"] },
+    { category: "Software Development", courses: ["Python Full Stack", "MERN Stack Development", "Java Full Stack"] },
+    { category: "Digital Tech & Marketing", courses: ["Digital Marketing Executive", "Data Analyst", "Artificial Intelligence"] }
+  ];
+  const FALLBACK_BRANCHES = [
+    { region: "Karnataka", branches: ["Bangalore", "Mangalore", "Mysore"] },
+    { region: "Kerala", branches: ["Kochi", "Calicut", "Trivandrum", "Kannur", "Thrissur", "Kottayam", "Palakkad", "Kollam", "Perinthalmanna", "Attingal", "Pathanamthitta"] },
+    { region: "Tamil Nadu", branches: ["Chennai", "Coimbatore", "Tambaram", "Madurai", "Salem", "Trichy", "Tirunelveli", "Erode"] },
+    { region: "International", branches: ["Dubai (UAE)", "Riyadh (Saudi Arabia)"] }
+  ];
+
   useEffect(() => {
     const fetchDynamicData = async () => {
       try {
         const courseRes = await axios.get(`${API_BASE_URL}/api/auth/courses`);
-        if (courseRes.data && courseRes.data.success) setCourseList(courseRes.data.groupedCourses || []);
-      } catch (err) { console.error("Course fetch failed:", err); }
+        if (courseRes.data && courseRes.data.success && Array.isArray(courseRes.data.groupedCourses) && courseRes.data.groupedCourses.length > 0) {
+            setCourseList(courseRes.data.groupedCourses);
+        } else { setCourseList(FALLBACK_COURSES); }
+      } catch (err) { setCourseList(FALLBACK_COURSES); }
       
       try {
         const branchRes = await axios.get(`${API_BASE_URL}/api/auth/branches`);
-        if (branchRes.data && branchRes.data.success) setBranchList(branchRes.data.groupedBranches || []);
-      } catch (err) { console.error("Branch fetch failed:", err); }
+        if (branchRes.data && branchRes.data.success && Array.isArray(branchRes.data.groupedBranches) && branchRes.data.groupedBranches.length > 0) {
+            setBranchList(branchRes.data.groupedBranches);
+        } else { setBranchList(FALLBACK_BRANCHES); }
+      } catch (err) { setBranchList(FALLBACK_BRANCHES); }
       
       setIsFetchingData(false);
     };
@@ -851,10 +869,16 @@ export function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    
+    // Automatically clean out spaces, dashes, and country codes (+91)
+    const cleanPhone = formData.phone.replace(/\D/g, '').slice(-10);
+    const cleanF1 = formData.friend1Phone.replace(/\D/g, '').slice(-10);
+    const cleanF2 = formData.friend2Phone.replace(/\D/g, '').slice(-10);
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { setStatus({ type: 'error', message: 'Please enter a valid email format.' }); return; }
-    if (!/^\d{10}$/.test(formData.phone)) { setStatus({ type: 'error', message: 'Your phone number must be exactly 10 digits.' }); return; }
-    if (!/^\d{10}$/.test(formData.friend1Phone) || !/^\d{10}$/.test(formData.friend2Phone)) { setStatus({ type: 'error', message: 'Referral phone numbers must be exactly 10 digits.' }); return; }
-    if (formData.friend1Phone === formData.friend2Phone) { setStatus({ type: 'error', message: 'Friend 1 and Friend 2 referral phone numbers cannot be the same.' }); return; }
+    if (cleanPhone.length !== 10) { setStatus({ type: 'error', message: 'Your phone number must be exactly 10 digits.' }); return; }
+    if (cleanF1.length !== 10 || cleanF2.length !== 10) { setStatus({ type: 'error', message: 'Referral phone numbers must be exactly 10 digits.' }); return; }
+    if (cleanF1 === cleanF2) { setStatus({ type: 'error', message: 'Friend 1 and Friend 2 referral phone numbers cannot be the same.' }); return; }
     if (formData.password !== formData.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match!' }); return; }
     if (!tncAccepted) { setStatus({ type: 'error', message: 'You must accept the Terms & Conditions.' }); return; }
 
@@ -867,7 +891,9 @@ export function Signup() {
     const finalRollNo = `IPCS - ${formData.rollNo.trim()}`;
 
     setStatus({ type: 'info', message: 'Uploading photo & registering account...' });
-    const payload = { ...formData, rollNo: finalRollNo, qualification: resolvedQualification, stream: resolvedStream, photoBase64: finalPhotoBase64 };
+    
+    // Send the cleaned phone numbers to the backend
+    const payload = { ...formData, phone: cleanPhone, friend1Phone: cleanF1, friend2Phone: cleanF2, rollNo: finalRollNo, qualification: resolvedQualification, stream: resolvedStream, photoBase64: finalPhotoBase64 };
 
     try {
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, payload);
@@ -1072,15 +1098,19 @@ export function Signup() {
 const parseSafeDate = (dateStr) => {
   if (!dateStr || dateStr === "N/A" || dateStr === "undefined" || String(dateStr).toUpperCase() === "TBA") return null;
   let cleanStr = String(dateStr).replace(/,/g, '').replace(/\s+/g, ' ').trim();
+  
+  // 1. Try standard formatting first (Perfectly handles MM/DD/YYYY from Google Sheets)
+  let parsedDate = new Date(cleanStr);
+  if (!isNaN(parsedDate.getTime())) return parsedDate;
+
+  // 2. Fallback for strict Indian DD/MM/YYYY if standard parsing fails
   let parts = cleanStr.split(/[-/]/);
-  let parsedDate;
   if (parts.length === 3) {
-      if (parts[0].length <= 2) parsedDate = new Date(parts[2], parts[1] - 1, parts[0]); // Fixes DD/MM/YYYY
-      else parsedDate = new Date(parts[0], parts[1] - 1, parts[2]); // Fixes YYYY/MM/DD
-  } else {
-      parsedDate = new Date(cleanStr);
+      parsedDate = new Date(parts[2], parts[1] - 1, parts[0]); 
+      if (!isNaN(parsedDate.getTime())) return parsedDate;
   }
-  return isNaN(parsedDate.getTime()) ? null : parsedDate;
+  
+  return null;
 };
 
 const isEventExpired = (dateStr) => {
@@ -2479,13 +2509,20 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                       let parsedDate = hist.dateStr || "Unknown";
                       let parsedTime = "";
                       try {
-                        const d = new Date(hist.timestamp);
-                        if(!isNaN(d)) {
-                           parsedDate = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                           parsedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        // Use safe parser to fix the Indian Date format
+                        const safeD = parseSafeDate(hist.dateStr);
+                        if (safeD) {
+                           parsedDate = safeD.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                        }
+                        
+                        // Extract time cleanly
+                        const timeMatch = String(hist.timestamp).match(/\d{1,2}:\d{2}:\d{2}\s?(AM|PM|am|pm)/);
+                        if (timeMatch) {
+                           parsedTime = timeMatch[0];
                         } else {
-                           parsedDate = hist.timestamp.split(' ')[0] || hist.timestamp;
-                           parsedTime = hist.timestamp.split(' ')[1] || "";
+                           const d = new Date(hist.timestamp);
+                           if (!isNaN(d)) parsedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                           else parsedTime = hist.timestamp.split(' ')[1] || "";
                         }
                       } catch(e) {}
                       let statusText = hist.rating >= 4 ? 'Good' : (hist.rating === 3 ? 'Average' : 'Poor');
@@ -2882,14 +2919,14 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                     <i className="ph ph-x" style={{ color: '#fff', fontSize: '1.2rem' }}></i>
                 </div>
 
-                {/* Fix: Prevent the image banner from shrinking */}
-                <div style={{ width: '100%', height: '250px', background: 'var(--bg-dark)', flexShrink: 0 }}>
+                {/* Fix: Prevent the image banner from shrinking and fix poster cropping */}
+                <div style={{ width: '100%', minHeight: '200px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
                   {/* FIX: Checking both possible property names for the Poster Link */}
                   {(currentDrivePopup?.posterLink || currentDrivePopup['Poster Link']) ? (
                     <img 
                        src={getDriveImageUrl(currentDrivePopup?.posterLink || currentDrivePopup['Poster Link'])} 
                        alt="Drive Poster" 
-                       style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                       style={{ width: '100%', maxHeight: '350px', objectFit: 'contain' }} 
                     />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e1b4b, #311042)', color: '#fff', fontSize: '1.5rem', fontWeight: 800 }}>
