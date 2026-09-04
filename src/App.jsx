@@ -557,8 +557,20 @@ const GlobalStyle = () => {
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-placement.ipcsglobal.info';
-const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
+const GLOBAL_LOGO_URL = talenzoLogo; // Master Talenzo Logo Override
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
+
+// 🛡️ SECURE API INTERCEPTOR: Automatically attaches the JWT token to every request
+axios.interceptors.request.use(
+  (config) => {
+    const token = getSafeLocalStorage('talentino_student_token', null);
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // ==========================================
 // COUNTER COMPONENT (For Statistics)
@@ -671,7 +683,7 @@ export function Login() {
       <div className="animate-pulse-glow" style={{ position: 'absolute', top: '25%', left: '5%', width: '380px', height: '380px', background: 'rgba(56, 189, 248, 0.08)', borderRadius: '50%', filter: 'blur(80px)', zIndex: 0, pointerEvents: 'none' }}></div>
 
       <div className="landing-nav">
-        <img src={GLOBAL_LOGO_URL} alt="IPCS Global" style={{ height: '40px' }} />
+        <img src={GLOBAL_LOGO_URL} alt="Talenzo" style={{ height: '50px', objectFit: 'contain' }} />
       </div>
       
       <div className="landing-grid">
@@ -806,11 +818,16 @@ export function Signup() {
   useEffect(() => {
     const fetchDynamicData = async () => {
       try {
-        const [courseRes, branchRes] = await Promise.all([ axios.get(`${API_BASE_URL}/api/auth/courses`), axios.get(`${API_BASE_URL}/api/auth/branches`) ]);
-        if (courseRes.data && courseRes.data.success && Array.isArray(courseRes.data.groupedCourses)) { setCourseList(courseRes.data.groupedCourses); }
-        if (branchRes.data && branchRes.data.success && Array.isArray(branchRes.data.groupedBranches)) { setBranchList(branchRes.data.groupedBranches); }
-      } catch (err) { console.error("Failed to fetch dynamic dropdowns:", err); } 
-      finally { setIsFetchingData(false); }
+        const courseRes = await axios.get(`${API_BASE_URL}/api/auth/courses`);
+        if (courseRes.data && courseRes.data.success) setCourseList(courseRes.data.groupedCourses || []);
+      } catch (err) { console.error("Course fetch failed:", err); }
+      
+      try {
+        const branchRes = await axios.get(`${API_BASE_URL}/api/auth/branches`);
+        if (branchRes.data && branchRes.data.success) setBranchList(branchRes.data.groupedBranches || []);
+      } catch (err) { console.error("Branch fetch failed:", err); }
+      
+      setIsFetchingData(false);
     };
     fetchDynamicData();
   }, []);
