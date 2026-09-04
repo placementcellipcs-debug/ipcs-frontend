@@ -557,7 +557,7 @@ const GlobalStyle = () => {
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-placement.ipcsglobal.info';
-const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN';
+const GLOBAL_LOGO_URL = 'https://lh3.googleusercontent.com/d/1VqmH9-l2lBHErJPW1tCjtCu-SrTEMPtN'; // Restored IPCS Logo
 const COVER_BANNER_URL = 'https://lh3.googleusercontent.com/d/1eiP135HOsuG3MEaEplNblmcLewjnKXp6';
 
 // 🛡️ SECURE API INTERCEPTOR: Automatically attaches the JWT token to every request
@@ -806,44 +806,46 @@ export function Login() {
   );
 }
 
+// Automatic Phone Number Cleaner
+const sanitizePhoneNumber = (val) => {
+  if (!val) return '';
+  let digits = String(val).replace(/\D/g, ''); // Remove +, spaces, dashes
+  if (digits.startsWith('91') && digits.length === 12) digits = digits.slice(2);
+  if (digits.startsWith('0') && digits.length === 11) digits = digits.slice(1);
+  return digits.slice(-10);
+};
+
 export function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState(null);
   
-  const [courseList, setCourseList] = useState([]);
-  const [branchList, setBranchList] = useState([]);
-  const [isFetchingData, setIsFetchingData] = useState(true);
-
-  // Fallback Data to prevent blank dropdowns during mass signups
-  const FALLBACK_COURSES = [
+  // ADDED FALLBACKS to prevent blank dropdowns during heavy load
+  const [courseList, setCourseList] = useState([
     { category: "Industrial Automation", courses: ["Automation Engineer", "PLC & SCADA Programming", "Robotics & Motion Control"] },
     { category: "Embedded Systems & IoT", courses: ["Embedded Systems", "IoT & Robotics", "Embedded Linux & ARM"] },
     { category: "Software Development", courses: ["Python Full Stack", "MERN Stack Development", "Java Full Stack"] },
     { category: "Digital Tech & Marketing", courses: ["Digital Marketing Executive", "Data Analyst", "Artificial Intelligence"] }
-  ];
-  const FALLBACK_BRANCHES = [
+  ]);
+  const [branchList, setBranchList] = useState([
     { region: "Karnataka", branches: ["Bangalore", "Mangalore", "Mysore"] },
     { region: "Kerala", branches: ["Kochi", "Calicut", "Trivandrum", "Kannur", "Thrissur", "Kottayam", "Palakkad", "Kollam", "Perinthalmanna", "Attingal", "Pathanamthitta"] },
     { region: "Tamil Nadu", branches: ["Chennai", "Coimbatore", "Tambaram", "Madurai", "Salem", "Trichy", "Tirunelveli", "Erode"] },
     { region: "International", branches: ["Dubai (UAE)", "Riyadh (Saudi Arabia)"] }
-  ];
+  ]);
+  const [isFetchingData, setIsFetchingData] = useState(true);
 
   useEffect(() => {
     const fetchDynamicData = async () => {
       try {
         const courseRes = await axios.get(`${API_BASE_URL}/api/auth/courses`);
-        if (courseRes.data && courseRes.data.success && Array.isArray(courseRes.data.groupedCourses) && courseRes.data.groupedCourses.length > 0) {
-            setCourseList(courseRes.data.groupedCourses);
-        } else { setCourseList(FALLBACK_COURSES); }
-      } catch (err) { setCourseList(FALLBACK_COURSES); }
+        if (courseRes.data && courseRes.data.success && courseRes.data.groupedCourses.length > 0) setCourseList(courseRes.data.groupedCourses);
+      } catch (err) {}
       
       try {
         const branchRes = await axios.get(`${API_BASE_URL}/api/auth/branches`);
-        if (branchRes.data && branchRes.data.success && Array.isArray(branchRes.data.groupedBranches) && branchRes.data.groupedBranches.length > 0) {
-            setBranchList(branchRes.data.groupedBranches);
-        } else { setBranchList(FALLBACK_BRANCHES); }
-      } catch (err) { setBranchList(FALLBACK_BRANCHES); }
+        if (branchRes.data && branchRes.data.success && branchRes.data.groupedBranches.length > 0) setBranchList(branchRes.data.groupedBranches);
+      } catch (err) {}
       
       setIsFetchingData(false);
     };
@@ -870,10 +872,10 @@ export function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     
-    // Automatically clean out spaces, dashes, and country codes (+91)
-    const cleanPhone = formData.phone.replace(/\D/g, '').slice(-10);
-    const cleanF1 = formData.friend1Phone.replace(/\D/g, '').slice(-10);
-    const cleanF2 = formData.friend2Phone.replace(/\D/g, '').slice(-10);
+    // Auto-clean spaces and +91 from phone numbers
+    const cleanPhone = sanitizePhoneNumber(formData.phone);
+    const cleanF1 = sanitizePhoneNumber(formData.friend1Phone);
+    const cleanF2 = sanitizePhoneNumber(formData.friend2Phone);
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { setStatus({ type: 'error', message: 'Please enter a valid email format.' }); return; }
     if (cleanPhone.length !== 10) { setStatus({ type: 'error', message: 'Your phone number must be exactly 10 digits.' }); return; }
@@ -900,7 +902,7 @@ export function Signup() {
       if (response.data.success) { setStatus({ type: 'success', message: 'Account created! Redirecting to login...' }); setTimeout(() => navigate('/'), 2500); }
     } catch (error) { setStatus({ type: 'error', message: error.response?.data?.message || 'Server Error.' }); }
   };
-
+  
   return (
     <div className="auth-wrapper" style={{ background: '#0b0f17' }}>
       <div className="profile-reg-card">
@@ -1099,11 +1101,11 @@ const parseSafeDate = (dateStr) => {
   if (!dateStr || dateStr === "N/A" || dateStr === "undefined" || String(dateStr).toUpperCase() === "TBA") return null;
   let cleanStr = String(dateStr).replace(/,/g, '').replace(/\s+/g, ' ').trim();
   
-  // 1. Try standard formatting first (Perfectly handles MM/DD/YYYY from Google Sheets)
+  // 1. Try standard Google Sheets formatting first (MM/DD/YYYY)
   let parsedDate = new Date(cleanStr);
   if (!isNaN(parsedDate.getTime())) return parsedDate;
 
-  // 2. Fallback for strict Indian DD/MM/YYYY if standard parsing fails
+  // 2. Fallback for strict Indian DD/MM/YYYY
   let parts = cleanStr.split(/[-/]/);
   if (parts.length === 3) {
       parsedDate = new Date(parts[2], parts[1] - 1, parts[0]); 
@@ -2509,13 +2511,11 @@ const handleStartExam = async (type, testNum = 1, isReview = false) => {
                       let parsedDate = hist.dateStr || "Unknown";
                       let parsedTime = "";
                       try {
-                        // Use safe parser to fix the Indian Date format
                         const safeD = parseSafeDate(hist.dateStr);
                         if (safeD) {
                            parsedDate = safeD.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
                         }
                         
-                        // Extract time cleanly
                         const timeMatch = String(hist.timestamp).match(/\d{1,2}:\d{2}:\d{2}\s?(AM|PM|am|pm)/);
                         if (timeMatch) {
                            parsedTime = timeMatch[0];
